@@ -27,6 +27,21 @@ const ProfileScreen = () => {
                 <div style={{ marginTop: '12px', display: 'inline-block', background: '#E8F5E9', color: '#2E7D32', padding: '4px 12px', borderRadius: '30px', fontSize: '0.75rem', fontWeight: 800 }}>
                     VERIFIED FARMER
                 </div>
+
+                <div style={{ display: 'flex', justifyContent: 'center', gap: '32px', marginTop: '30px' }}>
+                    <div style={{ textAlign: 'center' }}>
+                        <div style={{ fontSize: '1.25rem', fontWeight: 800, color: 'var(--primary)' }}>१२</div>
+                        <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', fontWeight: 600 }}>एकड जमीन<br />Acres</div>
+                    </div>
+                    <div style={{ textAlign: 'center' }}>
+                        <div style={{ fontSize: '1.25rem', fontWeight: 800, color: 'var(--primary)' }}>४५०</div>
+                        <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', fontWeight: 600 }}>क्रेडीट्स<br />Credits</div>
+                    </div>
+                    <div style={{ textAlign: 'center' }}>
+                        <div style={{ fontSize: '1.25rem', fontWeight: 800, color: 'var(--primary)' }}>५</div>
+                        <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', fontWeight: 600 }}>सक्रिय पिके<br />Active Crops</div>
+                    </div>
+                </div>
             </div>
 
             <div style={{ marginTop: '20px' }}>

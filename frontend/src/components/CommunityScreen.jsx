@@ -1,9 +1,10 @@
 import React from 'react';
 import { MessageCircle, Heart, Share2, Plus } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 
 const CommunityScreen = () => {
-    const posts = [
+    const [showCreate, setShowCreate] = React.useState(false);
+    const [posts, setPosts] = React.useState([
         {
             user: 'पाटील दादा / Patil Dada',
             location: 'सातारा',
@@ -20,7 +21,24 @@ const CommunityScreen = () => {
             likes: 85,
             comments: 32
         }
-    ];
+    ]);
+
+    const [newPost, setNewPost] = React.useState('');
+
+    const handlePost = () => {
+        if (!newPost.trim()) return;
+        const post = {
+            user: 'पाटील साहेब',
+            location: 'पुणे',
+            content: newPost,
+            en: 'Auto-translated text will appear here...',
+            likes: 0,
+            comments: 0
+        };
+        setPosts([post, ...posts]);
+        setNewPost('');
+        setShowCreate(false);
+    };
 
     return (
         <motion.div
@@ -31,10 +49,39 @@ const CommunityScreen = () => {
         >
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
                 <h2 className="marathi">समुदाय / Community</h2>
-                <button style={{ background: 'var(--primary)', color: 'white', border: 'none', padding: '10px 16px', borderRadius: '12px', display: 'flex', alignItems: 'center', gap: '8px', fontWeight: 700 }}>
-                    <Plus size={18} /> पोस्ट करा
+                <button
+                    onClick={() => setShowCreate(!showCreate)}
+                    style={{ background: 'var(--primary)', color: 'white', border: 'none', padding: '10px 16px', borderRadius: '12px', display: 'flex', alignItems: 'center', gap: '8px', fontWeight: 700 }}
+                >
+                    <Plus size={18} /> {showCreate ? 'बंद करा' : 'पोस्ट करा'}
                 </button>
             </div>
+
+            <AnimatePresence>
+                {showCreate && (
+                    <motion.div
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: 'auto', opacity: 1 }}
+                        exit={{ height: 0, opacity: 0 }}
+                        style={{ overflow: 'hidden', marginBottom: '20px' }}
+                    >
+                        <div style={{ background: 'white', padding: '20px', borderRadius: '20px', boxShadow: 'var(--shadow-subtle)' }}>
+                            <textarea
+                                value={newPost}
+                                onChange={(e) => setNewPost(e.target.value)}
+                                placeholder="तुमचे विचार सांगा... / Share your thoughts..."
+                                style={{ width: '100%', height: '100px', border: '1px solid #eee', borderRadius: '12px', padding: '12px', marginBottom: '12px', fontFamily: 'inherit' }}
+                            />
+                            <button
+                                onClick={handlePost}
+                                style={{ width: '100%', background: 'var(--primary)', color: 'white', border: 'none', padding: '12px', borderRadius: '12px', fontWeight: 700 }}
+                            >
+                                पोस्ट करा / Post
+                            </button>
+                        </div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
 
             {posts.map((post, i) => (
                 <div key={i} className="post-card">

@@ -3,6 +3,20 @@ import { Mic, X } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 const VoiceModal = ({ isOpen, onClose }) => {
+    const [status, setStatus] = React.useState('listening'); // listening, processing
+
+    React.useEffect(() => {
+        if (isOpen) {
+            const timer = setTimeout(() => {
+                setStatus('processing');
+            }, 3000);
+            return () => {
+                clearTimeout(timer);
+                setStatus('listening');
+            };
+        }
+    }, [isOpen]);
+
     if (!isOpen) return null;
 
     return (
@@ -18,17 +32,23 @@ const VoiceModal = ({ isOpen, onClose }) => {
                 <X size={24} />
             </button>
 
-            <div className="pulse-mic">
+            <div className="pulse-mic" style={{ animation: status === 'listening' ? 'pulse-ring 1.5s infinite' : 'none' }}>
                 <Mic size={48} color="var(--primary)" />
             </div>
 
-            <h2 className="marathi" style={{ fontSize: '1.5rem', marginBottom: '10px' }}>मी ऐकत आहे...</h2>
-            <p style={{ opacity: 0.8 }}>I am listening...</p>
-
-            <p style={{ marginTop: '40px', fontSize: '0.875rem', maxWidth: '250px' }}>
-                "आजचा गव्हाचा बाजार भाव काय आहे?" <br />
-                <span style={{ opacity: 0.6 }}>"What is today's wheat price?"</span>
+            <h2 className="marathi" style={{ fontSize: '1.5rem', marginBottom: '10px' }}>
+                {status === 'listening' ? 'मी ऐकत आहे...' : 'प्रक्रिया करत आहे...'}
+            </h2>
+            <p style={{ opacity: 0.8 }}>
+                {status === 'listening' ? 'I am listening...' : 'Processing your request...'}
             </p>
+
+            {status === 'listening' && (
+                <p style={{ marginTop: '40px', fontSize: '0.875rem', maxWidth: '250px' }}>
+                    "आजचा गव्हाचा बाजार भाव काय आहे?" <br />
+                    <span style={{ opacity: 0.6 }}>"What is today's wheat price?"</span>
+                </p>
+            )}
         </motion.div>
     );
 };

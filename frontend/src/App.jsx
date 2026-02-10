@@ -18,16 +18,20 @@ import {
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
-// Component Imports
+import LandingScreen from './components/LandingScreen';
+import FarmInfoScreen from './components/FarmInfoScreen';
 import MarketTicker from './components/MarketTicker';
 import VoiceModal from './components/VoiceModal';
 import CommunityScreen from './components/CommunityScreen';
 import ProfileScreen from './components/ProfileScreen';
+import CropAnalysis from './components/CropAnalysis';
 
 function App() {
+  const [onboarding, setOnboarding] = useState('landing'); // landing, farm_info, finished
   const [activeTab, setActiveTab] = useState('home'); // home, crops, community, profile
   const [screen, setScreen] = useState('home'); // home, recommendations, wheat_detail
   const [isVoiceOpen, setIsVoiceOpen] = useState(false);
+  const [lang, setLang] = useState('mr'); // mr or en
 
   const BottomNav = () => (
     <div className="bottom-nav">
@@ -57,12 +61,13 @@ function App() {
   const HomeScreen = () => (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="app-shell">
       <div className="top-bar">
-        <span className="title">CropAdvisor</span>
+        <span className="title" style={{ letterSpacing: '-0.5px' }}>CropAdvisor</span>
         <div className="right">
-          <span className="time">21:45</span>
-          <div className="lang">मर / EN</div>
-          <div onClick={() => setIsVoiceOpen(true)} style={{ cursor: 'pointer' }}>
-            <Mic size={24} color="var(--primary)" />
+          <div className="lang" onClick={() => setLang(lang === 'mr' ? 'en' : 'mr')} style={{ cursor: 'pointer', background: lang === 'mr' ? 'var(--primary)' : 'white', color: lang === 'mr' ? 'white' : 'var(--text-main)', padding: '6px 12px', border: '1px solid #eee' }}>
+            {lang === 'mr' ? 'मराठी' : 'English'}
+          </div>
+          <div onClick={() => setIsVoiceOpen(true)} style={{ cursor: 'pointer', background: 'white', padding: '8px', borderRadius: '50%', border: '1px solid #eee' }}>
+            <Mic size={20} color="var(--primary)" />
           </div>
         </div>
       </div>
@@ -98,8 +103,8 @@ function App() {
       </div>
 
       <div className="alert-card">
-        <div style={{ background: 'var(--secondary)', padding: '8px', borderRadius: '10px' }}>
-          <AlertTriangle size={20} color="white" />
+        <div style={{ background: 'var(--accent-yellow)', padding: '8px', borderRadius: '10px' }}>
+          <AlertTriangle size={20} color="var(--text-main)" />
         </div>
         <div>
           <div className="marathi">पुढच्या आठवड्यात उष्णतेचा धोका</div>
@@ -121,13 +126,13 @@ function App() {
             <span>60%</span>
           </div>
           <div className="progress-bar-container">
-            <div className="progress-bar" style={{ width: '60%', background: '#FBC02D' }}></div>
+            <div className="progress-bar" style={{ width: '60%', background: 'var(--accent-yellow)' }}></div>
           </div>
         </div>
       </div>
 
-      <div style={{ margin: '0 20px 20px', padding: '20px', background: 'var(--tip-bg)', borderRadius: '20px', display: 'flex', gap: '16px' }}>
-        <div style={{ background: 'white', padding: '10px', borderRadius: '12px', alignSelf: 'flex-start' }}>
+      <div style={{ margin: '0 20px 20px', padding: '20px', background: '#E8F5E9', borderRadius: '24px', display: 'flex', gap: '16px' }}>
+        <div style={{ background: 'white', padding: '10px', borderRadius: '12px', alignSelf: 'flex-start', boxShadow: 'var(--shadow-premium)' }}>
           <Lightbulb size={24} color="var(--primary)" />
         </div>
         <div>
@@ -137,7 +142,7 @@ function App() {
       </div>
 
       <button className="cta-btn" onClick={() => { setScreen('recommendations'); setActiveTab('crops'); }}>
-        <div className="marathi" style={{ fontSize: '1.1rem' }}>पीक शिफारसी मिळवा</div>
+        <div className="marathi" style={{ fontSize: '1.2rem' }}>पीक शिफारसी मिळवा 🌱</div>
         <div className="english-sub" style={{ color: 'rgba(255,255,255,0.8)' }}>Get Crop Recommendations</div>
       </button>
 
@@ -148,7 +153,7 @@ function App() {
   const RecommendationsScreen = () => (
     <motion.div initial={{ opacity: 0, x: 50 }} animate={{ opacity: 1, x: 0 }} className="app-shell" style={{ padding: '20px' }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '24px' }}>
-        <div onClick={() => { setScreen('home'); setActiveTab('home'); }} style={{ background: 'white', padding: '8px', borderRadius: '10px' }}>
+        <div onClick={() => { setScreen('home'); setActiveTab('home'); }} style={{ background: 'white', padding: '8px', borderRadius: '12px', boxShadow: 'var(--shadow-premium)' }}>
           <ChevronRight size={24} style={{ transform: 'rotate(180deg)' }} />
         </div>
         <h2 className="marathi">तुमच्यासाठी टॉप पीक / Top Crops</h2>
@@ -160,7 +165,7 @@ function App() {
       ].map(crop => (
         <div key={crop.id} className="crop-list-card" onClick={() => crop.id === 1 && setScreen('wheat_detail')}>
           <div className="crop-img-container" style={{ backgroundImage: `url(${crop.img})` }}>
-            <div className="rank-badge">#{crop.id} Top</div>
+            <div className="rank-badge">#{crop.id} Top Choice</div>
           </div>
           <div style={{ padding: '20px' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
@@ -170,7 +175,7 @@ function App() {
               </div>
               <div style={{ textAlign: 'right' }}>
                 <div style={{ fontWeight: 800, color: 'var(--primary)' }}>{crop.match}% Match</div>
-                <div style={{ fontSize: '0.75rem', color: 'white', background: crop.risk === 'Low' ? '#2E7D32' : '#FBC02D', padding: '2px 8px', borderRadius: '4px', marginTop: '4px' }}>{crop.risk} Risk</div>
+                <div style={{ fontSize: '0.75rem', color: 'white', background: crop.risk === 'Low' ? 'var(--primary)' : 'var(--accent-orange)', padding: '2px 8px', borderRadius: '4px', marginTop: '4px' }}>{crop.risk} Risk</div>
               </div>
             </div>
           </div>
@@ -187,12 +192,12 @@ function App() {
           <ChevronRight size={24} style={{ transform: 'rotate(180deg)' }} />
         </div>
       </div>
-      <div className="price-card">
+      <div className="price-card" style={{ borderRadius: 'var(--radius-lg)' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-          <div><h1 className="marathi">गहू • Wheat</h1><div className="msp-badge">MSP ₹2,275</div></div>
+          <div><h1 className="marathi">गहू • Wheat</h1><div className="msp-badge" style={{ background: '#E8F5E9', color: 'var(--primary-dark)' }}>MSP ₹2,275</div></div>
           <div style={{ textAlign: 'right' }}><div style={{ fontSize: '1.5rem', fontWeight: 800, color: 'var(--primary)' }}>₹2,400</div><div className="english-sub">Today's Price</div></div>
         </div>
-        <div style={{ padding: '16px', background: '#F1F8E9', borderRadius: '12px', display: 'flex', justifyContent: 'space-between' }}>
+        <div style={{ padding: '16px', background: 'var(--bg-field)', borderRadius: '12px', display: 'flex', justifyContent: 'space-between' }}>
           <div><div className="english-sub">Expected Profit/Acre</div><div style={{ fontWeight: 800, color: 'var(--primary-dark)' }}>₹15,000 - ₹20,000</div></div>
           <TrendingUp size={24} color="var(--primary)" />
         </div>
@@ -200,13 +205,18 @@ function App() {
       <div style={{ padding: '0 20px 20px' }}>
         <h3 className="marathi" style={{ marginBottom: '16px' }}>जोखीम विश्लेषण / Risk Analysis</h3>
         <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-          {[{ label: 'हवामान जोखीम / Weather', val: 'Low', perc: 20, color: '#2E7D32' }, { label: 'बाजार जोखीम / Market', val: 'Med', perc: 45, color: '#FBC02D' }].map((r, i) => (
+          {[{ label: 'हवामान जोखीम / Weather', val: 'Low', perc: 20, color: 'var(--primary)' }, { label: 'बाजार जोखीम / Market', val: 'Med', perc: 45, color: 'var(--accent-yellow)' }].map((r, i) => (
             <div key={i}>
               <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.875rem', fontWeight: 600, marginBottom: '6px' }}><span>{r.label}</span><span style={{ color: r.color }}>{r.val}</span></div>
               <div className="progress-bar-container"><div className="progress-bar" style={{ width: `${r.perc}%`, background: r.color }}></div></div>
             </div>
           ))}
         </div>
+      </div>
+
+      <div style={{ padding: '0 20px 40px' }}>
+        <h3 className="marathi" style={{ marginBottom: '16px' }}>पीक विश्लेषण / Crop Analysis</h3>
+        <CropAnalysis />
       </div>
       <BottomNav />
     </motion.div>
@@ -215,11 +225,22 @@ function App() {
   return (
     <div className="App">
       <AnimatePresence mode="wait">
-        {screen === 'home' && <HomeScreen key="home" />}
-        {screen === 'recommendations' && <RecommendationsScreen key="recs" />}
-        {screen === 'wheat_detail' && <DetailScreen key="detail" />}
-        {screen === 'community' && <CommunityScreen key="comm" />}
-        {screen === 'profile' && <ProfileScreen key="prof" />}
+        {onboarding === 'landing' && (
+          <LandingScreen key="landing" onNext={() => setOnboarding('farm_info')} />
+        )}
+        {onboarding === 'farm_info' && (
+          <FarmInfoScreen key="farm_info" onNext={() => setOnboarding('finished')} />
+        )}
+
+        {onboarding === 'finished' && (
+          <>
+            {screen === 'home' && <HomeScreen key="home" />}
+            {screen === 'recommendations' && <RecommendationsScreen key="recs" />}
+            {screen === 'wheat_detail' && <DetailScreen key="detail" />}
+            {screen === 'community' && <CommunityScreen key="comm" />}
+            {screen === 'profile' && <ProfileScreen key="prof" />}
+          </>
+        )}
       </AnimatePresence>
 
       <VoiceModal isOpen={isVoiceOpen} onClose={() => setIsVoiceOpen(false)} />
