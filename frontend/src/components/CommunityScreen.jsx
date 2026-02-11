@@ -1,6 +1,6 @@
 import React from 'react';
 import { MessageCircle, Heart, Share2, Plus } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion as Motion, AnimatePresence } from 'framer-motion';
 
 const CommunityScreen = () => {
     const [showCreate, setShowCreate] = React.useState(false);
@@ -41,7 +41,7 @@ const CommunityScreen = () => {
     };
 
     return (
-        <motion.div
+        <Motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             className="app-shell"
@@ -59,7 +59,7 @@ const CommunityScreen = () => {
 
             <AnimatePresence>
                 {showCreate && (
-                    <motion.div
+                    <Motion.div
                         initial={{ height: 0, opacity: 0 }}
                         animate={{ height: 'auto', opacity: 1 }}
                         exit={{ height: 0, opacity: 0 }}
@@ -79,7 +79,7 @@ const CommunityScreen = () => {
                                 पोस्ट करा / Post
                             </button>
                         </div>
-                    </motion.div>
+                    </Motion.div>
                 )}
             </AnimatePresence>
 
@@ -109,7 +109,7 @@ const CommunityScreen = () => {
                     </div>
                 </div>
             ))}
-        </motion.div>
+        </Motion.div>
     );
 };
 

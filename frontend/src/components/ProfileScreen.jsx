@@ -1,6 +1,6 @@
 import React from 'react';
 import { Settings, CreditCard, Shield, Map, LogOut, ChevronRight } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { motion as Motion } from 'framer-motion';
 
 const ProfileScreen = () => {
     const menuItems = [
@@ -11,7 +11,7 @@ const ProfileScreen = () => {
     ];
 
     return (
-        <motion.div
+        <Motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             className="app-shell"
@@ -63,7 +63,7 @@ const ProfileScreen = () => {
                     <LogOut size={20} /> लॉगआउट / Logout
                 </button>
             </div>
-        </motion.div>
+        </Motion.div>
     );
 };
 

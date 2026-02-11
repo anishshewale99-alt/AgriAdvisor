@@ -1,8 +1,7 @@
 import React from 'react';
-import { motion } from 'framer-motion';
-import { PieChart, TrendingUp, DollarSign, Sprout, Droplets, ThermometerSun } from 'lucide-react';
+import { TrendingUp, Droplets, ThermometerSun } from 'lucide-react';
 
-const CropAnalysis = ({ cropData }) => {
+const CropAnalysis = () => {
     return (
         <div className="analysis-viewer">
             {/* Market Trend Card */}
@@ -21,60 +20,8 @@ const CropAnalysis = ({ cropData }) => {
                 </div>
             </div>
 
-            {/* Soil Suitability */}
-            <div className="analysis-card">
-                <div className="card-header">
-                    <Sprout size={20} color="var(--primary)" />
-                    <h4 className="marathi">जमीन सुसंगतता / Soil Analysis</h4>
-                </div>
-                <div className="grid-2">
-                    <div className="stat-item">
-                        <span className="label">PH Level</span>
-                        <span className="value">6.5 - 7.5</span>
-                    </div>
-                    <div className="stat-item">
-                        <span className="label">Nitrogen</span>
-                        <span className="value">High</span>
-                    </div>
-                    <div className="stat-item">
-                        <span className="label">Moisture</span>
-                        <span className="value">40%</span>
-                    </div>
-                    <div className="stat-item">
-                        <span className="label">Organic Carbon</span>
-                        <span className="value">0.8%</span>
-                    </div>
-                </div>
-            </div>
-
-            {/* Financial Breakdown */}
-            <div className="analysis-card dark">
-                <div className="card-header">
-                    <DollarSign size={20} color="#fff" />
-                    <h4 className="marathi" style={{ color: '#fff' }}>खर्च आणि नफा / Cost & Profit</h4>
-                </div>
-                <div style={{ marginTop: '16px' }}>
-                    <div className="cost-row">
-                        <span>बियाणे / Seeds</span>
-                        <span>₹2,500</span>
-                    </div>
-                    <div className="cost-row">
-                        <span>खते / Fertilizers</span>
-                        <span>₹4,800</span>
-                    </div>
-                    <div className="cost-row">
-                        <span>मजुरी / Labor</span>
-                        <span>₹3,500</span>
-                    </div>
-                    <div className="total-profit-row">
-                        <span className="marathi">अपेक्षित नफा / Exp. Profit</span>
-                        <span style={{ color: '#81C784' }}>+₹18,500</span>
-                    </div>
-                </div>
-            </div>
-
             {/* Environmental Factors */}
-            <div className="grid-2" style={{ gap: '16px' }}>
+            <div className="grid-2" style={{ gap: '16px', marginBottom: '16px' }}>
                 <div className="mini-card">
                     <ThermometerSun size={20} color="#f59e0b" />
                     <div className="marathi">तापमान</div>
@@ -84,6 +31,20 @@ const CropAnalysis = ({ cropData }) => {
                     <Droplets size={20} color="#3b82f6" />
                     <div className="marathi">पाणी</div>
                     <div className="val">Medium</div>
+                </div>
+            </div>
+
+            {/* Risk Assessment / AI Insights Footer */}
+            <div className="analysis-card" style={{ border: '1px solid rgba(0,0,0,0.03)' }}>
+                <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)', lineHeight: '1.5' }}>
+                    <span style={{ fontWeight: 800, color: 'var(--primary)', display: 'block', marginBottom: '4px', fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                        AI Insights • जोखीम विश्लेषण
+                    </span>
+                    वर्तमान हवामान आणि बाजार कलानुसार, या पिकासाठी मध्यम जोखीम आहे. आगामी काळात किमती स्थिर राहण्याची शक्यता आहे.
+                    <br />
+                    <span style={{ fontSize: '0.8rem', opacity: 0.8, fontStyle: 'italic' }}>
+                        Risk is moderate based on current weather and market trends. Prices are expected to remain stable.
+                    </span>
                 </div>
             </div>
         </div>

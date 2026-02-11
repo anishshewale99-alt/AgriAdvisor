@@ -153,6 +153,33 @@ body {
   font-weight: 700;
 }
 
+.floating-next-btn {
+  position: fixed;
+  bottom: 32px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--primary-dark);
+  color: white;
+  padding: 14px 32px;
+  border-radius: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+  cursor: pointer;
+  z-index: 1200;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border: none;
+  min-width: 200px;
+  white-space: nowrap;
+}
+
+.floating-next-btn:active {
+  transform: translateX(-50%) scale(0.96);
+  opacity: 0.9;
+}
+
 /* Mobile Container Overrides */
 .app-shell {
   max-width: 480px;
@@ -200,6 +227,60 @@ body {
   border-radius: 20px;
   font-size: 0.75rem;
   font-weight: 700;
+}
+
+.lang-toggle {
+  display: flex;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  border-radius: 30px;
+  position: relative;
+  padding: 2px;
+  cursor: pointer;
+  width: 84px;
+  height: 32px;
+  user-select: none;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.04);
+}
+
+.toggle-slide {
+  position: absolute;
+  top: 2px;
+  bottom: 2px;
+  width: calc(50% - 2px);
+  background: var(--primary);
+  border-radius: 28px;
+  z-index: 1;
+}
+
+.lang-toggle span {
+  flex: 1;
+  text-align: center;
+  font-size: 0.7rem;
+  font-weight: 800;
+  z-index: 2;
+  transition: color 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  color: var(--text-muted);
+}
+
+.lang-toggle span.active {
+  color: white;
+}
+
+.speaker-fab {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(8px);
+  padding: 16px;
+  border-radius: 50%;
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  outline: none;
 }
 
 /* Market Ticker */
@@ -251,10 +332,11 @@ body {
 .weather-card {
   margin: 0 20px 20px;
   padding: 24px;
-  background: linear-gradient(135deg, var(--primary), var(--weather-teal));
+  background: white;
+  border: 1px solid rgba(0, 0, 0, 0.05);
   border-radius: var(--radius);
-  color: white;
-  box-shadow: 0 10px 25px rgba(46, 125, 50, 0.2);
+  color: #1f2937;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
 }
 
 .weather-header {
@@ -267,6 +349,7 @@ body {
   font-size: 3.5rem;
   font-weight: 800;
   line-height: 1;
+  color: var(--primary);
 }
 
 .weather-stats {
@@ -274,7 +357,7 @@ body {
   gap: 24px;
   margin-top: 20px;
   padding-top: 16px;
-  border-top: 1px solid rgba(255, 255, 255, 0.2);
+  border-top: 1px solid #eee;
   font-size: 0.875rem;
 }
 

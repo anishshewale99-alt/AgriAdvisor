@@ -1,6 +1,6 @@
 import React from 'react';
 import { Mic, X } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { motion as Motion } from 'framer-motion';
 
 const VoiceModal = ({ isOpen, onClose }) => {
     const [status, setStatus] = React.useState('listening'); // listening, processing
@@ -20,7 +20,7 @@ const VoiceModal = ({ isOpen, onClose }) => {
     if (!isOpen) return null;
 
     return (
-        <motion.div
+        <Motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             className="voice-modal"
@@ -49,7 +49,7 @@ const VoiceModal = ({ isOpen, onClose }) => {
                     <span style={{ opacity: 0.6 }}>"What is today's wheat price?"</span>
                 </p>
             )}
-        </motion.div>
+        </Motion.div>
     );
 };
 
