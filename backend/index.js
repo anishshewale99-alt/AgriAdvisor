@@ -15,8 +15,14 @@ app.get('/', (req, res) => {
     res.send('AgriAdvisor API is running...');
 });
 
+// Routes
+const postRoutes = require('./routes/posts');
+const cropRoutes = require('./routes/crops');
+app.use('/api/posts', postRoutes);
+app.use('/api/crops', cropRoutes);
+
 // Database Connection
-const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/agriadvisor';
+const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/agriadvisor';
 mongoose.connect(MONGODB_URI)
     .then(() => console.log('MongoDB connected successfully'))
     .catch(err => console.error('MongoDB connection error:', err));
