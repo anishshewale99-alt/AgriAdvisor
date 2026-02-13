@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { motion as Motion, AnimatePresence } from 'framer-motion';
 import { LogIn, Phone, Rocket, Languages, Volume2, ArrowRight } from 'lucide-react';
 import FarmPattern from '../assets/image.png';
-import LandingImg from '../assets/landing img.jpg';
+import LandingImg from '../assets/landing 2.webp';
 import '../styles/LandingScreen.css';
 
 const LandingScreen = ({ onNext, isDesktop }) => {
