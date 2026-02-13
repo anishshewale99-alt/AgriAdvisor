@@ -1,6 +1,7 @@
 import React from 'react';
 import { Mic, X } from 'lucide-react';
 import { motion as Motion } from 'framer-motion';
+import '../styles/VoiceModal.css';
 
 const VoiceModal = ({ isOpen, onClose }) => {
     const [status, setStatus] = React.useState('listening'); // listening, processing

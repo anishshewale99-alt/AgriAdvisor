@@ -1,0 +1,23 @@
+
+> client@0.0.0 lint
+> eslint .
+
+
+C:\Users\Admin\Desktop\AgriAdvisior\frontend\src\components\DesktopSidebar.jsx
+  3:10  error  'motion' is defined but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+  5:92  error  'lang' is defined but never used                                               no-unused-vars
+  5:98  error  'setLang' is defined but never used                                            no-unused-vars
+
+C:\Users\Admin\Desktop\AgriAdvisior\frontend\src\pages\CropRecommendationScreen.jsx
+  7:69  error  'farmInfo' is assigned a value but never used  no-unused-vars
+  7:84  error  'isDesktop' is defined but never used          no-unused-vars
+
+C:\Users\Admin\Desktop\AgriAdvisior\frontend\src\pages\LandingScreen.jsx
+  10:23  error  'setIsEnglish' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+
+C:\Users\Admin\Desktop\AgriAdvisior\frontend\src\pages\SettingsScreen.jsx
+  14:27  error  'darkMode' is defined but never used       no-unused-vars
+  14:49  error  'setIsDarkMode' is defined but never used  no-unused-vars
+
+✖ 8 problems (8 errors, 0 warnings)
+

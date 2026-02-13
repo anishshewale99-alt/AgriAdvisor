@@ -2,15 +2,16 @@ import React, { useState } from 'react';
 import { Volume2, TrendingUp, Filter, ChevronDown } from 'lucide-react';
 import { motion as Motion } from 'framer-motion';
 import { cropData } from '../cropData';
+import '../styles/CropRecommendationScreen.css';
 
-const CropRecommendationScreen = ({ onSelectCrop, lang, isDarkMode, farmInfo = {} }) => {
+const CropRecommendationScreen = ({ onSelectCrop, lang, isDarkMode, farmInfo = {}, isDesktop }) => {
     const [filters, setFilters] = useState({
         soil: 'All',
         season: 'All',
         water: 'All'
     });
-    const [isEnglish, setIsEnglish] = useState(false);
     const [isSpeaking, setIsSpeaking] = useState(false);
+    const isEn = lang === 'en';
 
     // Filter crops based on manual filters
     const filteredCrops = cropData.filter(crop => {
@@ -41,8 +42,6 @@ const CropRecommendationScreen = ({ onSelectCrop, lang, isDarkMode, farmInfo = {
         ]
     };
 
-
-
     const handleSpeak = () => {
         if (window.speechSynthesis.speaking) {
             window.speechSynthesis.cancel();
@@ -50,10 +49,10 @@ const CropRecommendationScreen = ({ onSelectCrop, lang, isDarkMode, farmInfo = {
             return;
         }
 
-        let text = isEnglish ? 'Top Crops for You. ' : 'तुमच्यासाठी टॉप पिके. ';
+        let text = isEn ? 'Top Crops for You. ' : 'तुमच्यासाठी टॉप पिके. ';
 
         filteredCrops.forEach((crop, index) => {
-            if (isEnglish) {
+            if (isEn) {
                 text += `Number ${index + 1}, ${crop.englishName}, Match ${crop.matchScore} percent. `;
             } else {
                 text += `क्रमांक ${index + 1}, ${crop.marathiName}, जुळणी ${crop.matchScore} टक्के. `;
@@ -61,7 +60,7 @@ const CropRecommendationScreen = ({ onSelectCrop, lang, isDarkMode, farmInfo = {
         });
 
         const utterance = new SpeechSynthesisUtterance(text);
-        utterance.lang = isEnglish ? 'en-US' : 'mr-IN';
+        utterance.lang = isEn ? 'en-US' : 'mr-IN';
 
         utterance.onend = () => setIsSpeaking(false);
         utterance.onerror = () => setIsSpeaking(false);
@@ -73,7 +72,6 @@ const CropRecommendationScreen = ({ onSelectCrop, lang, isDarkMode, farmInfo = {
     return (
         <div style={{
             width: '100%',
-            maxWidth: '580px', // Increased to accommodate wider inner card
             margin: '0 auto',
             padding: '0 20px 40px'
         }}>
@@ -81,10 +79,9 @@ const CropRecommendationScreen = ({ onSelectCrop, lang, isDarkMode, farmInfo = {
             <div style={{
                 background: isDarkMode ? '#111827' : 'white',
                 borderRadius: '24px',
-                padding: '24px', // Increased to p-6 (24px all around)
+                padding: '24px',
                 boxShadow: isDarkMode ? '0 10px 40px rgba(0,0,0,0.3)' : '0 10px 40px rgba(0,0,0,0.04)',
                 width: '100%',
-                maxWidth: '540px', // Increased max-width
                 margin: '0 auto',
                 border: isDarkMode ? '1px solid #374151' : '1px solid #f0f0f0',
                 color: isDarkMode ? '#f3f4f6' : '#111827'
@@ -94,7 +91,7 @@ const CropRecommendationScreen = ({ onSelectCrop, lang, isDarkMode, farmInfo = {
                     display: 'flex',
                     justifyContent: 'space-between',
                     alignItems: 'flex-start',
-                    marginBottom: '24px', // Breathing room between title and filters
+                    marginBottom: '24px',
                     padding: '0 8px'
                 }}>
                     <div>
@@ -103,7 +100,7 @@ const CropRecommendationScreen = ({ onSelectCrop, lang, isDarkMode, farmInfo = {
                             color: isDarkMode ? '#fff' : 'var(--primary-dark)',
                             lineHeight: 1.1
                         }}>
-                            {isEnglish ? 'Top Crops for You' : 'तुमच्यासाठी टॉप पिके'}
+                            {isEn ? 'Top Crops for You' : 'तुमच्यासाठी टॉप पिके'}
                         </h2>
                         <span style={{
                             fontSize: '0.9rem',
@@ -112,49 +109,11 @@ const CropRecommendationScreen = ({ onSelectCrop, lang, isDarkMode, farmInfo = {
                             display: 'block',
                             marginTop: '4px'
                         }}>
-                            {isEnglish ? 'तुमच्यासाठी टॉप पिके' : 'Top Crops for You'}
+                            {isEn ? 'तुमच्यासाठी टॉप पिके' : 'Top Crops for You'}
                         </span>
                     </div>
 
                     <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                        {/* Language Toggle Pill */}
-                        <div
-                            onClick={() => setIsEnglish(!isEnglish)}
-                            style={{
-                                display: 'flex',
-                                alignItems: 'center',
-                                background: isDarkMode ? 'rgba(255,255,255,0.1)' : 'white',
-                                padding: '4px',
-                                borderRadius: '30px',
-                                cursor: 'pointer',
-                                border: isDarkMode ? '1px solid rgba(255,255,255,0.2)' : '1px solid #e5e7eb',
-                                boxShadow: '0 2px 8px rgba(0,0,0,0.05)'
-                            }}
-                        >
-                            <div style={{
-                                padding: '6px 12px',
-                                borderRadius: '20px',
-                                fontSize: '0.75rem',
-                                fontWeight: 700,
-                                background: !isEnglish ? '#16a34a' : 'transparent',
-                                color: !isEnglish ? 'white' : (isDarkMode ? '#9ca3af' : '#6b7280'),
-                                transition: 'all 0.2s ease'
-                            }}>
-                                MR
-                            </div>
-                            <div style={{
-                                padding: '6px 12px',
-                                borderRadius: '20px',
-                                fontSize: '0.75rem',
-                                fontWeight: 700,
-                                background: isEnglish ? '#16a34a' : 'transparent',
-                                color: isEnglish ? 'white' : (isDarkMode ? '#9ca3af' : '#6b7280'),
-                                transition: 'all 0.2s ease'
-                            }}>
-                                EN
-                            </div>
-                        </div>
-
                         {/* Speaker Icon */}
                         <div
                             onClick={handleSpeak}
@@ -188,11 +147,11 @@ const CropRecommendationScreen = ({ onSelectCrop, lang, isDarkMode, farmInfo = {
                                 style={{
                                     width: '100%',
                                     appearance: 'none',
-                                    WebkitAppearance: 'none', // For Safari
+                                    WebkitAppearance: 'none',
                                     backgroundColor: isDarkMode ? '#1f2937' : '#f3f4f6',
                                     color: isDarkMode ? '#fff' : '#1f2937',
                                     padding: '10px 12px',
-                                    paddingRight: '32px', // Space for chevron
+                                    paddingRight: '32px',
                                     borderRadius: '12px',
                                     border: isDarkMode ? '1px solid #4b5563' : '1px solid #e5e7eb',
                                     outline: 'none',
@@ -204,7 +163,7 @@ const CropRecommendationScreen = ({ onSelectCrop, lang, isDarkMode, farmInfo = {
                             >
                                 {filterOptions[key].map(opt => (
                                     <option key={opt.val} value={opt.val}>
-                                        {isEnglish ? opt.en : opt.mr}
+                                        {isEn ? opt.en : opt.mr}
                                     </option>
                                 ))}
                             </select>
@@ -224,7 +183,7 @@ const CropRecommendationScreen = ({ onSelectCrop, lang, isDarkMode, farmInfo = {
                 </div>
 
                 {/* Crop List */}
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}> {/* Increased gap to 20px */}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
                     {filteredCrops.length > 0 ? (
                         filteredCrops.map((crop) => (
                             <Motion.div
@@ -234,7 +193,7 @@ const CropRecommendationScreen = ({ onSelectCrop, lang, isDarkMode, farmInfo = {
                                 style={{
                                     background: isDarkMode ? '#1f2937' : '#fff',
                                     borderRadius: '20px',
-                                    padding: '24px', // Increased padding
+                                    padding: '24px',
                                     boxShadow: '0 4px 12px rgba(0,0,0,0.03)',
                                     border: isDarkMode ? '1px solid #4a5568' : '1px solid #f5f5f5',
                                     cursor: 'pointer'
@@ -267,14 +226,14 @@ const CropRecommendationScreen = ({ onSelectCrop, lang, isDarkMode, farmInfo = {
                                                     lineHeight: 1.2,
                                                     fontWeight: 700
                                                 }}>
-                                                    {isEnglish ? crop.englishName : crop.marathiName}
+                                                    {isEn ? crop.englishName : crop.marathiName}
                                                 </h3>
                                                 <p style={{
                                                     fontSize: '0.8rem',
                                                     color: isDarkMode ? '#9ca3af' : 'var(--text-muted)',
                                                     marginTop: '2px'
                                                 }}>
-                                                    {isEnglish ? crop.marathiName : crop.englishName}
+                                                    {isEn ? crop.marathiName : crop.englishName}
                                                 </p>
                                             </div>
                                         </div>
@@ -308,10 +267,10 @@ const CropRecommendationScreen = ({ onSelectCrop, lang, isDarkMode, farmInfo = {
                                         }}>
                                             <div style={{ display: 'flex', flexDirection: 'column' }}>
                                                 <span className="marathi" style={{ lineHeight: 1.2 }}>
-                                                    {isEnglish ? 'Match' : 'जुळणी'}
+                                                    {isEn ? 'Match' : 'जुळणी'}
                                                 </span>
-                                                <span style={{ fontSize: '0.65rem', color: isDarkMode ? '#9ca3af' : '#9ca3af', fontWeight: 400 }}>
-                                                    {isEnglish ? 'जुळणी' : 'Match'}
+                                                <span style={{ fontSize: '0.65rem', color: '#9ca3af', fontWeight: 400 }}>
+                                                    {isEn ? 'जुळणी' : 'Match'}
                                                 </span>
                                             </div>
                                             <span style={{ color: 'var(--primary)' }}>{crop.matchScore}%</span>
@@ -337,19 +296,22 @@ const CropRecommendationScreen = ({ onSelectCrop, lang, isDarkMode, farmInfo = {
 
                                     {/* Row 3: Tags */}
                                     <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
-                                        {crop.tags.slice(0, 2).map((tag, idx) => (
-                                            <div key={idx} style={{
-                                                background: tag.includes('Low') ? 'rgba(46, 125, 50, 0.08)' : 'rgba(255, 152, 0, 0.08)',
-                                                color: tag.includes('Low') ? '#2E7D32' : '#F57C00',
-                                                padding: '4px 10px',
-                                                borderRadius: '20px',
-                                                fontSize: '0.65rem',
-                                                fontWeight: 700,
-                                                border: tag.includes('Low') ? '1px solid rgba(46, 125, 50, 0.1)' : '1px solid rgba(255, 152, 0, 0.1)'
-                                            }}>
-                                                {tag}
-                                            </div>
-                                        ))}
+                                        {crop.tags.slice(0, 2).map((tag, idx) => {
+                                            const isSuccess = tag.includes('Resistant') || tag.includes('Staple') || tag.includes('Quality') || tag.includes('Low');
+                                            return (
+                                                <div key={idx} style={{
+                                                    background: isSuccess ? 'rgba(46, 125, 50, 0.08)' : 'rgba(255, 152, 0, 0.08)',
+                                                    color: isSuccess ? '#2E7D32' : '#F57C00',
+                                                    padding: '4px 10px',
+                                                    borderRadius: '20px',
+                                                    fontSize: '0.65rem',
+                                                    fontWeight: 700,
+                                                    border: isSuccess ? '1px solid rgba(46, 125, 50, 0.1)' : '1px solid rgba(255, 152, 0, 0.1)'
+                                                }}>
+                                                    {tag}
+                                                </div>
+                                            );
+                                        })}
                                     </div>
                                 </div>
                             </Motion.div>
@@ -360,10 +322,10 @@ const CropRecommendationScreen = ({ onSelectCrop, lang, isDarkMode, farmInfo = {
                             padding: '40px 20px'
                         }}>
                             <h3 className="marathi" style={{ color: isDarkMode ? '#fff' : '#374151', marginBottom: '10px', fontSize: '1rem' }}>
-                                {isEnglish ? 'No crops found.' : 'पिके आढळली नाहीत.'}
+                                {isEn ? 'No crops found.' : 'पिके आढळली नाहीत.'}
                             </h3>
                             <p className="english-sub" style={{ color: isDarkMode ? '#9ca3af' : '#6b7280', fontSize: '0.8rem' }}>
-                                {isEnglish ? 'Try changing the filters.' : 'फिल्टर्स बदलून पहा.'}
+                                {isEn ? 'Try changing the filters.' : 'फिल्टर्स बदलून पहा.'}
                             </p>
                         </div>
                     )}

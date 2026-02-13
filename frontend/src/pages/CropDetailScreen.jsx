@@ -12,6 +12,7 @@ import {
     ChevronLeft
 } from 'lucide-react';
 import { motion as Motion } from 'framer-motion';
+import '../styles/CropDetailScreen.css';
 
 const IconMap = {
     Sun: Sun,
@@ -30,7 +31,6 @@ const CropDetailScreen = ({ crop, onBack, isDarkMode }) => {
             exit={{ opacity: 0, y: 20 }}
             style={{
                 width: '100%',
-                maxWidth: '480px',
                 margin: '0 auto',
                 paddingBottom: '40px'
             }}

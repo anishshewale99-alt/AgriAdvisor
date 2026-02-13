@@ -1,15 +1,13 @@
 import React, { useState } from 'react';
 import { User, Sprout, Droplets, CloudRain, Tractor, Edit2 } from 'lucide-react';
 import { motion as Motion } from 'framer-motion';
+import '../styles/ProfileScreen.css';
 
-const ProfileScreen = ({ darkMode, farmDetails }) => {
+const ProfileScreen = ({ darkMode, farmDetails, isDesktop }) => {
     const [isEnglish, setIsEnglish] = useState(false);
 
     // Fallback data if farmDetails is missing
-    // Fallback data if farmDetails is missing
     const details = farmDetails || {};
-
-
 
     return (
         <Motion.div
@@ -17,7 +15,6 @@ const ProfileScreen = ({ darkMode, farmDetails }) => {
             animate={{ opacity: 1 }}
             style={{
                 width: '100%',
-                maxWidth: '540px',
                 margin: '0 auto',
                 padding: '20px',
                 paddingBottom: '100px',
@@ -52,46 +49,48 @@ const ProfileScreen = ({ darkMode, farmDetails }) => {
                     border: '1px solid rgba(255,255,255,0.1)',
                     position: 'relative'
                 }}>
-                    {/* Language Toggle */}
-                    <div
-                        onClick={() => setIsEnglish(!isEnglish)}
-                        style={{
-                            position: 'absolute',
-                            top: '20px',
-                            right: '20px',
-                            background: 'rgba(255, 255, 255, 0.2)',
-                            backdropFilter: 'blur(10px)',
-                            padding: '4px',
-                            borderRadius: '100px',
-                            display: 'flex',
-                            cursor: 'pointer',
-                            border: '1px solid rgba(255, 255, 255, 0.3)',
-                            zIndex: 10
-                        }}
-                    >
-                        <div style={{
-                            padding: '6px 12px',
-                            borderRadius: '100px',
-                            fontSize: '0.75rem',
-                            fontWeight: '700',
-                            background: !isEnglish ? 'white' : 'transparent',
-                            color: !isEnglish ? '#166534' : 'rgba(255,255,255,0.8)',
-                            transition: 'all 0.2s ease'
-                        }}>
-                            MR
+                    {/* Language Toggle - only on mobile */}
+                    {!isDesktop && (
+                        <div
+                            onClick={() => setIsEnglish(!isEnglish)}
+                            style={{
+                                position: 'absolute',
+                                top: '20px',
+                                right: '20px',
+                                background: 'rgba(255, 255, 255, 0.2)',
+                                backdropFilter: 'blur(10px)',
+                                padding: '4px',
+                                borderRadius: '100px',
+                                display: 'flex',
+                                cursor: 'pointer',
+                                border: '1px solid rgba(255, 255, 255, 0.3)',
+                                zIndex: 10
+                            }}
+                        >
+                            <div style={{
+                                padding: '6px 12px',
+                                borderRadius: '100px',
+                                fontSize: '0.75rem',
+                                fontWeight: '700',
+                                background: !isEnglish ? 'white' : 'transparent',
+                                color: !isEnglish ? '#166534' : 'rgba(255,255,255,0.8)',
+                                transition: 'all 0.2s ease'
+                            }}>
+                                MR
+                            </div>
+                            <div style={{
+                                padding: '6px 12px',
+                                borderRadius: '100px',
+                                fontSize: '0.75rem',
+                                fontWeight: '700',
+                                background: isEnglish ? 'white' : 'transparent',
+                                color: isEnglish ? '#166534' : 'rgba(255,255,255,0.8)',
+                                transition: 'all 0.2s ease'
+                            }}>
+                                EN
+                            </div>
                         </div>
-                        <div style={{
-                            padding: '6px 12px',
-                            borderRadius: '100px',
-                            fontSize: '0.75rem',
-                            fontWeight: '700',
-                            background: isEnglish ? 'white' : 'transparent',
-                            color: isEnglish ? '#166534' : 'rgba(255,255,255,0.8)',
-                            transition: 'all 0.2s ease'
-                        }}>
-                            EN
-                        </div>
-                    </div>
+                    )}
 
                     <div style={{
                         width: '80px',

@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { Volume2, Droplets, CloudOff, ChevronRight, ChevronLeft, CloudRain, Snowflake, Sun, CalendarRange } from 'lucide-react';
 import FarmPattern from '../assets/bg2.png';
+import '../styles/FarmInfoScreen.css';
 
-const FarmInfoScreen = ({ onNext, onBack, farmInfo, setFarmInfo }) => {
+const FarmInfoScreen = ({ onNext, onBack, farmInfo, setFarmInfo, isDesktop }) => {
     const { acres, soil, irrigation, season: plantingSeason } = farmInfo;
 
     // Helper to update farmInfo state
@@ -74,9 +75,8 @@ const FarmInfoScreen = ({ onNext, onBack, farmInfo, setFarmInfo }) => {
             flexDirection: 'column',
             alignItems: 'center'
         }}>
-            <div className="top-bar" style={{
+            <div className="top-bar content-card" style={{
                 width: '100%',
-                maxWidth: '540px',
                 background: isScrolled ? 'white' : 'transparent',
                 boxShadow: isScrolled ? '0 4px 20px rgba(0,0,0,0.08)' : 'none',
                 position: 'fixed',
@@ -113,49 +113,51 @@ const FarmInfoScreen = ({ onNext, onBack, farmInfo, setFarmInfo }) => {
                     </div>
 
                     <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                        <div
-                            onClick={() => setIsEnglish(!isEnglish)}
-                            style={{
-                                display: 'flex',
-                                alignItems: 'center',
-                                background: isScrolled ? '#f3f4f6' : 'rgba(255,255,255,0.2)',
-                                padding: '3px',
-                                borderRadius: '30px',
-                                cursor: 'pointer',
-                                position: 'relative',
-                                width: '90px',
-                                height: '40px',
-                                border: isScrolled ? '1px solid #eee' : '1px solid rgba(255,255,255,0.3)',
-                                transition: 'all 0.3s ease'
-                            }}
-                        >
-                            <div style={{
-                                position: 'absolute',
-                                left: isEnglish ? '48px' : '3px',
-                                width: '39px',
-                                height: '34px',
-                                background: 'var(--primary)',
-                                borderRadius: '25px',
-                                transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-                                zIndex: 1
-                            }} />
-                            <span style={{
-                                flex: 1,
-                                textAlign: 'center',
-                                fontSize: '0.85rem',
-                                fontWeight: 800,
-                                zIndex: 2,
-                                color: !isEnglish ? 'white' : (isScrolled ? 'var(--text-muted)' : 'rgba(255,255,255,0.8)')
-                            }}>MR</span>
-                            <span style={{
-                                flex: 1,
-                                textAlign: 'center',
-                                fontSize: '0.85rem',
-                                fontWeight: 800,
-                                zIndex: 2,
-                                color: isEnglish ? 'white' : (isScrolled ? 'var(--text-muted)' : 'rgba(255,255,255,0.8)')
-                            }}>EN</span>
-                        </div>
+                        {!isDesktop && (
+                            <div
+                                onClick={() => setIsEnglish(!isEnglish)}
+                                style={{
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    background: isScrolled ? '#f3f4f6' : 'rgba(255,255,255,0.2)',
+                                    padding: '3px',
+                                    borderRadius: '30px',
+                                    cursor: 'pointer',
+                                    position: 'relative',
+                                    width: '90px',
+                                    height: '40px',
+                                    border: isScrolled ? '1px solid #eee' : '1px solid rgba(255,255,255,0.3)',
+                                    transition: 'all 0.3s ease'
+                                }}
+                            >
+                                <div style={{
+                                    position: 'absolute',
+                                    left: isEnglish ? '48px' : '3px',
+                                    width: '39px',
+                                    height: '34px',
+                                    background: 'var(--primary)',
+                                    borderRadius: '25px',
+                                    transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                                    zIndex: 1
+                                }} />
+                                <span style={{
+                                    flex: 1,
+                                    textAlign: 'center',
+                                    fontSize: '0.85rem',
+                                    fontWeight: 800,
+                                    zIndex: 2,
+                                    color: !isEnglish ? 'white' : (isScrolled ? 'var(--text-muted)' : 'rgba(255,255,255,0.8)')
+                                }}>MR</span>
+                                <span style={{
+                                    flex: 1,
+                                    textAlign: 'center',
+                                    fontSize: '0.85rem',
+                                    fontWeight: 800,
+                                    zIndex: 2,
+                                    color: isEnglish ? 'white' : (isScrolled ? 'var(--text-muted)' : 'rgba(255,255,255,0.8)')
+                                }}>EN</span>
+                            </div>
+                        )}
                         <div
                             onClick={handleSpeak}
                             style={{
@@ -176,10 +178,9 @@ const FarmInfoScreen = ({ onNext, onBack, farmInfo, setFarmInfo }) => {
                     </div>
                 </div>
             </div>
-            <div className="app-shell" style={{
+            <div className="app-shell content-card" style={{
                 background: 'transparent',
                 width: '100%',
-                maxWidth: '540px',
                 padding: '24px',
                 minHeight: '100vh',
                 paddingTop: '80px'

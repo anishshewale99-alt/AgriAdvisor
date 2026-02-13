@@ -1,0 +1,28 @@
+/* Crop Recommendation Styles */
+.crop-list-card {
+    background: white;
+    margin-bottom: 24px;
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+    cursor: pointer;
+}
+
+.crop-img-container {
+    height: 200px;
+    width: 100%;
+    background-size: cover;
+    background-position: center;
+    position: relative;
+}
+
+.rank-badge {
+    position: absolute;
+    top: 16px;
+    left: 16px;
+    background: var(--primary);
+    color: white;
+    padding: 6px 12px;
+    border-radius: 10px;
+    font-weight: 800;
+}

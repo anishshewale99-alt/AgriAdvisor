@@ -1,0 +1,68 @@
+/* Home Screen Styles */
+.season-chip {
+    display: inline-flex;
+    background: white;
+    padding: 6px 16px;
+    border-radius: 30px;
+    margin: 16px 20px 16px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    border: 1px solid #eee;
+}
+
+.weather-card {
+    margin: 0 20px 20px;
+    padding: 24px;
+    background: white;
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    border-radius: var(--radius-md);
+    color: #1f2937;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+}
+
+.weather-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+.weather-temp {
+    font-size: 3.5rem;
+    font-weight: 800;
+    line-height: 1;
+    color: var(--primary);
+}
+
+.weather-stats {
+    display: flex;
+    gap: 24px;
+    margin-top: 20px;
+    padding-top: 16px;
+    border-top: 1px solid #eee;
+    font-size: 0.875rem;
+}
+
+.alert-card {
+    margin: 0 20px 20px;
+    padding: 16px;
+    background: #FFF9C4;
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    border: 1px solid #FFF176;
+}
+
+.insight-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin: 0 20px 20px;
+}
+
+.insight-card {
+    background: white;
+    padding: 20px;
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-premium);
+}
