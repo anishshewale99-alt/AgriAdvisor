@@ -19,31 +19,7 @@ const LandingScreen = ({ onNext }) => {
             padding: '20px',
             overflow: 'hidden'
         }}>
-            <div className="top-bar" style={{ background: 'transparent', position: 'absolute', top: 0, left: 0, width: '100%' }}>
-                <div style={{ flex: 1 }} />
-                <div className="right">
-                    <div
-                        className="lang-toggle"
-                        onClick={() => setIsEnglish(!isEnglish)}
-                    >
-                        <Motion.div
-                            className="toggle-slide"
-                            animate={{ left: isEnglish ? '50%' : '2px' }}
-                            transition={{ type: "spring", stiffness: 400, damping: 30 }}
-                        />
-                        <span className={!isEnglish ? 'active' : ''}>MR</span>
-                        <span className={isEnglish ? 'active' : ''}>EN</span>
-                    </div>
-                    <Motion.button
-                        whileHover={{ scale: 1.1 }}
-                        whileTap={{ scale: 0.95 }}
-                        onClick={() => { }}
-                        className="speaker-fab"
-                    >
-                        <Volume2 size={32} color="var(--primary)" />
-                    </Motion.button>
-                </div>
-            </div>
+
 
             <Motion.div
                 initial={{ y: 50, opacity: 0 }}

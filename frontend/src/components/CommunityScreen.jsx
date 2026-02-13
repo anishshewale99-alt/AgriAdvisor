@@ -45,7 +45,12 @@ const CommunityScreen = () => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             className="app-shell"
-            style={{ padding: '20px' }}
+            style={{
+                padding: '20px',
+                width: '100%',
+                maxWidth: '540px',
+                margin: '0 auto'
+            }}
         >
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
                 <h2 className="marathi">समुदाय / Community</h2>

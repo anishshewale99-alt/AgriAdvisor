@@ -1,12 +1,31 @@
 import React, { useState, useEffect } from 'react';
-import { Volume2, Droplets, CloudOff, ChevronRight } from 'lucide-react';
+import { Volume2, Droplets, CloudOff, ChevronRight, ChevronLeft, CloudRain, Snowflake, Sun, CalendarRange } from 'lucide-react';
 import FarmPattern from '../assets/bg2.png';
 
-const FarmInfoScreen = ({ onNext }) => {
-    const [acres, setAcres] = useState('2');
-    const [soil, setSoil] = useState('Black Cotton');
-    const [irrigation, setIrrigation] = useState(true);
+const FarmInfoScreen = ({ onNext, onBack, farmInfo, setFarmInfo }) => {
+    const { acres, soil, irrigation, season: plantingSeason } = farmInfo;
+
+    // Helper to update farmInfo state
+    const updateFarmInfo = (updates) => {
+        setFarmInfo(prev => ({ ...prev, ...updates }));
+    };
+
+    const setAcres = (val) => updateFarmInfo({ acres: val });
+    const setSoil = (val) => updateFarmInfo({ soil: val });
+    const setIrrigation = (val) => updateFarmInfo({ irrigation: val });
+    const setPlantingSeason = (val) => updateFarmInfo({ season: val });
+
     const [isSpeaking, setIsSpeaking] = useState(false);
+    const [isScrolled, setIsScrolled] = useState(false);
+    const [isEnglish, setIsEnglish] = useState(false);
+
+    useEffect(() => {
+        const handleScroll = () => {
+            setIsScrolled(window.scrollY > 50);
+        };
+        window.addEventListener('scroll', handleScroll);
+        return () => window.removeEventListener('scroll', handleScroll);
+    }, []);
 
     const handleSpeak = () => {
         if (window.speechSynthesis.speaking) {
@@ -15,8 +34,12 @@ const FarmInfoScreen = ({ onNext }) => {
             return;
         }
 
-        const textToRead = "Tell us about your farm. Farm size in acres. Soil type. Irrigation available?";
+        const textToRead = isEnglish
+            ? "Tell us about your farm. Select your farm size and soil type."
+            : "तुमच्या शेताची माहिती. कृपया आपल्या शेताचा आकार आणि मातीचा प्रकार निवडा.";
+
         const utterance = new SpeechSynthesisUtterance(textToRead);
+        utterance.lang = isEnglish ? 'en-US' : 'mr-IN';
 
         utterance.onend = () => setIsSpeaking(false);
         utterance.onerror = () => setIsSpeaking(false);
@@ -30,29 +53,136 @@ const FarmInfoScreen = ({ onNext }) => {
     }, []);
 
     const soilTypes = [
-        { id: 'Black Cotton', mr: 'काळी कापूस', en: 'Black Cotton', color: '#373B4D' },
-        { id: 'Red Soil', mr: 'लाल माती', en: 'Red Soil', color: '#8D5858' },
-        { id: 'Loamy', mr: 'चिकणमाती', en: 'Loamy', color: '#8D6E63' },
-        { id: 'Sandy', mr: 'वालुकामय', en: 'Sandy', color: '#FFD54F' },
+        { id: 'black', mr: 'काळी कापूस', en: 'Black Cotton', color: '#373B4D' },
+        { id: 'red', mr: 'लाल माती', en: 'Red Soil', color: '#8D5858' },
+        { id: 'loamy', mr: 'चिकणमाती', en: 'Loamy', color: '#8D6E63' },
+        { id: 'sandy', mr: 'वालुकामय', en: 'Sandy', color: '#FFD54F' },
+    ];
+
+    const seasons = [
+        { id: 'kharif', mr: 'खरीप', en: 'Kharif', icon: CloudRain, color: '#607D8B' },
+        { id: 'rabi', mr: 'रबी', en: 'Rabi', icon: Snowflake, color: '#03A9F4' },
+        { id: 'summer', mr: 'उन्हाळी', en: 'Summer', icon: Sun, color: '#FF9800' },
+        { id: 'all_year', mr: 'वर्षभर', en: 'All Year', icon: CalendarRange, color: '#4CAF50' },
     ];
 
     return (
         <div style={{
-            backgroundImage: `url(${FarmPattern})`,
-            backgroundRepeat: 'repeat',
-            backgroundSize: '400px',
             minHeight: '100vh',
             width: '100%',
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center'
         }}>
+            <div className="top-bar" style={{
+                width: '100%',
+                maxWidth: '540px',
+                background: isScrolled ? 'white' : 'transparent',
+                boxShadow: isScrolled ? '0 4px 20px rgba(0,0,0,0.08)' : 'none',
+                position: 'fixed',
+                top: 0,
+                transition: 'all 0.3s ease',
+                zIndex: 1000
+            }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', padding: '16px 20px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                        {onBack && (
+                            <button
+                                onClick={onBack}
+                                style={{
+                                    background: 'transparent',
+                                    border: 'none',
+                                    padding: '4px',
+                                    cursor: 'pointer',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    color: isScrolled ? 'var(--primary)' : 'white',
+                                    transition: 'all 0.3s ease',
+                                    marginLeft: '-8px'
+                                }}
+                            >
+                                <ChevronLeft size={24} />
+                            </button>
+                        )}
+                        <span className="title" style={{
+                            letterSpacing: '-0.5px',
+                            color: isScrolled ? 'var(--primary)' : 'white',
+                            transition: 'all 0.3s ease'
+                        }}>CropAdvisor</span>
+                    </div>
+
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                        <div
+                            onClick={() => setIsEnglish(!isEnglish)}
+                            style={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                background: isScrolled ? '#f3f4f6' : 'rgba(255,255,255,0.2)',
+                                padding: '3px',
+                                borderRadius: '30px',
+                                cursor: 'pointer',
+                                position: 'relative',
+                                width: '90px',
+                                height: '40px',
+                                border: isScrolled ? '1px solid #eee' : '1px solid rgba(255,255,255,0.3)',
+                                transition: 'all 0.3s ease'
+                            }}
+                        >
+                            <div style={{
+                                position: 'absolute',
+                                left: isEnglish ? '48px' : '3px',
+                                width: '39px',
+                                height: '34px',
+                                background: 'var(--primary)',
+                                borderRadius: '25px',
+                                transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                                zIndex: 1
+                            }} />
+                            <span style={{
+                                flex: 1,
+                                textAlign: 'center',
+                                fontSize: '0.85rem',
+                                fontWeight: 800,
+                                zIndex: 2,
+                                color: !isEnglish ? 'white' : (isScrolled ? 'var(--text-muted)' : 'rgba(255,255,255,0.8)')
+                            }}>MR</span>
+                            <span style={{
+                                flex: 1,
+                                textAlign: 'center',
+                                fontSize: '0.85rem',
+                                fontWeight: 800,
+                                zIndex: 2,
+                                color: isEnglish ? 'white' : (isScrolled ? 'var(--text-muted)' : 'rgba(255,255,255,0.8)')
+                            }}>EN</span>
+                        </div>
+                        <div
+                            onClick={handleSpeak}
+                            style={{
+                                background: isSpeaking ? 'var(--accent-orange)' : 'white',
+                                padding: '6px',
+                                borderRadius: '50%',
+                                color: isSpeaking ? 'white' : 'var(--primary)',
+                                cursor: 'pointer',
+                                transition: 'all 0.3s ease',
+                                boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center'
+                            }}
+                        >
+                            <Volume2 size={20} />
+                        </div>
+                    </div>
+                </div>
+            </div>
             <div className="app-shell" style={{
                 background: 'transparent',
                 width: '100%',
-                maxWidth: '480px',
+                maxWidth: '540px',
                 padding: '24px',
-                minHeight: '100vh'
+                minHeight: '100vh',
+                paddingTop: '80px'
             }}>
                 <div style={{
                     background: 'rgba(255, 255, 255, 0.95)',
@@ -65,87 +195,148 @@ const FarmInfoScreen = ({ onNext }) => {
                 }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '32px' }}>
                         <div>
-                            <h1 className="marathi" style={{ fontSize: '1.75rem', color: 'var(--primary-dark)' }}>तुमच्या शेताची माहिती</h1>
-                            <p className="english-sub" style={{ fontSize: '1rem' }}>Tell us about your farm</p>
-                        </div>
-                        <div
-                            onClick={handleSpeak}
-                            style={{
-                                background: isSpeaking ? 'var(--accent-orange)' : 'var(--primary)',
-                                padding: '12px',
-                                borderRadius: '50%',
-                                color: 'white',
-                                cursor: 'pointer',
-                                transition: 'all 0.3s ease',
-                                boxShadow: '0 4px 12px rgba(0,0,0,0.1)'
-                            }}
-                        >
-                            <Volume2 size={24} />
+                            <h1 className="marathi" style={{ fontSize: '1.75rem', color: '#1f2937' }}>
+                                {isEnglish ? 'Farm Information' : 'तुमच्या शेताची माहिती'}
+                            </h1>
+                            <p className="english-sub" style={{ fontSize: '1rem', color: '#6b7280' }}>
+                                {isEnglish ? 'Help us personalize your experience' : 'अनुभव अधिक प्रभावी करण्यासाठी माहिती द्या'}
+                            </p>
                         </div>
                     </div>
 
                     <div style={{ marginBottom: '32px' }}>
-                        <h2 className="marathi" style={{ fontSize: '1.25rem', marginBottom: '4px' }}>शेत आकार (एकर)</h2>
-                        <p className="english-sub">Farm size in acres</p>
+                        <h2 className="marathi" style={{ fontSize: '1.25rem', marginBottom: '4px', color: '#1f2937' }}>
+                            {isEnglish ? 'Farm Size (Acres)' : 'शेत आकार (एकर)'}
+                        </h2>
+                        <p className="english-sub" style={{ color: '#6b7280' }}>{isEnglish ? 'Select area in acres' : 'एकरमध्ये क्षेत्र निवडा'}</p>
                         <div className="pill-selector">
                             {['0.5', '1', '2', '3', '5+'].map(val => (
                                 <div
                                     key={val}
-                                    className={`pill-item ${acres === val ? 'active' : ''}`}
+                                    className="pill-item"
                                     onClick={() => setAcres(val)}
+                                    style={{
+                                        background: acres === val ? '#15803d' : '#f3f4f6',
+                                        color: acres === val ? 'white' : '#1f2937',
+                                        border: acres === val ? '2px solid #15803d' : '2px solid transparent'
+                                    }}
                                 >
-                                    {val}
+                                    {val} {isEnglish ? 'Acres' : 'एकर'}
                                 </div>
                             ))}
                         </div>
                     </div>
 
                     <div style={{ marginBottom: '32px' }}>
-                        <h2 className="marathi" style={{ fontSize: '1.25rem', marginBottom: '4px' }}>माती प्रकार</h2>
-                        <p className="english-sub">Soil type</p>
+                        <h2 className="marathi" style={{ fontSize: '1.25rem', marginBottom: '4px', color: '#1f2937' }}>
+                            {isEnglish ? 'Soil Type' : 'माती प्रकार'}
+                        </h2>
+                        <p className="english-sub" style={{ color: '#6b7280' }}>{isEnglish ? 'Select soil on your land' : 'तुमच्या जमिनीचा प्रकार निवडा'}</p>
                         <div className="selection-grid">
                             {soilTypes.map(type => (
                                 <div
                                     key={type.id}
-                                    className={`choice-card ${soil === type.id ? 'active' : ''}`}
+                                    className="choice-card"
                                     onClick={() => setSoil(type.id)}
+                                    style={{
+                                        background: soil === type.id ? '#15803d' : '#f3f4f6',
+                                        color: soil === type.id ? 'white' : '#1f2937',
+                                        border: soil === type.id ? '2px solid #15803d' : '2px solid transparent',
+                                        boxShadow: soil === type.id ? '0 8px 16px rgba(21, 128, 61, 0.2)' : 'none'
+                                    }}
                                 >
-                                    <div className="choice-icon-box" style={{ background: type.color }} />
+                                    <div className="choice-icon-box" style={{ background: type.color, opacity: soil === type.id ? 1 : 0.8 }} />
                                     <div>
-                                        <div className="marathi" style={{ fontSize: '0.9rem' }}>{type.mr}</div>
-                                        <div className="english-sub">{type.en}</div>
+                                        <div className="marathi" style={{ fontSize: '0.9rem', fontWeight: 700 }}>
+                                            {isEnglish ? type.en : type.mr}
+                                        </div>
                                     </div>
                                 </div>
                             ))}
                         </div>
                     </div>
 
-                    <div style={{ marginBottom: '12px' }}>
-                        <h2 className="marathi" style={{ fontSize: '1.25rem', marginBottom: '4px' }}>सिंचन उपलब्ध?</h2>
-                        <p className="english-sub">Irrigation available?</p>
+                    <div style={{ marginBottom: '32px' }}>
+                        <h2 className="marathi" style={{ fontSize: '1.25rem', marginBottom: '4px', color: '#1f2937' }}>
+                            {isEnglish ? 'Irrigation Available?' : 'सिंचन उपलब्ध?'}
+                        </h2>
+                        <p className="english-sub" style={{ color: '#6b7280' }}>{isEnglish ? 'Do you have water supply?' : 'पाण्याची उपलब्धता आहे का?'}</p>
                         <div className="selection-grid">
                             <div
-                                className={`choice-card ${irrigation ? 'active' : ''}`}
+                                className="choice-card"
                                 onClick={() => setIrrigation(true)}
-                                style={{ alignItems: 'center', textAlign: 'center' }}
+                                style={{
+                                    alignItems: 'center',
+                                    textAlign: 'center',
+                                    background: irrigation ? '#15803d' : '#f3f4f6',
+                                    color: irrigation ? 'white' : '#1f2937',
+                                    border: irrigation ? '2px solid #15803d' : '2px solid transparent'
+                                }}
                             >
-                                <Droplets size={32} color={irrigation ? 'var(--primary)' : '#5F6368'} />
-                                <div className="marathi">होय • Yes</div>
+                                <Droplets size={32} color={irrigation ? 'white' : '#1f2937'} />
+                                <div className="marathi" style={{ fontWeight: 700 }}>{isEnglish ? 'Yes' : 'होय'}</div>
                             </div>
                             <div
-                                className={`choice-card ${!irrigation ? 'active' : ''}`}
+                                className="choice-card"
                                 onClick={() => setIrrigation(false)}
-                                style={{ alignItems: 'center', textAlign: 'center' }}
+                                style={{
+                                    alignItems: 'center',
+                                    textAlign: 'center',
+                                    background: !irrigation ? '#15803d' : '#f3f4f6',
+                                    color: !irrigation ? 'white' : '#1f2937',
+                                    border: !irrigation ? '2px solid #15803d' : '2px solid transparent'
+                                }}
                             >
-                                <CloudOff size={32} color={!irrigation ? 'var(--primary)' : '#5F6368'} />
-                                <div className="marathi">नाही • No</div>
+                                <CloudOff size={32} color={!irrigation ? 'white' : '#1f2937'} />
+                                <div className="marathi" style={{ fontWeight: 700 }}>{isEnglish ? 'No' : 'नाही'}</div>
                             </div>
+                        </div>
+                    </div>
+
+                    <div style={{ marginBottom: '12px' }}>
+                        <h2 className="marathi" style={{ fontSize: '1.25rem', marginBottom: '4px', color: '#1f2937' }}>
+                            {isEnglish ? 'Planting Season' : 'पेरणी वेळ'}
+                        </h2>
+                        <p className="english-sub" style={{ color: '#6b7280' }}>{isEnglish ? 'Current or upcoming season' : 'सध्याचा किंवा येणारा हंगाम'}</p>
+                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', marginTop: '16px' }}>
+                            {seasons.map(season => {
+                                const Icon = season.icon;
+                                const isActive = plantingSeason === season.id;
+                                return (
+                                    <div
+                                        key={season.id}
+                                        onClick={() => setPlantingSeason(season.id)}
+                                        style={{
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            gap: '8px',
+                                            padding: '10px 16px',
+                                            borderRadius: '50px',
+                                            cursor: 'pointer',
+                                            transition: 'all 0.2s',
+                                            background: isActive ? '#15803d' : '#f3f4f6',
+                                            border: `2px solid ${isActive ? '#15803d' : 'transparent'}`,
+                                            color: isActive ? 'white' : '#1f2937',
+                                            fontWeight: 700
+                                        }}
+                                    >
+                                        <Icon size={18} color={isActive ? 'white' : season.color} />
+                                        <div>
+                                            <div className="marathi" style={{ fontSize: '0.85rem', lineHeight: 1 }}>
+                                                {isEnglish ? season.en : season.mr}
+                                            </div>
+                                        </div>
+                                    </div>
+                                );
+                            })}
                         </div>
                     </div>
                 </div>
 
                 <div className="floating-next-btn" onClick={onNext}>
-                    <span className="marathi" style={{ fontSize: '1.1rem', fontWeight: 700 }}>माहिती साठवा</span>
+                    <span className="marathi" style={{ fontSize: '1.1rem', fontWeight: 700 }}>
+                        {isEnglish ? 'Get Crop Recommendations' : 'पीक शिफारसी मिळवा'}
+                    </span>
                     <ChevronRight size={24} />
                 </div>
             </div>
