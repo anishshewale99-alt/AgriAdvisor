@@ -1,0 +1,16 @@
+
+C:\Users\Admin\Desktop\AgriAdvisior\frontend\src\App.jsx
+  72:23  error  'lang' is defined but never used            no-unused-vars
+  72:29  error  'setLang' is defined but never used         no-unused-vars
+  72:38  error  'setIsVoiceOpen' is defined but never used  no-unused-vars
+
+C:\Users\Admin\Desktop\AgriAdvisior\frontend\src\components\CropRecommendationScreen.jsx
+  6:51  error  'lang' is defined but never used               no-unused-vars
+  6:69  error  'farmInfo' is assigned a value but never used  no-unused-vars
+
+C:\Users\Admin\Desktop\AgriAdvisior\frontend\src\components\LandingScreen.jsx
+  6:34  error  'isDesktop' is defined but never used                                                         no-unused-vars
+  7:23  error  'setIsEnglish' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+
+✖ 7 problems (7 errors, 0 warnings)
+
