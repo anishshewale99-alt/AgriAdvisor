@@ -50,7 +50,7 @@ const LandingScreen = ({ onNext, isDesktop }) => {
                         fontWeight: 500,
                         maxWidth: '450px'
                     }}>
-                        Experience the true taste of farm-fresh rice.
+                        Sow Right, Grow Bright.
                     </p>
 
                     <button
