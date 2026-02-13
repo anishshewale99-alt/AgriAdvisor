@@ -392,6 +392,7 @@ body {
 
   .main-content-desktop {
     flex: 1;
+    min-width: 0;
     padding: 40px;
     background-color: var(--bg-cream);
   }
@@ -405,8 +406,13 @@ body {
 
   .app-shell {
     width: 100% !important;
-    max-width: 1000px !important;
-    margin: 0 auto !important;
+    max-width: none !important;
+    margin: 0 !important;
     padding-bottom: 40px !important;
+  }
+
+  .content-card {
+    max-width: none !important;
+    width: 100% !important;
   }
 }

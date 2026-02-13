@@ -176,7 +176,7 @@ function App() {
               />
             )}
 
-            <div className={isDesktop ? "main-content-desktop" : "mobile-content-wrapper"} style={{ width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+            <div className={isDesktop ? "main-content-desktop" : "mobile-content-wrapper"} style={{ flex: isDesktop ? 1 : 'unset', width: isDesktop ? 'auto' : '100%', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
               <MainHeader
                 screen={screen}
                 setScreen={setScreen}
