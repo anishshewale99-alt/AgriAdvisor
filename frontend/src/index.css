@@ -696,3 +696,100 @@ body {
   font-size: 1rem;
   color: var(--primary);
 }
+
+/* ==========================================
+   Dark Mode System
+   ========================================== */
+
+.app-container.dark-mode,
+.dark-mode body {
+  background-color: #121212 !important;
+  color: #e0e0e0 !important;
+}
+
+.app-container.dark-mode .app-shell,
+.app-container.dark-mode .top-bar,
+.app-container.dark-mode .bottom-nav {
+  background-color: #121212 !important;
+  border-color: #2d2d2d !important;
+}
+
+/* Global Card Theming */
+.app-container.dark-mode div[style*="background: white"],
+.app-container.dark-mode div[style*="background: #ffffff"],
+.app-container.dark-mode .weather-card,
+.app-container.dark-mode .insight-card,
+.app-container.dark-mode .post-card,
+.app-container.dark-mode .price-card,
+.app-container.dark-mode .profile-header,
+.app-container.dark-mode .setting-item,
+.app-container.dark-mode .crop-list-card,
+.app-container.dark-mode .mini-card,
+.app-container.dark-mode .ticker-container,
+.app-container.dark-mode .season-chip {
+  background-color: #1e1e1e !important;
+  color: #e0e0e0 !important;
+  border-color: #2d2d2d !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4) !important;
+}
+
+/* Typography Overrides */
+.app-container.dark-mode h1,
+.app-container.dark-mode h2,
+.app-container.dark-mode h3,
+.app-container.dark-mode h4,
+.app-container.dark-mode h5,
+.app-container.dark-mode h6,
+.app-container.dark-mode p,
+.app-container.dark-mode span:not(.active),
+.app-container.dark-mode .english-sub,
+.app-container.dark-mode .marathi {
+  color: #e0e0e0 !important;
+}
+
+/* Specific Component Tweaks */
+.app-container.dark-mode .stat-item {
+  background-color: #2d2d2d !important;
+}
+
+.app-container.dark-mode .stat-item .label {
+  color: #9ca3af !important;
+}
+
+.app-container.dark-mode .nav-item {
+  color: #9ca3af !important;
+}
+
+.app-container.dark-mode .nav-item.active {
+  color: var(--primary-light) !important;
+}
+
+.app-container.dark-mode .lang-toggle {
+  background: rgba(255, 255, 255, 0.05) !important;
+}
+
+/* Inputs & Interactive */
+.app-container.dark-mode input,
+.app-container.dark-mode select,
+.app-container.dark-mode textarea {
+  background-color: #2d2d2d !important;
+  color: #ffffff !important;
+  border: 1px solid #444 !important;
+  border-radius: 8px;
+  padding: 8px 12px;
+}
+
+.app-container.dark-mode .pill-item:not(.active) {
+  background-color: #2d2d2d !important;
+  color: #e0e0e0 !important;
+}
+
+.app-container.dark-mode .choice-card:not(.active) {
+  background-color: #2d2d2d !important;
+}
+
+/* Glassmorphism adjustment */
+.app-container.dark-mode .glass-overlay {
+  background: rgba(30, 30, 30, 0.8) !important;
+  border-color: rgba(255, 255, 255, 0.1) !important;
+}
