@@ -1,6 +1,7 @@
 import React from 'react';
 import { Home, Sprout, Users, User, Settings, LogOut, Moon, Sun, Mic } from 'lucide-react';
 import { motion } from 'framer-motion';
+import '../styles/DesktopSidebar.css';
 
 const DesktopSidebar = ({ activeTab, setTab, setScreen, isDarkMode, toggleTheme, onLogout, lang, setLang }) => {
     const menuItems = [

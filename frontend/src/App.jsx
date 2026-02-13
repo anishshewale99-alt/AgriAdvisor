@@ -158,7 +158,7 @@ function App() {
             style={{
               display: isDesktop ? 'flex' : 'flex',
               flexDirection: isDesktop ? 'row' : 'column',
-              alignItems: 'center',
+              alignItems: isDesktop ? 'stretch' : 'center',
               width: '100%',
               minHeight: '100vh',
             }}
