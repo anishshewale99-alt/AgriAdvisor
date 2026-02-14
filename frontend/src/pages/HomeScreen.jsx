@@ -7,12 +7,34 @@ import '../styles/HomeScreen.css';
 const HomeScreen = ({ setScreen, setTab, isDarkMode }) => {
     const [weather, setWeather] = React.useState(null);
 
+    const weatherTranslations = {
+        'clear sky': 'स्वच्छ आकाश',
+        'few clouds': 'थोडे ढग',
+        'scattered clouds': 'विखुरलेले ढग',
+        'broken clouds': 'ढगाळ वातावरण',
+        'shower rain': 'पावसाच्या सरी',
+        'rain': 'पाऊस',
+        'thunderstorm': 'विजांसह पाऊस',
+        'snow': 'बर्फवृष्टी',
+        'mist': 'धुके',
+        'haze': 'धुके / धुरके',
+        'overcast clouds': 'पूर्णतः ढगाळ',
+        'light rain': 'हल्का पाऊस',
+        'moderate rain': 'मध्यम पाऊस',
+        'heavy intensity rain': 'मुसळधार पाऊस'
+    };
+
+    const translateWeather = (desc) => {
+        const lowerDesc = desc.toLowerCase();
+        return weatherTranslations[lowerDesc] || desc;
+    };
+
     React.useEffect(() => {
         const fetchWeather = async () => {
             const API_KEY = import.meta.env.VITE_WEATHER_API_KEY;
             const CACHE_KEY = 'agri_weather_data';
             const CACHE_TIME_KEY = 'agri_weather_timestamp';
-            const CACHE_LOC_KEY = 'agri_weather_location'; // Store lat/lon to check if user moved
+            const CACHE_LOC_KEY = 'agri_weather_location';
 
             const getPosition = () => {
                 return new Promise((resolve, reject) => {
@@ -20,7 +42,7 @@ const HomeScreen = ({ setScreen, setTab, isDarkMode }) => {
                 });
             };
 
-            let lat = 18.5204; // Default Pune
+            let lat = 18.5204;
             let lon = 73.8567;
             let locationName = "पुणे, महाराष्ट्र";
 
@@ -28,12 +50,11 @@ const HomeScreen = ({ setScreen, setTab, isDarkMode }) => {
                 const pos = await getPosition();
                 lat = pos.coords.latitude;
                 lon = pos.coords.longitude;
-                locationName = "Your Location";
+                locationName = "तुमचे ठिकाण";
             } catch (err) {
-                console.warn("Location access denied or timed out, using Pune.");
+                console.warn("Location access denied.");
             }
 
-            // 1. Check for cached data (15 minute cache AND same location)
             try {
                 const cachedData = localStorage.getItem(CACHE_KEY);
                 const cachedTime = localStorage.getItem(CACHE_TIME_KEY);
@@ -44,30 +65,26 @@ const HomeScreen = ({ setScreen, setTab, isDarkMode }) => {
                     cachedLoc.lon && Math.abs(cachedLoc.lon - lon) < 0.01;
 
                 if (cachedData && cachedTime && isSameLocation && (now - parseInt(cachedTime) < 900000)) {
-                    console.log("Using cached local weather data...");
                     setWeather(JSON.parse(cachedData));
                     return;
                 }
-            } catch (e) { console.error("Cache read error", e); }
+            } catch (e) { }
 
             try {
                 if (!API_KEY || API_KEY === 'your_key_here') throw new Error("Missing API Key");
 
-                console.log(`Fetching weather for ${lat}, ${lon}...`);
                 const response = await fetch(`https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${API_KEY}&units=metric`);
-
-                if (!response.ok) {
-                    if (response.status === 401) throw new Error("401");
-                    throw new Error(`Weather API Error: ${response.status}`);
-                }
+                if (!response.ok) throw new Error("API Error");
 
                 const data = await response.json();
                 if (data.main) {
+                    const englishDesc = data.weather[0].description;
                     const weatherInfo = {
                         temperature: Math.round(data.main.temp),
                         humidity: data.main.humidity,
                         windspeed: data.wind.speed,
-                        description: data.weather[0].description,
+                        description: englishDesc,
+                        descriptionMR: translateWeather(englishDesc),
                         location: data.name || locationName
                     };
 
@@ -78,7 +95,6 @@ const HomeScreen = ({ setScreen, setTab, isDarkMode }) => {
                     setWeather(weatherInfo);
                 }
             } catch (err) {
-                console.error("OpenWeather failed:", err.message);
                 // Fallback to Open-Meteo
                 try {
                     const fallbackRes = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true`);
@@ -87,12 +103,11 @@ const HomeScreen = ({ setScreen, setTab, isDarkMode }) => {
                         temperature: Math.round(fallbackData.current_weather.temperature),
                         humidity: '--',
                         windspeed: fallbackData.current_weather.windspeed,
-                        description: 'Live (Estimate)',
+                        description: 'Cloudy',
+                        descriptionMR: 'ढगाळ वातावरण',
                         location: locationName
                     });
-                } catch (fallbackErr) {
-                    console.error("Fallback failed:", fallbackErr);
-                }
+                } catch (fallbackErr) { }
             }
         };
 
@@ -129,7 +144,7 @@ const HomeScreen = ({ setScreen, setTab, isDarkMode }) => {
                                         </div>
                                         <div className="weather-temp">{weather.temperature}°C</div>
                                         <div style={{ fontSize: '1rem', fontWeight: 700, marginTop: '4px', textTransform: 'capitalize' }}>
-                                            {weather.description}
+                                            {weather.descriptionMR} / {weather.description}
                                         </div>
                                     </div>
                                     <Sun size={64} color="#ffd54f" />
