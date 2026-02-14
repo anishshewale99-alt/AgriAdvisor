@@ -1,13 +1,10 @@
 /* Home Screen Styles */
 .season-chip {
     display: inline-flex;
-    background: white;
     padding: 6px 16px;
     border-radius: 30px;
-    margin: 16px 20px 16px;
     font-size: 0.75rem;
     font-weight: 600;
-    border: 1px solid #eee;
 }
 
 .weather-card {
@@ -43,26 +40,13 @@
 }
 
 .alert-card {
-    margin: 0 20px 20px;
-    padding: 16px;
-    background: #FFF9C4;
-    border-radius: 16px;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    border: 1px solid #FFF176;
+    transition: all 0.3s ease;
 }
 
 .insight-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 16px;
-    margin: 0 20px 20px;
+    transition: all 0.3s ease;
 }
 
 .insight-card {
-    background: white;
-    padding: 20px;
-    border-radius: var(--radius-lg);
-    box-shadow: var(--shadow-premium);
+    transition: all 0.3s ease;
 }

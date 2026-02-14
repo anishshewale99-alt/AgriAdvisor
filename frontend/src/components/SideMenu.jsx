@@ -5,16 +5,18 @@ import {
     Phone,
     FileText,
     X,
-    ChevronRight
+    ChevronRight,
+    User
 } from 'lucide-react';
 import { motion as Motion, AnimatePresence } from 'framer-motion';
 
-const SideMenu = ({ isOpen, onClose, darkMode }) => {
+const SideMenu = ({ isOpen, onClose, darkMode, setScreen, setTab }) => {
     const menuItems = [
         { icon: Shield, title: 'विमा माहिती', subtitle: 'Insurance Info', color: '#2196F3' },
         { icon: CircleHelp, title: 'मदत आणि सहाय्य', subtitle: 'Help & Support', color: '#9C27B0' },
         { icon: Phone, title: 'संपर्क साधा', subtitle: 'Contact Us', color: '#4CAF50' },
         { icon: FileText, title: 'गोपनीयता धोरण', subtitle: 'Privacy Policy', color: '#607D8B' },
+        { icon: User, title: 'प्रोफाइल', subtitle: 'Profile', color: '#FF5722', id: 'profile' },
     ];
 
     return (
@@ -89,6 +91,13 @@ const SideMenu = ({ isOpen, onClose, darkMode }) => {
                                 {menuItems.map((item, i) => (
                                     <div
                                         key={i}
+                                        onClick={() => {
+                                            if (item.id === 'profile') {
+                                                setScreen('profile');
+                                                setTab('profile');
+                                                onClose();
+                                            }
+                                        }}
                                         style={{
                                             display: 'flex',
                                             alignItems: 'center',

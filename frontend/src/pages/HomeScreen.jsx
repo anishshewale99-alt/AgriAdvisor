@@ -25,11 +25,14 @@ const HomeScreen = ({ setScreen, setTab, isDarkMode }) => {
                     width: '100%',
                     margin: '0 auto 40px',
                     color: isDarkMode ? '#f3f4f6' : '#111827',
-                    border: isDarkMode ? '1px solid #374151' : 'none'
-                }}>
-                    <MarketTicker />
+                    border: isDarkMode ? '1px solid #374151' : 'none',
+                    paddingBottom: '96px' // pb-24 equivalent
+                }} className="pb-24">
+                    <div className="my-4">
+                        <MarketTicker />
+                    </div>
 
-                    <div className="season-chip" style={{ margin: '16px 0' }}>
+                    <div className="season-chip bg-white text-gray-800 dark:bg-gray-800 dark:text-gray-200 border border-gray-100 dark:border-gray-700 shadow-sm" style={{ margin: '16px 0' }}>
                         रबी हंगाम – फेब्रुवारी 2026 | Rabi Season - Feb 2026
                     </div>
 
@@ -63,42 +66,42 @@ const HomeScreen = ({ setScreen, setTab, isDarkMode }) => {
                         )}
                     </div>
 
-                    <div className="alert-card">
-                        <div style={{ background: 'var(--accent-yellow)', padding: '8px', borderRadius: '10px' }}>
-                            <AlertTriangle size={20} color="var(--text-main)" />
+                    <div className="alert-card bg-yellow-50 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400 border border-yellow-100 dark:border-yellow-950" style={{ margin: '0 0 20px', padding: '16px', borderRadius: '16px', display: 'flex', alignItems: 'center', gap: '12px' }}>
+                        <div className="p-2 bg-yellow-100 dark:bg-yellow-800/40 rounded-lg">
+                            <AlertTriangle size={20} className="text-yellow-700 dark:text-yellow-400" />
                         </div>
                         <div>
-                            <div className="marathi">पुढच्या आठवड्यात उष्णतेचा धोका</div>
-                            <div className="english-sub">Heat risk warning next week</div>
+                            <div className="marathi font-bold text-gray-900 dark:text-white">पुढच्या आठवड्यात उष्णतेचा धोका</div>
+                            <div className="english-sub text-gray-500 dark:text-gray-400 text-sm">Heat risk warning next week</div>
                         </div>
                     </div>
 
-                    <div className="insight-grid">
-                        <div className="insight-card">
-                            <div className="marathi" style={{ fontSize: '1rem', marginBottom: '8px' }}>द्राक्ष काढा / Harvest Grapes</div>
+                    <div className="insight-grid grid grid-cols-2 gap-4" style={{ margin: '0 0 20px' }}>
+                        <div className="insight-card bg-white dark:bg-gray-800 p-4 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700">
+                            <div className="marathi text-gray-900 dark:text-white font-bold mb-2" style={{ fontSize: '1rem' }}>द्राक्ष काढा / Harvest Grapes</div>
                             <div className="badge success" style={{ background: isDarkMode ? 'rgba(34, 197, 94, 0.2)' : '#E8F5E9', color: isDarkMode ? '#86efac' : '#2E7D32', padding: '4px 8px', borderRadius: '6px', fontSize: '0.75rem', fontWeight: 800, display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
                                 <TrendingUp size={12} /> ↑ High Demand
                             </div>
                         </div>
-                        <div className="insight-card">
-                            <div className="marathi" style={{ fontSize: '1rem', marginBottom: '8px' }}>जोखीम पातळी / Risk Level</div>
+                        <div className="insight-card bg-white dark:bg-gray-800 p-4 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700">
+                            <div className="marathi text-gray-900 dark:text-white font-bold mb-2" style={{ fontSize: '1rem' }}>जोखीम पातळी / Risk Level</div>
                             <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.75rem', fontWeight: 700, marginBottom: '4px' }}>
-                                <span>Medium</span>
-                                <span>60%</span>
+                                <span className="text-gray-500 dark:text-gray-400">Medium</span>
+                                <span className="text-gray-500 dark:text-gray-400">60%</span>
                             </div>
-                            <div className="progress-bar-container">
-                                <div className="progress-bar" style={{ width: '60%', background: 'var(--accent-yellow)' }}></div>
+                            <div className="progress-bar-container bg-gray-100 dark:bg-gray-700 rounded-full h-2 overflow-hidden">
+                                <div className="progress-bar h-full" style={{ width: '60%', background: 'var(--accent-yellow)' }}></div>
                             </div>
                         </div>
                     </div>
 
-                    <div style={{ margin: '0 0 24px', padding: '20px', background: isDarkMode ? '#1f2937' : 'white', borderRadius: '24px', display: 'flex', gap: '16px', boxShadow: isDarkMode ? 'none' : '0 4px 15px rgba(0,0,0,0.05)', border: isDarkMode ? '1px solid #374151' : '1px solid #f0f0f0' }}>
+                    <div className="bg-green-50 text-green-900 dark:bg-green-900/30 dark:text-green-300 shadow-sm border border-green-100 dark:border-green-950" style={{ margin: '0 0 24px', padding: '20px', borderRadius: '24px', display: 'flex', gap: '16px' }}>
                         <div style={{ background: 'var(--primary-dark)', padding: '10px', borderRadius: '12px', alignSelf: 'flex-start', boxShadow: '0 4px 10px rgba(0,0,0,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                             <Lightbulb size={24} color="white" />
                         </div>
                         <div>
-                            <div className="marathi" style={{ marginBottom: '4px', color: isDarkMode ? '#f3f4f6' : '#374151', fontSize: '0.95rem' }}>सेंद्रिय खतांचा वापर वाढवा आणि जमिनीचा पोत सुधारा.</div>
-                            <div className="english-sub" style={{ color: isDarkMode ? '#9ca3af' : '#6b7280', fontSize: '0.75rem' }}>Increase the use of organic fertilizers to improve soil texture.</div>
+                            <div className="marathi font-bold" style={{ marginBottom: '4px', fontSize: '0.95rem' }}>सेंद्रिय खतांचा वापर वाढवा आणि जमिनीचा पोत सुधारा.</div>
+                            <div className="english-sub" style={{ fontSize: '0.75rem', opacity: 0.8 }}>Increase the use of organic fertilizers to improve soil texture.</div>
                         </div>
                     </div>
 

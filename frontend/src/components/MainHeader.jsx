@@ -2,7 +2,7 @@ import React from 'react';
 import { Menu, ArrowLeft, Volume2 } from 'lucide-react';
 
 const MainHeader = ({ screen, setScreen, setTab, isScrolled, lang, setLang, setIsMenuOpen, handleTTS, isSpeaking, isDesktop, isDarkMode }) => (
-    <div className="top-bar" style={{
+    <div className="top-bar flex items-center justify-between gap-2" style={{
         width: '100%',
         margin: '0 auto',
         background: isScrolled || screen !== 'home' ? (isScrolled ? (isDesktop ? 'rgba(255,255,255,0.8)' : 'rgba(255,255,255,0.95)') : 'white') : 'transparent',
@@ -11,14 +11,11 @@ const MainHeader = ({ screen, setScreen, setTab, isScrolled, lang, setLang, setI
         top: 0,
         transition: 'all 0.3s ease',
         zIndex: 1000,
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'center',
         padding: isDesktop ? '16px 40px' : '16px 20px',
         backdropFilter: isScrolled ? 'blur(10px)' : 'none',
         borderBottom: isScrolled ? '1px solid rgba(0,0,0,0.05)' : 'none'
     }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
             {screen === 'home' ? (
                 !isDesktop && (
                     <button onClick={() => setIsMenuOpen(true)} style={{ background: 'transparent', border: 'none', cursor: 'pointer', display: 'flex', color: isScrolled ? 'var(--primary)' : 'white' }}>
@@ -31,7 +28,33 @@ const MainHeader = ({ screen, setScreen, setTab, isScrolled, lang, setLang, setI
                 </button>
             )}
 
-            {/* Fixed Language Toggle on Left for Desktop, or Right for Mobile */}
+            <span className="title" style={{
+                letterSpacing: '-0.5px',
+                color: isScrolled || screen !== 'home' ? 'var(--primary)' : (isDesktop ? 'var(--primary)' : 'white'),
+                transition: 'all 0.3s ease',
+                fontSize: isDesktop ? '1.5rem' : '1.25rem',
+                fontWeight: 800
+            }}>CropAdvisor</span>
+        </div>
+
+        <div className="flex items-center gap-2">
+            {!isDesktop && screen !== 'profile' && screen !== 'recommendations' && (
+                <div className="lang" onClick={() => setLang(lang === 'mr' ? 'en' : 'mr')} style={{
+                    cursor: 'pointer',
+                    background: lang === 'mr' ? 'var(--primary)' : 'white',
+                    color: lang === 'mr' ? 'white' : 'var(--text-main)',
+                    padding: '6px 16px',
+                    borderRadius: '24px',
+                    border: '1px solid #eee',
+                    fontSize: '0.8rem',
+                    fontWeight: 700,
+                    boxShadow: '0 2px 8px rgba(0,0,0,0.05)',
+                    textAlign: 'center'
+                }}>
+                    {lang === 'mr' ? 'मराठी' : 'English'}
+                </div>
+            )}
+
             {isDesktop && (
                 <div className="lang-toggle-nav" onClick={() => setLang(lang === 'mr' ? 'en' : 'mr')} style={{
                     cursor: 'pointer',
@@ -44,7 +67,8 @@ const MainHeader = ({ screen, setScreen, setTab, isScrolled, lang, setLang, setI
                     border: '1px solid rgba(46, 125, 50, 0.2)',
                     display: 'flex',
                     gap: '12px',
-                    alignItems: 'center'
+                    alignItems: 'center',
+                    marginRight: '8px'
                 }}>
                     <span style={{ opacity: lang === 'mr' ? 1 : 0.4 }}>मराठी</span>
                     <div style={{ width: '1px', height: '14px', background: 'rgba(46, 125, 50, 0.3)' }} />
@@ -52,33 +76,6 @@ const MainHeader = ({ screen, setScreen, setTab, isScrolled, lang, setLang, setI
                 </div>
             )}
 
-            <span className="title" style={{
-                letterSpacing: '-0.5px',
-                color: isScrolled || screen !== 'home' ? 'var(--primary)' : (isDesktop ? 'var(--primary)' : 'white'),
-                transition: 'all 0.3s ease',
-                fontSize: '1.5rem',
-                fontWeight: 800
-            }}>CropAdvisor</span>
-        </div>
-
-        <div className="right" style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-            {!isDesktop && screen !== 'profile' && screen !== 'recommendations' && (
-                <div className="lang" onClick={() => setLang(lang === 'mr' ? 'en' : 'mr')} style={{
-                    cursor: 'pointer',
-                    background: lang === 'mr' ? 'var(--primary)' : 'white',
-                    color: lang === 'mr' ? 'white' : 'var(--text-main)',
-                    padding: '8px 20px',
-                    borderRadius: '24px',
-                    border: '1px solid #eee',
-                    fontSize: '0.9rem',
-                    fontWeight: 700,
-                    boxShadow: '0 2px 8px rgba(0,0,0,0.05)',
-                    minWidth: '100px',
-                    textAlign: 'center'
-                }}>
-                    {lang === 'mr' ? 'मराठी' : 'English'}
-                </div>
-            )}
             <div onClick={handleTTS} style={{
                 cursor: 'pointer',
                 background: isDarkMode ? '#1f2937' : 'white',
