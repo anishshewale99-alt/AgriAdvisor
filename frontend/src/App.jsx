@@ -57,11 +57,6 @@ const BottomNav = ({ activeTab, setTab, setScreen }) => (
         <Users size={22} />
         <span>समुदाय<br />Comm</span>
       </div>
-      <div className={`nav-item ${activeTab === 'profile' ? 'active' : ''}`}
-        onClick={() => { setTab('profile'); setScreen('profile'); }}>
-        <User size={22} />
-        <span>प्रोफाइल<br />Profile</span>
-      </div>
       <div className={`nav-item ${activeTab === 'settings' ? 'active' : ''}`}
         onClick={() => { setTab('settings'); setScreen('settings'); }}>
         <Settings size={22} />
@@ -196,6 +191,8 @@ function App() {
                   isOpen={isMenuOpen}
                   onClose={() => setIsMenuOpen(false)}
                   darkMode={isDarkMode}
+                  setScreen={setScreen}
+                  setTab={setActiveTab}
                 />
               )}
 
