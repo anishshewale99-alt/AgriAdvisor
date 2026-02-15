@@ -17,7 +17,8 @@ import {
   MapPin,
   Menu,
   ArrowLeft,
-  Settings
+  Settings,
+  ChevronDown
 } from 'lucide-react';
 import { motion as Motion, AnimatePresence } from 'framer-motion';
 
@@ -35,32 +36,30 @@ import CropRecommendationScreen from './pages/CropRecommendationScreen';
 import CropDetailScreen from './pages/CropDetailScreen';
 import DesktopSidebar from './components/DesktopSidebar';
 import MainHeader from './components/MainHeader';
-import LightBg from './assets/light.png';
-import DarkBg from './assets/bg2.png';
-import FarmPattern from './assets/image.png';
+// Image imports removed for clean solid background layout
 
-const BottomNav = ({ activeTab, setTab, setScreen }) => (
+const BottomNav = ({ activeTab, setTab, setScreen, lang }) => (
   <div className="bottom-nav" style={{ width: '100%', display: 'flex', justifyContent: 'center' }}>
-    <div style={{ width: '100%', display: 'flex', justifyContent: 'space-around', alignItems: 'center' }}>
+    <div style={{ width: '100%', display: 'flex', justifyContent: 'space-evenly', alignItems: 'center' }}>
       <div className={`nav-item ${activeTab === 'home' ? 'active' : ''}`}
         onClick={() => { setTab('home'); setScreen('home'); }}>
         <Home size={22} />
-        <span>होम<br />Home</span>
+        <span className="marathi">{lang === 'en' ? 'Home' : 'होम'}</span>
       </div>
       <div className={`nav-item ${activeTab === 'crops' ? 'active' : ''}`}
         onClick={() => { setTab('crops'); setScreen('recommendations'); }}>
         <Sprout size={22} />
-        <span>पीके<br />Crops</span>
+        <span className="marathi">{lang === 'en' ? 'Crops' : 'पीके'}</span>
       </div>
       <div className={`nav-item ${activeTab === 'community' ? 'active' : ''}`}
         onClick={() => { setTab('community'); setScreen('community'); }}>
         <Users size={22} />
-        <span>समुदाय<br />Comm</span>
+        <span className="marathi">{lang === 'en' ? 'Community' : 'समुदाय'}</span>
       </div>
       <div className={`nav-item ${activeTab === 'settings' ? 'active' : ''}`}
         onClick={() => { setTab('settings'); setScreen('settings'); }}>
         <Settings size={22} />
-        <span>सेटिंग्ज<br />Settings</span>
+        <span className="marathi">{lang === 'en' ? 'Settings' : 'सेटिंग्ज'}</span>
       </div>
     </div>
   </div>
@@ -70,6 +69,142 @@ const BottomNav = ({ activeTab, setTab, setScreen }) => (
 // Replaced by CropRecommendationScreen.jsx component
 
 // Replaced by CropDetailScreen.jsx component
+
+// Loading Screen Component
+const LoadingScreen = ({ lang, isDarkMode, onFinished }) => {
+  const [currentStep, setCurrentStep] = useState(0);
+  const isEn = lang === 'en';
+
+  const steps = [
+    { en: 'Fetching mandi prices', mr: 'मंडी भाव मिळवत आहे' },
+    { en: 'Checking IMD weather data', mr: 'IMD हवामान डेटा तपासत आहे' },
+    { en: 'Analyzing risks and demand', mr: 'जोखीम आणि मागणीचे विश्लेषण' },
+    { en: 'Preparing recommendations', mr: 'शिफारसी तयार करत आहे' }
+  ];
+
+  React.useEffect(() => {
+    if (currentStep < steps.length) {
+      const timer = setTimeout(() => {
+        setCurrentStep(prev => prev + 1);
+      }, 800);
+      return () => clearTimeout(timer);
+    } else {
+      const finishTimer = setTimeout(() => {
+        onFinished();
+      }, 500);
+      return () => clearTimeout(finishTimer);
+    }
+  }, [currentStep, onFinished]);
+
+  return (
+    <div style={{
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'center',
+      justifyContent: 'center',
+      minHeight: '60vh',
+      padding: '40px 20px',
+      textAlign: 'center'
+    }}>
+      <Motion.div
+        initial={{ scale: 0.5, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        transition={{ duration: 0.5 }}
+        style={{
+          background: 'rgba(46, 125, 50, 0.1)',
+          padding: '24px',
+          borderRadius: '50%',
+          marginBottom: '24px'
+        }}
+      >
+        <Sprout size={64} color="var(--primary)" />
+      </Motion.div>
+
+      <h2 className="marathi" style={{
+        fontSize: '1.75rem',
+        marginBottom: '32px',
+        color: isDarkMode ? 'white' : 'var(--primary-dark)'
+      }}>
+        {isEn ? 'Analyzing Your Farm...' : 'तुमच्या शेताचे विश्लेषण करत आहे...'}
+      </h2>
+
+      <div style={{
+        width: '100%',
+        maxWidth: '320px',
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '20px',
+        textAlign: 'left'
+      }}>
+        {steps.map((step, idx) => {
+          const isCompleted = idx < currentStep;
+          const isActive = idx === currentStep;
+
+          return (
+            <Motion.div
+              key={idx}
+              initial={{ opacity: 0, x: -10 }}
+              animate={{ opacity: 1, x: 0 }}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '12px',
+                color: isCompleted || isActive ? (isDarkMode ? '#fff' : '#1f2937') : (isDarkMode ? '#4b5563' : '#9ca3af'),
+                fontWeight: isActive ? 700 : 500
+              }}
+            >
+              <div style={{
+                width: '24px',
+                height: '24px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center'
+              }}>
+                {isCompleted ? (
+                  <Motion.div initial={{ scale: 0 }} animate={{ scale: 1 }}>
+                    <div style={{
+                      width: '20px',
+                      height: '20px',
+                      borderRadius: '50%',
+                      background: '#16a34a',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center'
+                    }}>
+                      <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+                        <path d="M10 3L4.5 8.5L2 6" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                      </svg>
+                    </div>
+                  </Motion.div>
+                ) : isActive ? (
+                  <Motion.div
+                    animate={{ rotate: 360 }}
+                    transition={{ repeat: Infinity, duration: 1, ease: 'linear' }}
+                    style={{
+                      width: '18px',
+                      height: '18px',
+                      border: `2px solid ${isDarkMode ? '#fff' : 'var(--primary)'}`,
+                      borderTopColor: 'transparent',
+                      borderRadius: '50%'
+                    }}
+                  />
+                ) : (
+                  <div style={{
+                    width: '18px',
+                    height: '18px',
+                    border: '2px solid #e5e7eb',
+                    borderRadius: '50%'
+                  }} />
+                )}
+              </div>
+              <span className="marathi">{isEn ? step.en : step.mr}</span>
+            </Motion.div>
+          );
+        })}
+      </div>
+    </div>
+  );
+};
 
 function App() {
   const [onboarding, setOnboarding] = useState('landing');
@@ -84,6 +219,7 @@ function App() {
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [farmDetails, setFarmDetails] = useState({});
   const [isDesktop, setIsDesktop] = useState(window.innerWidth >= 1024);
+  const [previousCropScreen, setPreviousCropScreen] = useState('recommendations');
 
   React.useEffect(() => {
     const handleResize = () => setIsDesktop(window.innerWidth >= 1024);
@@ -91,11 +227,7 @@ function App() {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  // Background Logic
-  let bgImage = null;
-  if (onboarding !== 'landing') {
-    bgImage = isDarkMode ? DarkBg : LightBg;
-  }
+  // Background Logic removed as per request to have solid backgrounds only
 
   const toggleTheme = () => setIsDarkMode(prev => !prev);
 
@@ -121,9 +253,9 @@ function App() {
 
   return (
     <div
-      className={`${isDarkMode ? 'dark bg-gray-900 text-white' : 'bg-gray-50 text-gray-900'} bg-fixed bg-cover bg-center bg-no-repeat w-full min-h-screen`}
+      className={`${isDarkMode ? 'dark bg-gray-900 text-white' : 'bg-gray-50 text-gray-900'} w-full min-h-screen`}
       style={{
-        backgroundImage: bgImage ? `url(${bgImage})` : 'none',
+        background: isDarkMode ? '#0f172a' : '#f8fafc',
       }}
     >
       <AnimatePresence mode="wait">
@@ -139,8 +271,7 @@ function App() {
             onNext={(data) => {
               if (data) setFarmDetails(data);
               setOnboarding('finished');
-              setScreen('recommendations');
-              setActiveTab('crops');
+              setScreen('loading');
             }}
             onBack={() => setOnboarding('landing')}
           />
@@ -171,7 +302,17 @@ function App() {
               />
             )}
 
-            <div className={isDesktop ? "main-content-desktop" : "mobile-content-wrapper"} style={{ flex: isDesktop ? 1 : 'unset', width: isDesktop ? 'auto' : '100%', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+            <div
+              className={isDesktop ? "main-content-desktop" : "mobile-content-wrapper"}
+              style={{
+                flex: isDesktop ? 1 : 'unset',
+                width: isDesktop ? 'auto' : '100%',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                paddingTop: isDesktop ? '80px' : '64px' // Account for fixed header
+              }}
+            >
               <MainHeader
                 screen={screen}
                 setScreen={setScreen}
@@ -184,6 +325,7 @@ function App() {
                 isSpeaking={isSpeaking}
                 isDesktop={isDesktop}
                 isDarkMode={isDarkMode}
+                previousCropScreen={previousCropScreen}
               />
 
               {!isDesktop && (
@@ -213,8 +355,36 @@ function App() {
                     isDarkMode={isDarkMode}
                     isDesktop={isDesktop}
                     farmInfo={farmDetails}
+                    showAll={false}
+                    setScreen={setScreen}
                     onSelectCrop={(crop) => {
                       setSelectedCrop(crop);
+                      setPreviousCropScreen('recommendations');
+                      setScreen('crop-detail');
+                    }}
+                  />
+                )}
+                {screen === 'loading' && (
+                  <LoadingScreen
+                    lang={lang}
+                    isDarkMode={isDarkMode}
+                    onFinished={() => {
+                      setScreen('recommendations');
+                      setActiveTab('crops');
+                    }}
+                  />
+                )}
+                {screen === 'all-crops' && (
+                  <CropRecommendationScreen
+                    lang={lang}
+                    isDarkMode={isDarkMode}
+                    isDesktop={isDesktop}
+                    farmInfo={farmDetails}
+                    showAll={true}
+                    setScreen={setScreen}
+                    onSelectCrop={(crop) => {
+                      setSelectedCrop(crop);
+                      setPreviousCropScreen('all-crops');
                       setScreen('crop-detail');
                     }}
                   />
@@ -222,8 +392,9 @@ function App() {
                 {screen === 'crop-detail' && (
                   <CropDetailScreen
                     crop={selectedCrop}
-                    onBack={() => setScreen('recommendations')}
+                    onBack={() => setScreen(previousCropScreen)}
                     isDarkMode={isDarkMode}
+                    lang={lang}
                   />
                 )}
                 {screen === 'community' && <CommunityScreen isDarkMode={isDarkMode} />}
@@ -249,7 +420,7 @@ function App() {
                 )}
               </div>
 
-              {!isDesktop && <BottomNav activeTab={activeTab} setTab={setActiveTab} setScreen={setScreen} />}
+              {!isDesktop && <BottomNav activeTab={activeTab} setTab={setActiveTab} setScreen={setScreen} lang={lang} />}
             </div>
           </div>
         )}
