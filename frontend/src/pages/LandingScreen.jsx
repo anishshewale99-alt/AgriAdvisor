@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { motion as Motion, AnimatePresence } from 'framer-motion';
 import { LogIn, Phone, Mail, ArrowRight, Languages, Eye, EyeOff, ChevronRight } from 'lucide-react';
 import LandingImg from '../assets/landing 2.webp';
+import GoogleLoginButton from '../components/GoogleLoginButton';
+import { useAuth } from '../context/AuthContext';
 import '../styles/LandingScreen.css';
 
 const LandingScreen = ({ onNext, isDesktop }) => {
@@ -219,14 +221,17 @@ const LandingScreen = ({ onNext, isDesktop }) => {
 
                     {/* Social Login Buttons */}
                     <div className="social-login-section">
-                        <button className="social-login-btn google-btn" onClick={onNext}>
-                            <img
-                                src="https://www.gstatic.com/images/branding/product/1x/gsa_512dp.png"
-                                alt="Google"
-                                className="social-icon"
-                            />
-                            <span>{isEnglish ? 'Continue with Google' : 'Google सह सुरू करा'}</span>
-                        </button>
+                        <GoogleLoginButton
+                            onSuccess={(user) => {
+                                // If user is onboarded, go to next screen
+                                // If not, they'll need to complete farm info
+                                onNext();
+                            }}
+                            onError={(error) => {
+                                console.error('Login failed:', error);
+                                alert(isEnglish ? 'Login failed. Please try again.' : 'लॉगिन अयशस्वी. कृपया पुन्हा प्रयत्न करा.');
+                            }}
+                        />
                     </div>
 
                     {/* Divider */}
