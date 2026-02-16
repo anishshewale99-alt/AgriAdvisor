@@ -4,7 +4,8 @@ import { MapPin, Sun, Droplets, Wind, AlertTriangle, TrendingUp, Lightbulb } fro
 import MarketTicker from '../components/MarketTicker';
 import '../styles/HomeScreen.css';
 
-const HomeScreen = ({ setScreen, setTab, isDarkMode }) => {
+const HomeScreen = ({ setScreen, setTab, isDarkMode, lang }) => {
+    const isEn = lang === 'en';
     const [weather, setWeather] = React.useState(null);
 
     const weatherTranslations = {
@@ -25,6 +26,7 @@ const HomeScreen = ({ setScreen, setTab, isDarkMode }) => {
     };
 
     const translateWeather = (desc) => {
+        if (isEn) return desc;
         const lowerDesc = desc.toLowerCase();
         return weatherTranslations[lowerDesc] || desc;
     };
@@ -44,13 +46,13 @@ const HomeScreen = ({ setScreen, setTab, isDarkMode }) => {
 
             let lat = 18.5204;
             let lon = 73.8567;
-            let locationName = "पुणे, महाराष्ट्र";
+            let locationName = isEn ? "Pune, Maharashtra" : "पुणे, महाराष्ट्र";
 
             try {
                 const pos = await getPosition();
                 lat = pos.coords.latitude;
                 lon = pos.coords.longitude;
-                locationName = "तुमचे ठिकाण";
+                locationName = isEn ? "Your Location" : "तुमचे ठिकाण";
             } catch (err) {
                 console.warn("Location access denied.");
             }
@@ -104,7 +106,7 @@ const HomeScreen = ({ setScreen, setTab, isDarkMode }) => {
                         humidity: '--',
                         windspeed: fallbackData.current_weather.windspeed,
                         description: 'Cloudy',
-                        descriptionMR: 'ढगाळ वातावरण',
+                        descriptionMR: isEn ? 'Cloudy' : 'ढगाळ वातावरण',
                         location: locationName
                     });
                 } catch (fallbackErr) { }
@@ -112,7 +114,7 @@ const HomeScreen = ({ setScreen, setTab, isDarkMode }) => {
         };
 
         fetchWeather();
-    }, []);
+    }, [isEn]);
 
     return (
         <>
@@ -133,7 +135,7 @@ const HomeScreen = ({ setScreen, setTab, isDarkMode }) => {
                     </div>
 
                     <div className="season-chip bg-white text-gray-800 dark:bg-gray-800 dark:text-gray-200 border border-gray-100 dark:border-gray-700 shadow-sm" style={{ margin: '16px 0' }}>
-                        रबी हंगाम – फेब्रुवारी 2026 | Rabi Season - Feb 2026
+                        {isEn ? 'Rabi Season - Feb 2026' : 'रबी हंगाम – फेब्रुवारी 2026'}
                     </div>
 
                     <div className="weather-card" style={{ color: isDarkMode ? '#f3f4f6' : '#1f2937', margin: '0 0 20px', padding: '20px', boxShadow: 'none', border: isDarkMode ? '1px solid #374151' : '1px solid #f0f0f0', background: isDarkMode ? '#1f2937' : 'transparent', borderRadius: '16px' }}>
@@ -147,7 +149,7 @@ const HomeScreen = ({ setScreen, setTab, isDarkMode }) => {
                                         </div>
                                         <div className="weather-temp">{weather.temperature}°C</div>
                                         <div style={{ fontSize: '1rem', fontWeight: 700, marginTop: '4px', textTransform: 'capitalize' }}>
-                                            {weather.descriptionMR} / {weather.description}
+                                            {isEn ? weather.description : weather.descriptionMR}
                                         </div>
                                     </div>
                                     <Sun size={64} color="#ffd54f" />
@@ -155,16 +157,16 @@ const HomeScreen = ({ setScreen, setTab, isDarkMode }) => {
                                 <div className="weather-stats">
                                     <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                                         <Droplets size={16} />
-                                        <span style={{ fontWeight: 600 }}>आद्रता {weather.humidity}%</span>
+                                        <span style={{ fontWeight: 600 }}>{isEn ? 'Humidity' : 'आद्रता'} {weather.humidity}%</span>
                                     </div>
                                     <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                                         <Wind size={16} />
-                                        <span style={{ fontWeight: 600 }}>वारा {weather.windspeed} km/h</span>
+                                        <span style={{ fontWeight: 600 }}>{isEn ? 'Wind' : 'वारा'} {weather.windspeed} km/h</span>
                                     </div>
                                 </div>
                             </>
                         ) : (
-                            <div style={{ textAlign: 'center', padding: '20px', fontWeight: 700 }}>Loading weather...</div>
+                            <div style={{ textAlign: 'center', padding: '20px', fontWeight: 700 }}>{isEn ? 'Loading weather...' : 'हवामान लोड होत आहे...'}</div>
                         )}
                     </div>
 
@@ -173,22 +175,30 @@ const HomeScreen = ({ setScreen, setTab, isDarkMode }) => {
                             <AlertTriangle size={20} className="text-yellow-700 dark:text-yellow-400" />
                         </div>
                         <div>
-                            <div className="marathi font-bold text-gray-900 dark:text-white">पुढच्या आठवड्यात उष्णतेचा धोका</div>
-                            <div className="english-sub text-gray-500 dark:text-gray-400 text-sm">Heat risk warning next week</div>
+                            <div className="marathi font-bold text-gray-900 dark:text-white">
+                                {isEn ? 'Heat risk warning next week' : 'पुढच्या आठवड्यात उष्णतेचा धोका'}
+                            </div>
+                            <div className="english-sub text-gray-500 dark:text-gray-400 text-sm">
+                                {isEn ? 'Take necessary precautions.' : 'आवश्यक खबरदारी घ्या.'}
+                            </div>
                         </div>
                     </div>
 
                     <div className="insight-grid grid grid-cols-2 gap-4" style={{ margin: '0 0 20px' }}>
                         <div className="insight-card bg-white dark:bg-gray-800 p-4 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700">
-                            <div className="marathi text-gray-900 dark:text-white font-bold mb-2" style={{ fontSize: '1rem' }}>द्राक्ष काढा / Harvest Grapes</div>
+                            <div className="marathi text-gray-900 dark:text-white font-bold mb-2" style={{ fontSize: '1rem' }}>
+                                {isEn ? 'Harvest Grapes' : 'द्राक्ष काढा'}
+                            </div>
                             <div className="badge success" style={{ background: isDarkMode ? 'rgba(34, 197, 94, 0.2)' : '#E8F5E9', color: isDarkMode ? '#86efac' : '#2E7D32', padding: '4px 8px', borderRadius: '6px', fontSize: '0.75rem', fontWeight: 800, display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
-                                <TrendingUp size={12} /> ↑ High Demand
+                                <TrendingUp size={12} /> ↑ {isEn ? 'High Demand' : 'मोठी मागणी'}
                             </div>
                         </div>
                         <div className="insight-card bg-white dark:bg-gray-800 p-4 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700">
-                            <div className="marathi text-gray-900 dark:text-white font-bold mb-2" style={{ fontSize: '1rem' }}>जोखीम पातळी / Risk Level</div>
+                            <div className="marathi text-gray-900 dark:text-white font-bold mb-2" style={{ fontSize: '1rem' }}>
+                                {isEn ? 'Risk Level' : 'जोखीम पातळी'}
+                            </div>
                             <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.75rem', fontWeight: 700, marginBottom: '4px' }}>
-                                <span className="text-gray-500 dark:text-gray-400">Medium</span>
+                                <span className="text-gray-500 dark:text-gray-400">{isEn ? 'Medium' : 'मध्यम'}</span>
                                 <span className="text-gray-500 dark:text-gray-400">60%</span>
                             </div>
                             <div className="progress-bar-container bg-gray-100 dark:bg-gray-700 rounded-full h-2 overflow-hidden">
@@ -202,14 +212,16 @@ const HomeScreen = ({ setScreen, setTab, isDarkMode }) => {
                             <Lightbulb size={24} color="white" />
                         </div>
                         <div>
-                            <div className="marathi font-bold" style={{ marginBottom: '4px', fontSize: '0.95rem' }}>सेंद्रिय खतांचा वापर वाढवा आणि जमिनीचा पोत सुधारा.</div>
-                            <div className="english-sub" style={{ fontSize: '0.75rem', opacity: 0.8 }}>Increase the use of organic fertilizers to improve soil texture.</div>
+                            <div className="marathi font-bold" style={{ marginBottom: '4px', fontSize: '0.95rem' }}>
+                                {isEn ? 'Increase the use of organic fertilizers to improve soil texture.' : 'सेंद्रिय खतांचा वापर वाढवा आणि जमिनीचा पोत सुधारा.'}
+                            </div>
                         </div>
                     </div>
 
                     <button className="cta-btn" onClick={() => { setScreen('recommendations'); setTab('crops'); }}>
-                        <div className="marathi" style={{ fontSize: '1.2rem' }}>पीक शिफारसी मिळवा 🌱</div>
-                        <div className="english-sub" style={{ color: 'rgba(255,255,255,0.8)' }}>Get Crop Recommendations</div>
+                        <div className="marathi" style={{ fontSize: '1.2rem' }}>
+                            {isEn ? 'Get Crop Recommendations 🌱' : 'पीक शिफारसी मिळवा 🌱'}
+                        </div>
                     </button>
                 </div>
             </Motion.div>

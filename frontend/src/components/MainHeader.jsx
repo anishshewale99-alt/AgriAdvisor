@@ -1,29 +1,45 @@
 import React from 'react';
 import { Menu, ArrowLeft, Volume2 } from 'lucide-react';
 
-const MainHeader = ({ screen, setScreen, setTab, isScrolled, lang, setLang, setIsMenuOpen, handleTTS, isSpeaking, isDesktop, isDarkMode }) => (
+const MainHeader = ({ screen, setScreen, setTab, isScrolled, lang, setLang, setIsMenuOpen, handleTTS, isSpeaking, isDesktop, isDarkMode, previousCropScreen }) => (
     <div className="top-bar flex items-center justify-between gap-2" style={{
         width: '100%',
         margin: '0 auto',
-        background: isScrolled || screen !== 'home' ? (isScrolled ? (isDesktop ? 'rgba(255,255,255,0.8)' : 'rgba(255,255,255,0.95)') : 'white') : 'transparent',
-        boxShadow: isScrolled || screen !== 'home' ? '0 4px 20px rgba(0,0,0,0.06)' : 'none',
-        position: 'sticky',
+        background: isDesktop ? (isScrolled || screen !== 'home' ? (isScrolled ? 'rgba(255,255,255,0.8)' : 'white') : 'transparent') : (isDarkMode ? '#0f172a' : 'white'),
+        boxShadow: (isScrolled || screen !== 'home' || !isDesktop) ? '0 4px 20px rgba(0,0,0,0.06)' : 'none',
+        position: 'fixed',
         top: 0,
+        left: 0,
+        right: 0,
         transition: 'all 0.3s ease',
-        zIndex: 1000,
+        zIndex: 1100,
         padding: isDesktop ? '16px 40px' : '16px 20px',
-        backdropFilter: isScrolled ? 'blur(10px)' : 'none',
-        borderBottom: isScrolled ? '1px solid rgba(0,0,0,0.05)' : 'none'
+        backdropFilter: (isScrolled && isDesktop) ? 'blur(10px)' : 'none',
+        borderBottom: (isScrolled || !isDesktop) ? (isDarkMode ? '1px solid #1e293b' : '1px solid rgba(0,0,0,0.05)') : 'none'
     }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-            {screen === 'home' ? (
-                !isDesktop && (
-                    <button onClick={() => setIsMenuOpen(true)} style={{ background: 'transparent', border: 'none', cursor: 'pointer', display: 'flex', color: isScrolled ? 'var(--primary)' : 'white' }}>
-                        <Menu size={24} />
-                    </button>
-                )
-            ) : (
-                <button onClick={() => { setScreen('home'); setTab('home'); }} style={{ background: 'transparent', border: 'none', cursor: 'pointer', display: 'flex', color: isScrolled || screen !== 'home' ? 'var(--primary)' : 'white' }}>
+            {!isDesktop && (
+                <button onClick={() => setIsMenuOpen(true)} style={{ background: 'transparent', border: 'none', cursor: 'pointer', display: 'flex', color: isDarkMode ? '#fff' : 'var(--primary)' }}>
+                    <Menu size={24} />
+                </button>
+            )}
+
+            {screen !== 'home' && (
+                <button
+                    onClick={() => {
+                        if (screen === 'all-crops') {
+                            setScreen('recommendations');
+                            setTab('crops');
+                        } else if (screen === 'crop-detail') {
+                            setScreen(previousCropScreen || 'recommendations');
+                            setTab('crops');
+                        } else {
+                            setScreen('home');
+                            setTab('home');
+                        }
+                    }}
+                    style={{ background: 'transparent', border: 'none', cursor: 'pointer', display: 'flex', color: (isScrolled || screen !== 'home' || isDarkMode) ? (isDarkMode ? '#fff' : 'var(--primary)') : (isDesktop ? 'var(--primary)' : 'white') }}
+                >
                     <ArrowLeft size={24} />
                 </button>
             )}
@@ -38,7 +54,7 @@ const MainHeader = ({ screen, setScreen, setTab, isScrolled, lang, setLang, setI
         </div>
 
         <div className="flex items-center gap-2">
-            {!isDesktop && screen !== 'profile' && screen !== 'recommendations' && (
+            {!isDesktop && (
                 <div className="lang" onClick={() => setLang(lang === 'mr' ? 'en' : 'mr')} style={{
                     cursor: 'pointer',
                     background: lang === 'mr' ? 'var(--primary)' : 'white',
@@ -83,10 +99,15 @@ const MainHeader = ({ screen, setScreen, setTab, isScrolled, lang, setLang, setI
                 borderRadius: '50%',
                 border: isDarkMode ? '1px solid #374151' : '1px solid #eee',
                 display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                width: isDesktop ? '42px' : '38px',
+                height: isDesktop ? '42px' : '38px',
+                flexShrink: 0,
                 boxShadow: '0 4px 12px rgba(0,0,0,0.05)',
                 transition: 'all 0.2s'
             }}>
-                <Volume2 size={22} color={isSpeaking ? 'var(--primary)' : (isDarkMode ? '#9ca3af' : '#64748b')} />
+                <Volume2 size={isDesktop ? 22 : 20} color={isSpeaking ? 'var(--primary)' : (isDarkMode ? '#9ca3af' : '#64748b')} />
             </div>
         </div>
     </div>

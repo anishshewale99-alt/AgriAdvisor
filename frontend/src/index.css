@@ -19,7 +19,6 @@
 
 .content-card {
   width: 100%;
-  max-width: 540px;
   margin: 0 auto;
 }
 
@@ -212,7 +211,7 @@ body {
 
 /* Mobile Container Overrides */
 .app-shell {
-  max-width: 480px;
+  width: 100%;
   margin: 0 auto;
   min-height: 100vh;
   background: var(--bg-cream);
@@ -229,7 +228,7 @@ body {
   background: var(--bg-cream);
   position: sticky;
   top: 0;
-  z-index: 100;
+  z-index: 1001;
 }
 
 .top-bar .title {
@@ -294,10 +293,9 @@ body {
 .bottom-nav {
   position: fixed;
   bottom: 0;
-  left: 50%;
-  transform: translateX(-50%);
+  left: 0;
+  right: 0;
   width: 100%;
-  max-width: 480px;
   background: white;
   display: flex;
   justify-content: space-around;

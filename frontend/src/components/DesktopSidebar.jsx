@@ -33,8 +33,7 @@ const DesktopSidebar = ({ activeTab, setTab, setScreen, isDarkMode, toggleTheme,
                     >
                         <item.icon size={24} />
                         <div className="sidebar-labels">
-                            <span className="marathi">{item.labelMar}</span>
-                            <span className="english">{item.labelEng}</span>
+                            <span className="marathi">{lang === 'en' ? item.labelEng : item.labelMar}</span>
                         </div>
                     </div>
                 ))}

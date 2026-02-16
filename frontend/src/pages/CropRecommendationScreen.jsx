@@ -4,7 +4,7 @@ import { motion as Motion } from 'framer-motion';
 import { cropData } from '../cropData';
 import '../styles/CropRecommendationScreen.css';
 
-const CropRecommendationScreen = ({ onSelectCrop, lang, isDarkMode, farmInfo = {}, isDesktop }) => {
+const CropRecommendationScreen = ({ onSelectCrop, lang, isDarkMode, farmInfo = {}, isDesktop, showAll = false, setScreen }) => {
     const [filters, setFilters] = useState({
         soil: 'All',
         season: 'All',
@@ -20,6 +20,8 @@ const CropRecommendationScreen = ({ onSelectCrop, lang, isDarkMode, farmInfo = {
         const waterMatch = filters.water === 'All' || crop.waterReq === filters.water;
         return soilMatch && seasonMatch && waterMatch;
     });
+
+    const displayCrops = showAll ? filteredCrops : filteredCrops.slice(0, 3);
 
     const filterOptions = {
         soil: [
@@ -100,7 +102,10 @@ const CropRecommendationScreen = ({ onSelectCrop, lang, isDarkMode, farmInfo = {
                             color: isDarkMode ? '#fff' : 'var(--primary-dark)',
                             lineHeight: 1.1
                         }}>
-                            {isEn ? 'Top Crops for You' : 'तुमच्यासाठी टॉप पिके'}
+                            {showAll
+                                ? (isEn ? 'All Ranked Crops' : 'सर्व रँक केलेली पिके')
+                                : (isEn ? 'Top Crops for You' : 'तुमच्यासाठी टॉप पिके')
+                            }
                         </h2>
                         <span style={{
                             fontSize: '0.9rem',
@@ -184,8 +189,8 @@ const CropRecommendationScreen = ({ onSelectCrop, lang, isDarkMode, farmInfo = {
 
                 {/* Crop List */}
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-                    {filteredCrops.length > 0 ? (
-                        filteredCrops.map((crop) => (
+                    {displayCrops.length > 0 ? (
+                        displayCrops.map((crop) => (
                             <Motion.div
                                 key={crop.id}
                                 whileTap={{ scale: 0.98 }}
@@ -330,6 +335,31 @@ const CropRecommendationScreen = ({ onSelectCrop, lang, isDarkMode, farmInfo = {
                         </div>
                     )}
                 </div>
+
+                {!showAll && filteredCrops.length > 3 && (
+                    <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '24px' }}>
+                        <button
+                            onClick={() => setScreen('all-crops')}
+                            style={{
+                                background: 'var(--primary)',
+                                color: 'white',
+                                padding: '12px 24px',
+                                borderRadius: '14px',
+                                border: 'none',
+                                fontWeight: 700,
+                                fontSize: '0.9rem',
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '8px',
+                                boxShadow: '0 4px 12px rgba(46, 125, 50, 0.2)',
+                                cursor: 'pointer'
+                            }}
+                        >
+                            <span className="marathi">{isEn ? 'Get More Info' : 'अधिक माहिती मिळवा'}</span>
+                            <TrendingUp size={18} />
+                        </button>
+                    </div>
+                )}
             </div>
         </div>
     );
