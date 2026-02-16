@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { motion as Motion, AnimatePresence } from 'framer-motion';
-import { LogIn, Phone, Mail, ArrowRight, Languages, Eye, EyeOff, ChevronRight } from 'lucide-react';
+import { LogIn, Phone, Mail, ArrowRight, Languages, Eye, EyeOff, ChevronRight, Sprout } from 'lucide-react';
 import LandingImg from '../assets/landing 2.webp';
+import HeroVideo from '../assets/hero-video.mp4';
 import '../styles/LandingScreen.css';
 
 const LandingScreen = ({ onNext, isDesktop }) => {
@@ -20,119 +21,65 @@ const LandingScreen = ({ onNext, isDesktop }) => {
                 exit={{ opacity: isDesktop ? 1 : 0 }}
                 transition={{ duration: 0.3 }}
                 className="landing-page"
-                style={{
-                    backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.5)), url(${LandingImg})`,
-                    backgroundSize: 'cover',
-                    backgroundPosition: 'center',
-                    minHeight: '100vh',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    justifyContent: 'center',
-                    alignItems: isDesktop ? 'flex-start' : 'center',
-                    padding: isDesktop ? '0 100px' : '40px 20px',
-                    position: 'relative'
-                }}
             >
-                {/* Language Toggle */}
-                <div style={{
-                    position: 'absolute',
-                    top: '30px',
-                    right: isDesktop ? '60px' : '20px'
-                }}>
-                    <button
-                        className="language-toggle-btn-landing"
-                        onClick={() => setIsEnglish(!isEnglish)}
-                    >
-                        <Languages size={18} />
-                        <span>{isEnglish ? 'English' : 'मराठी'}</span>
-                    </button>
-                </div>
+                <video
+                    autoPlay
+                    loop
+                    muted
+                    playsInline
+                    className="hero-video"
+                >
+                    <source src={HeroVideo} type="video/mp4" />
+                </video>
+                <div className="hero-dark-overlay"></div>
+
+                {/* Top Navbar */}
+                <nav className="landing-navbar">
+                    <div className="nav-container-landing">
+                        <div className="nav-left-landing">
+                            <div className="landing-lang-toggle-container">
+                                <button
+                                    className="lang-toggle-landing-minimal"
+                                    onClick={() => setIsEnglish(!isEnglish)}
+                                >
+                                    {isEnglish ? 'मराठी' : 'English'}
+                                </button>
+                            </div>
+                            <div className="landing-brand">
+                                <Sprout size={28} className="leaf-logo-landing" />
+                                <span className="brand-name-landing">AgriAdvisor</span>
+                            </div>
+                        </div>
+
+                        {!isDesktop ? (
+                            <button className="mobile-menu-btn-landing">
+                                <ChevronRight size={24} />
+                            </button>
+                        ) : (
+                            <div className="nav-links-landing">
+                                <a href="#">{isEnglish ? 'Home' : 'होम'}</a>
+                                <a href="#">{isEnglish ? 'About Us' : 'आमच्याबद्दल'}</a>
+                                <a href="#">{isEnglish ? 'Blog' : 'ब्लॉग'}</a>
+                                <a href="#">{isEnglish ? 'Contact Us' : 'संपर्क'}</a>
+                            </div>
+                        )}
+                    </div>
+                </nav>
 
                 <Motion.div
                     initial={{ opacity: 0, y: 30 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.8 }}
-                    style={{
-                        maxWidth: '700px',
-                        textAlign: isDesktop ? 'left' : 'center'
-                    }}
+                    className="hero-content-overlay"
                 >
-                    <h1 style={{
-                        color: 'white',
-                        fontSize: isDesktop ? '4rem' : '2.5rem',
-                        fontWeight: 800,
-                        lineHeight: 1.1,
-                        marginBottom: '24px',
-                        textShadow: '0 4px 20px rgba(0,0,0,0.5)'
-                    }}>
-                        {isEnglish
-                            ? 'Your harvest begins with the right decision'
-                            : 'तुमची कापणी योग्य निर्णयाने सुरू होते'}
-                    </h1>
-
-                    <p style={{
-                        color: 'rgba(255,255,255,0.95)',
-                        fontSize: '1.35rem',
-                        marginBottom: '20px',
-                        fontWeight: 500,
-                        textShadow: '0 2px 10px rgba(0,0,0,0.3)'
-                    }}>
-                        {isEnglish ? 'Sow Right, Grow Bright.' : 'योग्य पेरा, उज्ज्वल वाढ.'}
-                    </p>
-
-                    <div style={{
-                        display: 'grid',
-                        gap: '12px',
-                        marginBottom: '40px',
-                        color: 'rgba(255,255,255,0.9)',
-                        fontSize: '1.1rem'
-                    }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                            <span style={{ fontSize: '1.5rem' }}>✓</span>
-                            <span>{isEnglish ? 'Smart Crop Recommendations' : 'स्मार्ट पीक शिफारसी'}</span>
-                        </div>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                            <span style={{ fontSize: '1.5rem' }}>✓</span>
-                            <span>{isEnglish ? 'Real-time Weather Updates' : 'रिअल-टाइम हवामान अद्यतने'}</span>
-                        </div>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                            <span style={{ fontSize: '1.5rem' }}>✓</span>
-                            <span>{isEnglish ? 'Market Price Insights' : 'बाजार भाव माहिती'}</span>
-                        </div>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                            <span style={{ fontSize: '1.5rem' }}>✓</span>
-                            <span>{isEnglish ? 'Expert Agricultural Advice' : 'तज्ञ कृषी सल्ला'}</span>
-                        </div>
-                    </div>
+                    <h1 className="hero-title-main">AGRI-ADVISOR</h1>
+                    <p className="hero-subtitle-sub">{isEnglish ? 'SMART AGRICULTURE • DATA-DRIVEN DECISIONS' : 'स्मार्ट कृषी • डेटा-चालित निर्णय'}</p>
 
                     <button
                         onClick={() => setView('login')}
-                        style={{
-                            background: 'var(--accent-yellow)',
-                            color: '#1a232e',
-                            border: 'none',
-                            padding: '18px 48px',
-                            fontSize: '1.25rem',
-                            fontWeight: 800,
-                            borderRadius: '12px',
-                            cursor: 'pointer',
-                            transition: 'all 0.3s ease',
-                            display: 'inline-flex',
-                            alignItems: 'center',
-                            gap: '12px',
-                            boxShadow: '0 8px 24px rgba(0,0,0,0.3)'
-                        }}
-                        onMouseEnter={(e) => {
-                            e.target.style.transform = 'translateY(-2px)';
-                            e.target.style.boxShadow = '0 12px 32px rgba(0,0,0,0.4)';
-                        }}
-                        onMouseLeave={(e) => {
-                            e.target.style.transform = 'translateY(0)';
-                            e.target.style.boxShadow = '0 8px 24px rgba(0,0,0,0.3)';
-                        }}
+                        className="hero-discover-btn"
                     >
-                        {isEnglish ? 'Get Started' : 'सुरू करा'}
-                        <ChevronRight size={24} />
+                        {isEnglish ? 'DISCOVER' : 'शोध घ्या'}
                     </button>
                 </Motion.div>
             </Motion.div>
