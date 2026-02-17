@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Volume2, Droplets, CloudOff, ChevronRight, ChevronLeft, CloudRain, Snowflake, Sun, CalendarRange } from 'lucide-react';
 import FarmPattern from '../assets/bg2.png';
+import { useLanguage } from '../context/LanguageContext';
 import '../styles/FarmInfoScreen.css';
 
 const FarmInfoScreen = ({ onNext, onBack, farmInfo, setFarmInfo, isDesktop }) => {
@@ -18,7 +19,7 @@ const FarmInfoScreen = ({ onNext, onBack, farmInfo, setFarmInfo, isDesktop }) =>
 
     const [isSpeaking, setIsSpeaking] = useState(false);
     const [isScrolled, setIsScrolled] = useState(false);
-    const [isEnglish, setIsEnglish] = useState(false);
+    const { isEnglish, toggleLanguage } = useLanguage(); // Use global language context
 
     useEffect(() => {
         const handleScroll = () => {
@@ -115,7 +116,7 @@ const FarmInfoScreen = ({ onNext, onBack, farmInfo, setFarmInfo, isDesktop }) =>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                         {!isDesktop && (
                             <div
-                                onClick={() => setIsEnglish(!isEnglish)}
+                                onClick={toggleLanguage}
                                 style={{
                                     display: 'flex',
                                     alignItems: 'center',

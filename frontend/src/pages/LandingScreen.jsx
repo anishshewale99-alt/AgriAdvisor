@@ -4,12 +4,13 @@ import { LogIn, Phone, Mail, ArrowRight, Languages, Eye, EyeOff, ChevronRight, S
 import LandingImg from '../assets/landing 2.webp';
 import GoogleLoginButton from '../components/GoogleLoginButton';
 import { useAuth } from '../context/AuthContext';
+import { useLanguage } from '../context/LanguageContext';
 import HeroVideo from '../assets/hero-video.mp4';
 import '../styles/LandingScreen.css';
 
 const LandingScreen = ({ onNext, isDesktop }) => {
     const [view, setView] = useState('landing'); // 'landing' or 'login'
-    const [isEnglish, setIsEnglish] = useState(false);
+    const { isEnglish, toggleLanguage } = useLanguage(); // Use global language context
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [showPassword, setShowPassword] = useState(false);
@@ -42,7 +43,7 @@ const LandingScreen = ({ onNext, isDesktop }) => {
                             <div className="landing-lang-toggle-container">
                                 <button
                                     className="lang-toggle-landing-minimal"
-                                    onClick={() => setIsEnglish(!isEnglish)}
+                                    onClick={toggleLanguage}
                                 >
                                     {isEnglish ? 'मराठी' : 'English'}
                                 </button>
@@ -147,7 +148,7 @@ const LandingScreen = ({ onNext, isDesktop }) => {
                     <div className="language-toggle-container">
                         <button
                             className="language-toggle-btn"
-                            onClick={() => setIsEnglish(!isEnglish)}
+                            onClick={toggleLanguage}
                         >
                             <Languages size={18} />
                             <span>{isEnglish ? 'English' : 'मराठी'}</span>

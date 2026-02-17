@@ -2,10 +2,12 @@ import React from 'react';
 import { motion as Motion } from 'framer-motion';
 import { MapPin, Sun, Droplets, Wind, AlertTriangle, TrendingUp, Lightbulb } from 'lucide-react';
 import MarketTicker from '../components/MarketTicker';
+import { useLanguage } from '../context/LanguageContext';
 import '../styles/HomeScreen.css';
 
-const HomeScreen = ({ setScreen, setTab, isDarkMode, lang }) => {
-    const isEn = lang === 'en';
+const HomeScreen = ({ setScreen, setTab, isDarkMode }) => {
+    const { isEnglish } = useLanguage(); // Use global language context
+    const isEn = isEnglish; // Keep isEn for backward compatibility
     const [weather, setWeather] = React.useState(null);
 
     const weatherTranslations = {

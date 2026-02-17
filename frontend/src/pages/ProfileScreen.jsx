@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
 import { User, Sprout, Droplets, CloudRain, Tractor, Edit2 } from 'lucide-react';
 import { motion as Motion } from 'framer-motion';
+import { useLanguage } from '../context/LanguageContext';
 import '../styles/ProfileScreen.css';
 
 const ProfileScreen = ({ darkMode, farmDetails, isDesktop }) => {
-    const [isEnglish, setIsEnglish] = useState(false);
+    const { isEnglish, toggleLanguage } = useLanguage(); // Use global language context
 
     // Fallback data if farmDetails is missing
     const details = farmDetails || {};
@@ -52,7 +53,7 @@ const ProfileScreen = ({ darkMode, farmDetails, isDesktop }) => {
                     {/* Language Toggle - only on mobile */}
                     {!isDesktop && (
                         <div
-                            onClick={() => setIsEnglish(!isEnglish)}
+                            onClick={toggleLanguage}
                             style={{
                                 position: 'absolute',
                                 top: '20px',

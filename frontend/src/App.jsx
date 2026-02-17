@@ -21,6 +21,7 @@ import {
   ChevronDown
 } from 'lucide-react';
 import { motion as Motion, AnimatePresence } from 'framer-motion';
+import { useLanguage } from './context/LanguageContext';
 
 import LandingScreen from './pages/LandingScreen';
 import FarmInfoScreen from './pages/FarmInfoScreen';
@@ -38,32 +39,37 @@ import DesktopSidebar from './components/DesktopSidebar';
 import MainHeader from './components/MainHeader';
 // Image imports removed for clean solid background layout
 
-const BottomNav = ({ activeTab, setTab, setScreen, lang }) => (
-  <div className="bottom-nav" style={{ width: '100%', display: 'flex', justifyContent: 'center' }}>
-    <div style={{ width: '100%', display: 'flex', justifyContent: 'space-evenly', alignItems: 'center' }}>
-      <div className={`nav-item ${activeTab === 'home' ? 'active' : ''}`}
-        onClick={() => { setTab('home'); setScreen('home'); }}>
-        <Home size={22} />
-        <span className="marathi">{lang === 'en' ? 'Home' : 'होम'}</span>
-      </div>
-      <div className={`nav-item ${activeTab === 'crops' ? 'active' : ''}`}
-        onClick={() => { setTab('crops'); setScreen('recommendations'); }}>
-        <Sprout size={22} />
-        <span className="marathi">{lang === 'en' ? 'Crops' : 'पीके'}</span>
-      </div>
-      <div className={`nav-item ${activeTab === 'community' ? 'active' : ''}`}
-        onClick={() => { setTab('community'); setScreen('community'); }}>
-        <Users size={22} />
-        <span className="marathi">{lang === 'en' ? 'Community' : 'समुदाय'}</span>
-      </div>
-      <div className={`nav-item ${activeTab === 'settings' ? 'active' : ''}`}
-        onClick={() => { setTab('settings'); setScreen('settings'); }}>
-        <Settings size={22} />
-        <span className="marathi">{lang === 'en' ? 'Settings' : 'सेटिंग्ज'}</span>
+const BottomNav = ({ activeTab, setTab, setScreen }) => {
+  const { isEnglish } = useLanguage(); // Use global language context
+  const lang = isEnglish ? 'en' : 'mr'; // For backward compatibility
+
+  return (
+    <div className="bottom-nav" style={{ width: '100%', display: 'flex', justifyContent: 'center' }}>
+      <div style={{ width: '100%', display: 'flex', justifyContent: 'space-evenly', alignItems: 'center' }}>
+        <div className={`nav-item ${activeTab === 'home' ? 'active' : ''}`}
+          onClick={() => { setTab('home'); setScreen('home'); }}>
+          <Home size={22} />
+          <span className="marathi">{lang === 'en' ? 'Home' : 'होम'}</span>
+        </div>
+        <div className={`nav-item ${activeTab === 'crops' ? 'active' : ''}`}
+          onClick={() => { setTab('crops'); setScreen('recommendations'); }}>
+          <Sprout size={22} />
+          <span className="marathi">{lang === 'en' ? 'Crops' : 'पीके'}</span>
+        </div>
+        <div className={`nav-item ${activeTab === 'community' ? 'active' : ''}`}
+          onClick={() => { setTab('community'); setScreen('community'); }}>
+          <Users size={22} />
+          <span className="marathi">{lang === 'en' ? 'Community' : 'समुदाय'}</span>
+        </div>
+        <div className={`nav-item ${activeTab === 'settings' ? 'active' : ''}`}
+          onClick={() => { setTab('settings'); setScreen('settings'); }}>
+          <Settings size={22} />
+          <span className="marathi">{lang === 'en' ? 'Settings' : 'सेटिंग्ज'}</span>
+        </div>
       </div>
     </div>
-  </div>
-);
+  );
+};
 
 
 // Replaced by CropRecommendationScreen.jsx component
@@ -341,8 +347,6 @@ function App() {
               <div className="content-card">
                 {screen === 'home' && (
                   <HomeScreen
-                    lang={lang}
-                    setLang={setLang}
                     setIsVoiceOpen={setIsVoiceOpen}
                     setScreen={setScreen}
                     setTab={setActiveTab}
@@ -420,7 +424,7 @@ function App() {
                 )}
               </div>
 
-              {!isDesktop && <BottomNav activeTab={activeTab} setTab={setActiveTab} setScreen={setScreen} lang={lang} />}
+              {!isDesktop && <BottomNav activeTab={activeTab} setTab={setActiveTab} setScreen={setScreen} />}
             </div>
           </div>
         )}
