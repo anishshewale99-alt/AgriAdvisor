@@ -1,29 +1,70 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 
 const MarketTicker = () => {
-    const items = [
-        { name: 'गहू / Wheat', price: '₹2,275', trend: 'up' },
-        { name: 'कांदा / Onion', price: '₹1,500', trend: 'down' },
-        { name: 'सोयाबीन / Soy', price: '₹4,800', trend: 'up' },
-        { name: 'मका / Maize', price: '₹1,950', trend: 'stable' },
-    ];
+    const [trends, setTrends] = useState([]);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        const fetchTrends = async () => {
+            try {
+                const response = await fetch(`${import.meta.env.VITE_API_URL}/api/trends`);
+                const result = await response.json();
+                if (result.success) {
+                    setTrends(result.data);
+                }
+            } catch (err) {
+                console.error('Error fetching trends:', err);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchTrends();
+        // Refresh every 10 minutes
+        const interval = setInterval(fetchTrends, 10 * 60 * 1000);
+        return () => clearInterval(interval);
+    }, []);
+
+    if (loading || trends.length === 0) {
+        return (
+            <div className="ticker-container">
+                <div className="ticker-content">
+                    <span className="ticker-item">Mandi prices updating... Mandi prices updating...</span>
+                </div>
+            </div>
+        );
+    }
+
+    // Double/Triple the items to ensure smooth infinite loop
+    const displayItems = [...trends, ...trends, ...trends];
 
     return (
-        <div className="ticker-container">
+        <div className="ticker-container" style={{
+            background: '#f8fafc',
+            borderBottom: '1px solid #e2e8f0',
+            height: '40px',
+            display: 'flex',
+            alignItems: 'center'
+        }}>
             <div className="ticker-content">
-                {[...items, ...items, ...items, ...items].map((item, i) => (
-                    <span key={i} className="ticker-item">
-                        <span className="marathi">{item.name.split(' / ')[0]}</span>
-                        <span style={{ margin: '0 4px', fontSize: '0.7rem', opacity: 0.6 }}>/</span>
-                        <span style={{ fontWeight: 500 }}>{item.name.split(' / ')[1]}</span>
+                {displayItems.map((item, i) => (
+                    <span key={i} className="ticker-item" style={{ display: 'inline-flex', alignItems: 'center', margin: '0 20px' }}>
+                        <span style={{ fontWeight: 600, color: '#1e293b', fontSize: '0.9rem' }}>{item.commodity}</span>
                         <span style={{
-                            marginLeft: '8px',
-                            padding: '2px 8px',
-                            borderRadius: '6px',
-                            background: item.trend === 'up' ? 'rgba(46, 125, 50, 0.1)' : item.trend === 'down' ? 'rgba(239, 68, 68, 0.1)' : 'rgba(0,0,0,0.05)',
-                            color: item.trend === 'up' ? 'var(--primary)' : item.trend === 'down' ? '#ef4444' : 'var(--text-muted)'
+                            marginLeft: '10px',
+                            padding: '4px 10px',
+                            borderRadius: '20px',
+                            fontSize: '0.8rem',
+                            fontWeight: 700,
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '4px',
+                            background: item.trend === 'Rising' ? '#dcfce7' : item.trend === 'Falling' ? '#fee2e2' : '#f1f5f9',
+                            color: item.trend === 'Rising' ? '#166534' : item.trend === 'Falling' ? '#991b1b' : '#64748b',
+                            border: `1px solid ${item.trend === 'Rising' ? '#bbf7d0' : item.trend === 'Falling' ? '#fecaca' : '#e2e8f0'}`
                         }}>
-                            {item.price} {item.trend === 'up' ? '▲' : item.trend === 'down' ? '▼' : '•'}
+                            {item.trend === 'Rising' ? '▲' : item.trend === 'Falling' ? '▼' : '•'}
+                            {item.percentageChange > 0 ? '+' : ''}{item.percentageChange}%
                         </span>
                     </span>
                 ))}
