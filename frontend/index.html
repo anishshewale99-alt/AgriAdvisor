@@ -1,14 +1,132 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>AgriAdvisor - AI-Powered Precision Farming</title>
-    <meta name="description" content="AgriAdvisor helps farmers maximize yields with AI-driven weather analysis, market trends, and crop suggestions." />
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.jsx"></script>
-  </body>
+
+<head>
+  <meta charset="UTF-8" />
+
+  <!-- =============================================
+       FAVICON (browser tab icon)
+  ============================================= -->
+  <link rel="icon" type="image/png" sizes="48x48" href="/icons/icon-48x48.png" />
+  <link rel="icon" type="image/png" sizes="96x96" href="/icons/icon-96x96.png" />
+  <link rel="icon" type="image/png" sizes="192x192" href="/icons/icon-192x192.png" />
+
+  <!-- =============================================
+       PWA MANIFEST (Android + Desktop install)
+  ============================================= -->
+  <link rel="manifest" href="/manifest.json" />
+
+  <!-- =============================================
+       MOBILE VIEWPORT
+  ============================================= -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="mobile-web-app-capable" content="yes" />
+
+  <!-- =============================================
+       THEME COLORS (browser chrome color on mobile)
+  ============================================= -->
+  <meta name="theme-color" media="(prefers-color-scheme: light)" content="#2E7D32" />
+  <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#1B5E20" />
+  <meta name="msapplication-TileColor" content="#FAF9F6" />
+  <meta name="msapplication-TileImage" content="/icons/icon-144x144.png" />
+  <meta name="msapplication-navbutton-color" content="#2E7D32" />
+
+  <!-- =============================================
+       iOS / APPLE PWA SUPPORT
+  ============================================= -->
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-title" content="AgriAdvisor" />
+  <!-- default-style: black-translucent pushes content under status bar (full screen feel) -->
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+
+  <!-- Apple Touch Icons (different sizes for different iPhone/iPad models) -->
+  <link rel="apple-touch-icon" sizes="120x120" href="/icons/icon-128x128.png" />
+  <link rel="apple-touch-icon" sizes="152x152" href="/icons/icon-152x152.png" />
+  <link rel="apple-touch-icon" sizes="167x167" href="/icons/icon-167x167.png" />
+  <link rel="apple-touch-icon" sizes="180x180" href="/icons/icon-180x180.png" />
+  <link rel="apple-touch-icon" href="/icons/icon-192x192.png" />
+
+  <!-- iOS Splash Screens (Launch Images) - needed so iOS doesn't show a blank white flash -->
+  <!-- iPhone SE (1st gen / 5s) 320x568 -->
+  <link rel="apple-touch-startup-image"
+    media="(device-width: 320px) and (device-height: 568px) and (-webkit-device-pixel-ratio: 2)"
+    href="/icons/icon-192x192.png" />
+  <!-- iPhone 6/7/8 375x667 -->
+  <link rel="apple-touch-startup-image"
+    media="(device-width: 375px) and (device-height: 667px) and (-webkit-device-pixel-ratio: 2)"
+    href="/icons/icon-384x384.png" />
+  <!-- iPhone 6+/7+/8+ 414x736 -->
+  <link rel="apple-touch-startup-image"
+    media="(device-width: 414px) and (device-height: 736px) and (-webkit-device-pixel-ratio: 3)"
+    href="/icons/icon-384x384.png" />
+  <!-- iPhone X/XS 375x812 -->
+  <link rel="apple-touch-startup-image"
+    media="(device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3)"
+    href="/icons/icon-384x384.png" />
+  <!-- iPhone XS Max / 11 Pro Max 414x896 -->
+  <link rel="apple-touch-startup-image"
+    media="(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 3)"
+    href="/icons/icon-384x384.png" />
+  <!-- iPhone 12/13/14 390x844 -->
+  <link rel="apple-touch-startup-image"
+    media="(device-width: 390px) and (device-height: 844px) and (-webkit-device-pixel-ratio: 3)"
+    href="/icons/icon-512x512.png" />
+  <!-- iPhone 12/13 Pro Max / 14 Plus 430x932 -->
+  <link rel="apple-touch-startup-image"
+    media="(device-width: 430px) and (device-height: 932px) and (-webkit-device-pixel-ratio: 3)"
+    href="/icons/icon-512x512.png" />
+  <!-- iPhone 15 Pro / 15 Pro Max -->
+  <link rel="apple-touch-startup-image"
+    media="(device-width: 393px) and (device-height: 852px) and (-webkit-device-pixel-ratio: 3)"
+    href="/icons/icon-512x512.png" />
+  <!-- iPad 768x1024 -->
+  <link rel="apple-touch-startup-image"
+    media="(device-width: 768px) and (device-height: 1024px) and (-webkit-device-pixel-ratio: 2)"
+    href="/icons/icon-512x512.png" />
+  <!-- iPad Pro 11" 834x1194 -->
+  <link rel="apple-touch-startup-image"
+    media="(device-width: 834px) and (device-height: 1194px) and (-webkit-device-pixel-ratio: 2)"
+    href="/icons/icon-512x512.png" />
+  <!-- iPad Pro 12.9" 1024x1366 -->
+  <link rel="apple-touch-startup-image"
+    media="(device-width: 1024px) and (device-height: 1366px) and (-webkit-device-pixel-ratio: 2)"
+    href="/icons/icon-512x512.png" />
+
+  <!-- =============================================
+       SEO & PAGE META
+  ============================================= -->
+  <title>AgriAdvisor - AI-Powered Precision Farming</title>
+  <meta name="description"
+    content="AgriAdvisor helps farmers maximize yields with AI-driven weather analysis, market trends, and crop suggestions." />
+  <meta name="keywords"
+    content="agriculture, AI farming, crop advisory, precision farming, weather analysis, market trends, smart farming India" />
+  <meta name="author" content="AgriAdvisor Team" />
+  <meta name="robots" content="index, follow" />
+
+  <!-- =============================================
+       OPEN GRAPH (WhatsApp, Facebook link previews)
+  ============================================= -->
+  <meta property="og:title" content="AgriAdvisor - AI-Powered Precision Farming" />
+  <meta property="og:description"
+    content="AgriAdvisor helps farmers maximize yields with AI-driven weather analysis, market trends, and crop suggestions." />
+  <meta property="og:type" content="website" />
+  <meta property="og:image" content="/icons/icon-512x512.png" />
+  <meta property="og:image:width" content="512" />
+  <meta property="og:image:height" content="512" />
+
+  <!-- =============================================
+       TWITTER / X CARD
+  ============================================= -->
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="AgriAdvisor - AI-Powered Precision Farming" />
+  <meta name="twitter:description"
+    content="AgriAdvisor helps farmers maximize yields with AI-driven weather analysis, market trends, and crop suggestions." />
+  <meta name="twitter:image" content="/icons/icon-512x512.png" />
+</head>
+
+<body>
+  <div id="root"></div>
+  <script type="module" src="/src/main.jsx"></script>
+</body>
+
 </html>
