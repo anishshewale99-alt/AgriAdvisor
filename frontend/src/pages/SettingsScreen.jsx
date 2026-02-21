@@ -14,15 +14,6 @@ import '../styles/SettingsScreen.css';
 const SettingsScreen = ({ darkMode, isDarkMode, setIsDarkMode, toggleTheme, lang, setLang, onLogout, isDesktop }) => {
     const settings = [
         {
-            id: 'language',
-            icon: Globe,
-            label_mr: 'भाषा बदला',
-            label_en: 'Change Language',
-            value: lang === 'mr' ? 'मराठी' : 'English',
-            onClick: () => setLang(lang === 'mr' ? 'en' : 'mr'),
-            color: '#4CAF50'
-        },
-        {
             id: 'notifications',
             icon: Bell,
             label_mr: 'सूचना',
@@ -38,7 +29,7 @@ const SettingsScreen = ({ darkMode, isDarkMode, setIsDarkMode, toggleTheme, lang
             onClick: toggleTheme,
             color: isDarkMode ? '#FFD54F' : '#607D8B'
         }
-    ].filter(item => isDesktop ? item.id !== 'language' : true);
+    ];
 
     return (
         <Motion.div
@@ -52,59 +43,6 @@ const SettingsScreen = ({ darkMode, isDarkMode, setIsDarkMode, toggleTheme, lang
                 padding: '20px'
             }}
         >
-            {/* Language Selection - only on mobile */}
-            {!isDesktop && (
-                <div style={{
-                    background: isDarkMode ? '#1f2937' : 'white',
-                    borderRadius: '20px',
-                    padding: '24px',
-                    marginBottom: '20px',
-                    boxShadow: '0 4px 12px rgba(0,0,0,0.03)',
-                    border: isDarkMode ? '1px solid #374151' : '1px solid #f0f0f0'
-                }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '20px' }}>
-                        <div style={{ padding: '8px', background: 'rgba(46, 125, 50, 0.1)', borderRadius: '12px' }}>
-                            <Languages size={20} color="var(--primary)" />
-                        </div>
-                        <h3 className="marathi" style={{ fontSize: '1.1rem', color: isDarkMode ? '#fff' : '#1f2937' }}>
-                            {lang === 'mr' ? 'भाषा निवडा' : 'Select Language'}
-                        </h3>
-                    </div>
-
-                    <div style={{ display: 'flex', gap: '12px' }}>
-                        <button
-                            onClick={() => setLang('mr')}
-                            style={{
-                                flex: 1,
-                                padding: '16px',
-                                borderRadius: '16px',
-                                border: lang === 'mr' ? '2px solid var(--primary)' : '1px solid #eee',
-                                background: lang === 'mr' ? 'rgba(46, 125, 50, 0.05)' : 'transparent',
-                                color: lang === 'mr' ? 'var(--primary)' : (isDarkMode ? '#9ca3af' : '#6b7280'),
-                                fontWeight: 700,
-                                transition: 'all 0.2s ease'
-                            }}
-                        >
-                            मराठी
-                        </button>
-                        <button
-                            onClick={() => setLang('en')}
-                            style={{
-                                flex: 1,
-                                padding: '16px',
-                                borderRadius: '16px',
-                                border: lang === 'en' ? '2px solid var(--primary)' : '1px solid #eee',
-                                background: lang === 'en' ? 'rgba(46, 125, 50, 0.05)' : 'transparent',
-                                color: lang === 'en' ? 'var(--primary)' : (isDarkMode ? '#9ca3af' : '#6b7280'),
-                                fontWeight: 700,
-                                transition: 'all 0.2s ease'
-                            }}
-                        >
-                            English
-                        </button>
-                    </div>
-                </div>
-            )}
             <div style={{
                 background: isDarkMode ? '#111827' : 'white',
                 borderRadius: '24px',

@@ -221,7 +221,6 @@ function App() {
   const [lang, setLang] = useState('mr');
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [isScrolled, setIsScrolled] = useState(false);
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [farmDetails, setFarmDetails] = useState({});
   const [isDesktop, setIsDesktop] = useState(window.innerWidth >= 1024);
@@ -233,15 +232,9 @@ function App() {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  // Background Logic removed as per request to have solid backgrounds only
-
   const toggleTheme = () => setIsDarkMode(prev => !prev);
 
-  React.useEffect(() => {
-    const handleScroll = () => setIsScrolled(window.scrollY > 50);
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
+  // Background Logic removed as per request to have solid backgrounds only
 
   const handleTTS = () => {
     if (window.speechSynthesis.speaking) {
@@ -249,7 +242,7 @@ function App() {
       setIsSpeaking(false);
       return;
     }
-    const utterance = new SpeechSynthesisUtterance(lang === 'mr' ? 'क्रॉप ॲडव्हायझरमध्ये आपले स्वागत आहे. सध्या रबी हंगाम आहे.' : 'Welcome to CropAdvisor. It is currently Rabi Season.');
+    const utterance = new SpeechSynthesisUtterance(lang === 'mr' ? 'ॲग्री ॲडव्हायझरमध्ये आपले स्वागत आहे. सध्या रबी हंगाम आहे.' : 'Welcome to AgriAdvisor. It is currently Rabi Season.');
     utterance.lang = lang === 'mr' ? 'mr-IN' : 'en-US';
     utterance.onend = () => setIsSpeaking(false);
     utterance.onerror = () => setIsSpeaking(false);
@@ -316,14 +309,13 @@ function App() {
                 display: 'flex',
                 flexDirection: 'column',
                 alignItems: 'center',
-                paddingTop: isDesktop ? '80px' : '64px' // Account for fixed header
+                paddingTop: isDesktop ? '100px' : '84px' // Account for fixed header
               }}
             >
               <MainHeader
                 screen={screen}
                 setScreen={setScreen}
                 setTab={setActiveTab}
-                isScrolled={isScrolled}
                 lang={lang}
                 setLang={setLang}
                 setIsMenuOpen={setIsMenuOpen}
