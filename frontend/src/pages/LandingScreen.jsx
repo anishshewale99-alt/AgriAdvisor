@@ -99,12 +99,7 @@ const LandingScreen = ({ onNext, isDesktop }) => {
                             </button>
                         ) : (
                             <div className="nav-links-landing">
-                                <button onClick={() => setView('login')} className="nav-login-btn-minimal">
-                                    {isEnglish ? 'Login' : 'लॉगिन'}
-                                </button>
-                                <button onClick={() => setView('signup')} className="hero-discover-btn" style={{ padding: '8px 20px', fontSize: '0.9rem' }}>
-                                    {isEnglish ? 'Join Now' : 'आता सामील व्हा'}
-                                </button>
+                                {/* Clean Nav - Sign in/up removed */}
                             </div>
                         )}
                     </div>
@@ -123,21 +118,8 @@ const LandingScreen = ({ onNext, isDesktop }) => {
                         <button
                             onClick={() => setView('login')}
                             className="hero-discover-btn"
-                            style={{ minWidth: '160px' }}
                         >
-                            {isEnglish ? 'SIGN IN' : 'साइन इन'}
-                        </button>
-                        <button
-                            onClick={() => setView('signup')}
-                            className="hero-discover-btn"
-                            style={{
-                                minWidth: '160px',
-                                background: 'white',
-                                color: 'var(--primary-dark)',
-                                border: '2px solid white'
-                            }}
-                        >
-                            {isEnglish ? 'SIGN UP' : 'नोंदणी करा'}
+                            {isEnglish ? 'DISCOVER' : 'शोधा'}
                         </button>
                     </div>
                 </Motion.div>
