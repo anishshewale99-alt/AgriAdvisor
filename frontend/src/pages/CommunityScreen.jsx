@@ -1,5 +1,5 @@
 import React from 'react';
-import { Plus } from 'lucide-react';
+import { Plus, MessageCircle, Heart, Share2 } from 'lucide-react';
 import { motion as Motion, AnimatePresence } from 'framer-motion';
 import '../styles/CommunityScreen.css';
 import io from 'socket.io-client';
@@ -410,7 +410,25 @@ const CommunityScreen = ({ isDarkMode }) => {
                                 </div>
                             )}
 
-                            {/* Like / Comment / Share removed as per spec */}
+                            {/* Like / Comment / Share / Translate */}
+                            <div style={{
+                                display: 'flex',
+                                gap: '20px',
+                                marginTop: '16px',
+                                borderTop: isDarkMode ? '1px solid #374151' : '1px solid #f0f0f0',
+                                paddingTop: '12px',
+                                pointerEvents: 'auto'
+                            }}>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: isDarkMode ? '#9ca3af' : 'var(--text-muted)', fontSize: '0.875rem', cursor: 'pointer' }}>
+                                    <Heart size={18} /> {post.likes || 0}
+                                </div>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: isDarkMode ? '#9ca3af' : 'var(--text-muted)', fontSize: '0.875rem', cursor: 'pointer' }}>
+                                    <MessageCircle size={18} /> {post.comments || 0}
+                                </div>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: isDarkMode ? '#9ca3af' : 'var(--text-muted)', fontSize: '0.875rem', cursor: 'pointer', marginLeft: 'auto' }}>
+                                    <Share2 size={18} />
+                                </div>
+                            </div>
                         </Motion.div>
                     );
                 })}
