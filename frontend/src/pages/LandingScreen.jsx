@@ -53,19 +53,6 @@ const LandingScreen = ({ onNext, isDesktop }) => {
                                 <span className="brand-name-landing">AgriAdvisor</span>
                             </div>
                         </div>
-
-                        {!isDesktop ? (
-                            <button className="mobile-menu-btn-landing">
-                                <ChevronRight size={24} />
-                            </button>
-                        ) : (
-                            <div className="nav-links-landing">
-                                <a href="#">{isEnglish ? 'Home' : 'होम'}</a>
-                                <a href="#">{isEnglish ? 'About Us' : 'आमच्याबद्दल'}</a>
-                                <a href="#">{isEnglish ? 'Blog' : 'ब्लॉग'}</a>
-                                <a href="#">{isEnglish ? 'Contact Us' : 'संपर्क'}</a>
-                            </div>
-                        )}
                     </div>
                 </nav>
 

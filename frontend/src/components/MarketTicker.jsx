@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 
-const MarketTicker = () => {
+const MarketTicker = ({ isEnglish }) => {
     const [trends, setTrends] = useState([]);
     const [loading, setLoading] = useState(true);
 
@@ -26,10 +26,11 @@ const MarketTicker = () => {
     }, []);
 
     if (loading || trends.length === 0) {
+        const loadingText = isEnglish ? 'Mandi prices updating...' : 'मंडीचे भाव अपडेट होत आहेत...';
         return (
             <div className="ticker-container">
                 <div className="ticker-content">
-                    <span className="ticker-item">Mandi prices updating... Mandi prices updating...</span>
+                    <span className="ticker-item">{loadingText} {loadingText}</span>
                 </div>
             </div>
         );

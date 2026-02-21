@@ -23,32 +23,29 @@ import CropDetailScreen from './pages/CropDetailScreen';
 import DesktopSidebar from './components/DesktopSidebar';
 import MainHeader from './components/MainHeader';
 
-const BottomNav = ({ activeTab, setTab, setScreen }) => {
-  const { isEnglish } = useLanguage();
-  const lang = isEnglish ? 'en' : 'mr';
-
+const BottomNav = ({ activeTab, setTab, setScreen, isEnglish }) => {
   return (
     <div className="bottom-nav" style={{ width: '100%', display: 'flex', justifyContent: 'center' }}>
       <div style={{ width: '100%', display: 'flex', justifyContent: 'space-evenly', alignItems: 'center' }}>
         <div className={`nav-item ${activeTab === 'home' ? 'active' : ''}`}
           onClick={() => { setTab('home'); setScreen('home'); }}>
           <Home size={22} />
-          <span className="marathi">{lang === 'en' ? 'Home' : 'होम'}</span>
+          <span className="marathi">{isEnglish ? 'Home' : 'होम'}</span>
         </div>
         <div className={`nav-item ${activeTab === 'crops' ? 'active' : ''}`}
           onClick={() => { setTab('crops'); setScreen('recommendations'); }}>
           <Sprout size={22} />
-          <span className="marathi">{lang === 'en' ? 'Crops' : 'पीके'}</span>
+          <span className="marathi">{isEnglish ? 'Crops' : 'पीके'}</span>
         </div>
         <div className={`nav-item ${activeTab === 'community' ? 'active' : ''}`}
           onClick={() => { setTab('community'); setScreen('community'); }}>
           <Users size={22} />
-          <span className="marathi">{lang === 'en' ? 'Community' : 'समुदाय'}</span>
+          <span className="marathi">{isEnglish ? 'Community' : 'समुदाय'}</span>
         </div>
         <div className={`nav-item ${activeTab === 'settings' ? 'active' : ''}`}
           onClick={() => { setTab('settings'); setScreen('settings'); }}>
           <Settings size={22} />
-          <span className="marathi">{lang === 'en' ? 'Settings' : 'सेटिंग्ज'}</span>
+          <span className="marathi">{isEnglish ? 'Settings' : 'सेटिंग्ज'}</span>
         </div>
       </div>
     </div>
@@ -56,9 +53,9 @@ const BottomNav = ({ activeTab, setTab, setScreen }) => {
 };
 
 // Loading Screen Component
-const LoadingScreen = ({ lang, isDarkMode, onFinished }) => {
+const LoadingScreen = ({ isEnglish, isDarkMode, onFinished }) => {
   const [currentStep, setCurrentStep] = useState(0);
-  const isEn = lang === 'en';
+  const isEn = isEnglish;
 
   const steps = [
     { en: 'Fetching mandi prices', mr: 'मंडी भाव मिळवत आहे' },
@@ -192,12 +189,24 @@ const LoadingScreen = ({ lang, isDarkMode, onFinished }) => {
 };
 
 function App() {
+  const { isEnglish: contextIsEnglish, setIsEnglish: setContextIsEnglish } = useLanguage();
   const [onboarding, setOnboarding] = useState('landing');
   const [activeTab, setActiveTab] = useState('home');
   const [screen, setScreen] = useState('home');
   const [selectedCrop, setSelectedCrop] = useState(null);
   const [isVoiceOpen, setIsVoiceOpen] = useState(false);
-  const [lang, setLang] = useState('mr');
+  const [isEnglish, setIsEnglish] = useState(contextIsEnglish);
+
+  // Sync with context if it changes from other sources
+  React.useEffect(() => {
+    setIsEnglish(contextIsEnglish);
+  }, [contextIsEnglish]);
+
+  // Update context when local state changes
+  const handleSetIsEnglish = (val) => {
+    setIsEnglish(val);
+    setContextIsEnglish(val);
+  };
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [farmDetails, setFarmDetails] = useState({});
@@ -257,8 +266,7 @@ function App() {
                 setScreen={setScreen}
                 isDarkMode={isDarkMode}
                 toggleTheme={toggleTheme}
-                lang={lang}
-                setLang={setLang}
+                isEnglish={isEnglish}
                 onLogout={() => setOnboarding('landing')}
               />
             )}
@@ -278,8 +286,8 @@ function App() {
                 screen={screen}
                 setScreen={setScreen}
                 setTab={setActiveTab}
-                lang={lang}
-                setLang={setLang}
+                isEnglish={isEnglish}
+                setIsEnglish={handleSetIsEnglish}
                 setIsMenuOpen={setIsMenuOpen}
                 isDesktop={isDesktop}
                 isDarkMode={isDarkMode}
@@ -293,6 +301,7 @@ function App() {
                   darkMode={isDarkMode}
                   setScreen={setScreen}
                   setTab={setActiveTab}
+                  isEnglish={isEnglish}
                 />
               )}
 
@@ -303,11 +312,12 @@ function App() {
                     setScreen={setScreen}
                     setTab={setActiveTab}
                     isDarkMode={isDarkMode}
+                    isEnglish={isEnglish}
                   />
                 )}
                 {screen === 'recommendations' && (
                   <CropRecommendationScreen
-                    lang={lang}
+                    isEnglish={isEnglish}
                     isDarkMode={isDarkMode}
                     isDesktop={isDesktop}
                     farmInfo={farmDetails}
@@ -322,7 +332,7 @@ function App() {
                 )}
                 {screen === 'loading' && (
                   <LoadingScreen
-                    lang={lang}
+                    isEnglish={isEnglish}
                     isDarkMode={isDarkMode}
                     onFinished={() => {
                       setScreen('recommendations');
@@ -332,7 +342,7 @@ function App() {
                 )}
                 {screen === 'all-crops' && (
                   <CropRecommendationScreen
-                    lang={lang}
+                    isEnglish={isEnglish}
                     isDarkMode={isDarkMode}
                     isDesktop={isDesktop}
                     farmInfo={farmDetails}
@@ -350,7 +360,7 @@ function App() {
                     crop={selectedCrop}
                     onBack={() => setScreen(previousCropScreen)}
                     isDarkMode={isDarkMode}
-                    lang={lang}
+                    isEnglish={isEnglish}
                   />
                 )}
                 {screen === 'community' && <CommunityScreen isDarkMode={isDarkMode} />}
@@ -368,15 +378,15 @@ function App() {
                     isDarkMode={isDarkMode}
                     setIsDarkMode={setIsDarkMode}
                     toggleTheme={toggleTheme}
-                    lang={lang}
-                    setLang={setLang}
+                    isEnglish={isEnglish}
+                    setIsEnglish={handleSetIsEnglish}
                     isDesktop={isDesktop}
                     onLogout={() => setOnboarding('landing')}
                   />
                 )}
               </div>
 
-              {!isDesktop && <BottomNav activeTab={activeTab} setTab={setActiveTab} setScreen={setScreen} />}
+              {!isDesktop && <BottomNav activeTab={activeTab} setTab={setActiveTab} setScreen={setScreen} isEnglish={isEnglish} />}
             </div>
           </div>
         )}

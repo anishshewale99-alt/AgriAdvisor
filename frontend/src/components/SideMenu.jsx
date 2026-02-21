@@ -10,13 +10,13 @@ import {
 } from 'lucide-react';
 import { motion as Motion, AnimatePresence } from 'framer-motion';
 
-const SideMenu = ({ isOpen, onClose, darkMode, setScreen, setTab }) => {
+const SideMenu = ({ isOpen, onClose, darkMode, setScreen, setTab, isEnglish }) => {
     const menuItems = [
-        { icon: Shield, title: 'विमा माहिती', subtitle: 'Insurance Info', color: '#2196F3' },
-        { icon: CircleHelp, title: 'मदत आणि सहाय्य', subtitle: 'Help & Support', color: '#9C27B0' },
-        { icon: Phone, title: 'संपर्क साधा', subtitle: 'Contact Us', color: '#4CAF50' },
-        { icon: FileText, title: 'गोपनीयता धोरण', subtitle: 'Privacy Policy', color: '#607D8B' },
-        { icon: User, title: 'प्रोफाइल', subtitle: 'Profile', color: '#FF5722', id: 'profile' },
+        { icon: Shield, title: isEnglish ? 'Insurance Info' : 'विमा माहिती', color: '#2196F3' },
+        { icon: CircleHelp, title: isEnglish ? 'Help & Support' : 'मदत आणि सहाय्य', color: '#9C27B0' },
+        { icon: Phone, title: isEnglish ? 'Contact Us' : 'संपर्क साधा', color: '#4CAF50' },
+        { icon: FileText, title: isEnglish ? 'Privacy Policy' : 'गोपनीयता धोरण', color: '#607D8B' },
+        { icon: User, title: isEnglish ? 'Profile' : 'प्रोफाईल', color: '#FF5722', id: 'profile' },
     ];
 
     return (
@@ -122,9 +122,11 @@ const SideMenu = ({ isOpen, onClose, darkMode, setScreen, setTab }) => {
                                                 <div className="marathi" style={{ fontSize: '0.95rem', fontWeight: 700, color: darkMode ? '#fff' : '#1f2937' }}>
                                                     {item.title}
                                                 </div>
-                                                <div className="english-sub" style={{ fontSize: '0.75rem', opacity: 0.7 }}>
-                                                    {item.subtitle}
-                                                </div>
+                                                {!isEnglish && item.subtitle && (
+                                                    <div className="english-sub" style={{ fontSize: '0.75rem', opacity: 0.7 }}>
+                                                        {item.subtitle}
+                                                    </div>
+                                                )}
                                             </div>
                                         </div>
                                         <ChevronRight size={18} color="#cbd5e1" />

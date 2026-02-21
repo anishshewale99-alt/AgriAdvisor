@@ -1,10 +1,10 @@
 import React from 'react';
 
-const LanguageToggle = ({ lang, setLang, isDarkMode }) => {
+const LanguageToggle = ({ isEnglish, setIsEnglish, isDarkMode }) => {
     return (
         <div
             className="lang-toggle-nav"
-            onClick={() => setLang(lang === 'mr' ? 'en' : 'mr')}
+            onClick={() => setIsEnglish(!isEnglish)}
             style={{
                 cursor: 'pointer',
                 background: isDarkMode ? 'rgba(255, 255, 255, 0.05)' : 'rgba(46, 125, 50, 0.1)',
@@ -20,13 +20,13 @@ const LanguageToggle = ({ lang, setLang, isDarkMode }) => {
                 transition: 'all 0.3s ease'
             }}
         >
-            <span style={{ opacity: lang === 'mr' ? 1 : 0.4, transition: 'opacity 0.2s' }}>मराठी</span>
+            <span style={{ opacity: !isEnglish ? 1 : 0.4, transition: 'opacity 0.2s' }}>मराठी</span>
             <div style={{
                 width: '1px',
                 height: '14px',
                 background: isDarkMode ? 'rgba(255, 255, 255, 0.2)' : 'rgba(46, 125, 50, 0.3)'
             }} />
-            <span style={{ opacity: lang === 'en' ? 1 : 0.4, transition: 'opacity 0.2s' }}>English</span>
+            <span style={{ opacity: isEnglish ? 1 : 0.4, transition: 'opacity 0.2s' }}>English</span>
         </div>
     );
 };

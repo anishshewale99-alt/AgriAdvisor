@@ -6,8 +6,7 @@ import { useLanguage } from '../context/LanguageContext';
 import TTSButton from '../components/TTSButton';
 import '../styles/HomeScreen.css';
 
-const HomeScreen = ({ setScreen, setTab, isDarkMode }) => {
-    const { isEnglish } = useLanguage();
+const HomeScreen = ({ setScreen, setTab, isDarkMode, isEnglish }) => {
     const isEn = isEnglish;
     const [weather, setWeather] = React.useState(null);
 
@@ -120,7 +119,7 @@ const HomeScreen = ({ setScreen, setTab, isDarkMode }) => {
 
     const getTTSText = () => {
         let text = isEn ? "Home Overview. " : "होम ओव्हरव्ह्यू. ";
-        text += isEn ? "Current Season: Rabi. " : "सध्याचा हंगाम: रबी. ";
+        text += isEn ? "Current Season: Rabi. " : "सध्याचा हंगाम: रब्बी. ";
         if (weather) {
             text += isEn
                 ? `Weather in ${weather.location} is ${weather.description} with ${weather.temperature} degrees.`
@@ -150,13 +149,13 @@ const HomeScreen = ({ setScreen, setTab, isDarkMode }) => {
 
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
                         <div className="season-chip bg-white text-gray-800 dark:bg-gray-800 dark:text-gray-200 border border-gray-100 dark:border-gray-700 shadow-sm" style={{ margin: 0 }}>
-                            {isEn ? 'Rabi Season - Feb 2026' : 'रबी हंगाम – फेब्रुवारी 2026'}
+                            {isEn ? 'Rabi Season - Feb 2026' : 'रब्बी हंगाम - फेब्रुवारी 2026'}
                         </div>
                         <TTSButton textToRead={getTTSText()} isDarkMode={isDarkMode} />
                     </div>
 
                     <div className="my-4">
-                        <MarketTicker />
+                        <MarketTicker isEnglish={isEn} />
                     </div>
 
                     <div className="weather-card" style={{ color: isDarkMode ? '#f3f4f6' : '#1f2937', margin: '0 0 20px', padding: '20px', boxShadow: 'none', border: isDarkMode ? '1px solid #374151' : '1px solid #f0f0f0', background: isDarkMode ? '#1f2937' : 'transparent', borderRadius: '16px' }}>
@@ -178,7 +177,7 @@ const HomeScreen = ({ setScreen, setTab, isDarkMode }) => {
                                 <div className="weather-stats">
                                     <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                                         <Droplets size={16} />
-                                        <span style={{ fontWeight: 600 }}>{isEn ? 'Humidity' : 'आद्रता'} {weather.humidity}%</span>
+                                        <span style={{ fontWeight: 600 }}>{isEn ? 'Humidity' : 'आर्द्रता'} {weather.humidity}%</span>
                                     </div>
                                     <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                                         <Wind size={16} />
@@ -200,23 +199,32 @@ const HomeScreen = ({ setScreen, setTab, isDarkMode }) => {
                                 {isEn ? 'Heat risk warning next week' : 'पुढच्या आठवड्यात उष्णतेचा धोका'}
                             </div>
                             <div className="english-sub text-gray-500 dark:text-gray-400 text-sm">
-                                {isEn ? 'Take necessary precautions.' : 'आवश्यक खबरदारी घ्या.'}
+                                {isEn ? 'Take necessary precautions.' : 'आवश्यक ती काळजी घ्या.'}
                             </div>
                         </div>
                     </div>
 
                     <div className="insight-grid grid grid-cols-2 gap-4" style={{ margin: '0 0 20px' }}>
                         <div className="insight-card bg-white dark:bg-gray-800 p-4 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700">
-                            <div className="marathi text-gray-900 dark:text-white font-bold mb-2" style={{ fontSize: '1rem' }}>
-                                {isEn ? 'Harvest Grapes' : 'द्राक्ष काढा'}
+                            <div className="marathi text-gray-900 dark:text-white font-bold" style={{ fontSize: '1rem' }}>
+                                {isEn ? 'Harvest Grapes' : 'द्राक्ष काढणी'}
+                            </div>
+                            <div style={{ fontSize: '0.75rem', color: '#9ca3af', marginBottom: '8px' }}>
+                                {isEn ? 'द्राक्ष काढणी' : 'Harvest Grapes'}
                             </div>
                             <div className="badge success" style={{ background: isDarkMode ? 'rgba(34, 197, 94, 0.2)' : '#E8F5E9', color: isDarkMode ? '#86efac' : '#2E7D32', padding: '4px 8px', borderRadius: '6px', fontSize: '0.75rem', fontWeight: 800, display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
-                                <TrendingUp size={12} /> ↑ {isEn ? 'High Demand' : 'मोठी मागणी'}
+                                <TrendingUp size={12} /> ↑ {isEn ? 'High Demand' : 'जास्त मागणी'}
+                            </div>
+                            <div style={{ fontSize: '0.65rem', color: '#9ca3af', marginTop: '4px', marginLeft: '16px' }}>
+                                {isEn ? 'जास्त मागणी' : 'High Demand'}
                             </div>
                         </div>
                         <div className="insight-card bg-white dark:bg-gray-800 p-4 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700">
-                            <div className="marathi text-gray-900 dark:text-white font-bold mb-2" style={{ fontSize: '1rem' }}>
+                            <div className="marathi text-gray-900 dark:text-white font-bold" style={{ fontSize: '1rem' }}>
                                 {isEn ? 'Risk Level' : 'जोखीम पातळी'}
+                            </div>
+                            <div style={{ fontSize: '0.75rem', color: '#9ca3af', marginBottom: '8px' }}>
+                                {isEn ? 'जोखीम पातळी' : 'Risk Level'}
                             </div>
                             <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.75rem', fontWeight: 700, marginBottom: '4px' }}>
                                 <span className="text-gray-500 dark:text-gray-400">{isEn ? 'Medium' : 'मध्यम'}</span>
@@ -241,7 +249,7 @@ const HomeScreen = ({ setScreen, setTab, isDarkMode }) => {
 
                     <button className="cta-btn" onClick={() => { setScreen('recommendations'); setTab('crops'); }}>
                         <div className="marathi" style={{ fontSize: '1.2rem' }}>
-                            {isEn ? 'Get Crop Recommendations 🌱' : 'पीक शिफारसी मिळवा 🌱'}
+                            {isEn ? 'Get Crop Recommendations' : 'पीक शिफारसी मिळवा'}
                         </div>
                     </button>
                 </div>

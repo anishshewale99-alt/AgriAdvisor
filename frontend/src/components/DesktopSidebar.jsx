@@ -3,12 +3,12 @@ import { Home, Sprout, Users, User, Settings, LogOut, Moon, Sun, Mic } from 'luc
 import { motion } from 'framer-motion';
 import '../styles/DesktopSidebar.css';
 
-const DesktopSidebar = ({ activeTab, setTab, setScreen, isDarkMode, toggleTheme, onLogout, lang, setLang }) => {
+const DesktopSidebar = ({ activeTab, setTab, setScreen, isDarkMode, toggleTheme, onLogout, isEnglish }) => {
     const menuItems = [
         { id: 'home', icon: Home, labelMar: 'होम', labelEng: 'Home', screen: 'home' },
         { id: 'crops', icon: Sprout, labelMar: 'पीके', labelEng: 'Crops', screen: 'recommendations' },
         { id: 'community', icon: Users, labelMar: 'समुदाय', labelEng: 'Community', screen: 'community' },
-        { id: 'profile', icon: User, labelMar: 'प्रोफाइल', labelEng: 'Profile', screen: 'profile' },
+        { id: 'profile', icon: User, labelMar: 'प्रोफाईल', labelEng: 'Profile', screen: 'profile' },
         { id: 'settings', icon: Settings, labelMar: 'सेटिंग्ज', labelEng: 'Settings', screen: 'settings' },
     ];
 
@@ -33,7 +33,7 @@ const DesktopSidebar = ({ activeTab, setTab, setScreen, isDarkMode, toggleTheme,
                     >
                         <item.icon size={24} />
                         <div className="sidebar-labels">
-                            <span className="marathi">{lang === 'en' ? item.labelEng : item.labelMar}</span>
+                            <span className="marathi">{isEnglish ? item.labelEng : item.labelMar}</span>
                         </div>
                     </div>
                 ))}
@@ -42,12 +42,16 @@ const DesktopSidebar = ({ activeTab, setTab, setScreen, isDarkMode, toggleTheme,
             <div className="sidebar-footer">
                 <button className="sidebar-action-btn" onClick={toggleTheme}>
                     {isDarkMode ? <Sun size={20} /> : <Moon size={20} />}
-                    <span>{isDarkMode ? 'Light Mode' : 'Dark Mode'}</span>
+                    <span>
+                        {isDarkMode
+                            ? (isEnglish ? 'Light Mode' : 'लाईट मोड')
+                            : (isEnglish ? 'Dark Mode' : 'डार्क मोड')}
+                    </span>
                 </button>
 
                 <button className="sidebar-action-btn logout" onClick={onLogout}>
                     <LogOut size={20} />
-                    <span>Logout</span>
+                    <span>{isEnglish ? 'Logout' : 'बाहेर पडा'}</span>
                 </button>
             </div>
         </div>

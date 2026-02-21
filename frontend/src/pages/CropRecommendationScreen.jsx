@@ -5,13 +5,13 @@ import { cropData } from '../cropData';
 import TTSButton from '../components/TTSButton';
 import '../styles/CropRecommendationScreen.css';
 
-const CropRecommendationScreen = ({ onSelectCrop, lang, isDarkMode, farmInfo = {}, isDesktop, showAll = false, setScreen }) => {
+const CropRecommendationScreen = ({ onSelectCrop, isEnglish, isDarkMode, farmInfo = {}, isDesktop, showAll = false, setScreen }) => {
     const [filters, setFilters] = useState({
         soil: 'All',
         season: 'All',
         water: 'All'
     });
-    const isEn = lang === 'en';
+    const isEn = isEnglish;
 
     // Filter crops based on manual filters
     const filteredCrops = cropData.filter(crop => {
@@ -33,7 +33,7 @@ const CropRecommendationScreen = ({ onSelectCrop, lang, isDarkMode, farmInfo = {
         season: [
             { val: 'All', en: 'Season: All', mr: 'हंगाम: सर्व' },
             { val: 'Kharif', en: 'Kharif', mr: 'खरीप' },
-            { val: 'Rabi', en: 'Rabi', mr: 'रबी' },
+            { val: 'Rabi', en: 'Rabi', mr: 'रब्बी' },
             { val: 'Summer', en: 'Summer', mr: 'उन्हाळी' }
         ],
         water: [

@@ -2,7 +2,7 @@ import { Menu, ArrowLeft, Sprout } from 'lucide-react';
 import LanguageToggle from './LanguageToggle';
 import TTSButton from './TTSButton';
 
-const MainHeader = ({ screen, setScreen, setTab, lang, setLang, setIsMenuOpen, isDesktop, isDarkMode, previousCropScreen }) => (
+const MainHeader = ({ screen, setScreen, setTab, isEnglish, setIsEnglish, setIsMenuOpen, isDesktop, isDarkMode, previousCropScreen }) => (
     <div className="top-bar flex items-center justify-between gap-2" style={{
         width: '100%',
         margin: '0 auto',
@@ -58,10 +58,10 @@ const MainHeader = ({ screen, setScreen, setTab, lang, setLang, setIsMenuOpen, i
         </div>
 
         <div className="flex items-center gap-4">
-            <LanguageToggle lang={lang} setLang={setLang} isDarkMode={isDarkMode} />
+            <LanguageToggle isEnglish={isEnglish} setIsEnglish={setIsEnglish} isDarkMode={isDarkMode} />
 
             <TTSButton
-                textToRead={lang === 'en' ? "Welcome to AgriAdvisor. Your agricultural precision farming assistant." : "ॲग्री ॲडव्हायझरमध्ये आपले स्वागत आहे. आपले कृषी मार्गदर्शक."}
+                textToRead={isEnglish ? "Welcome to AgriAdvisor. Your agricultural precision farming assistant." : "ॲग्री ॲडव्हायझरमध्ये आपले स्वागत आहे. आपले कृषी मार्गदर्शक."}
                 isDarkMode={isDarkMode}
             />
         </div>
