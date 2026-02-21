@@ -95,16 +95,27 @@ export const AuthProvider = ({ children }) => {
                 body: JSON.stringify({ email, password })
             });
 
+            const contentType = response.headers.get("content-type");
             if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(errorData.error || errorData.message || 'Login failed');
+                if (contentType && contentType.indexOf("application/json") !== -1) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.error || errorData.message || 'Login failed');
+                } else {
+                    const text = await response.text();
+                    console.error('Server error (non-JSON):', text);
+                    throw new Error(`Server error (${response.status}). Please check if the backend is running.`);
+                }
             }
 
-            const data = await response.json();
-            localStorage.setItem('token', data.token);
-            setToken(data.token);
-            setUser(data.user);
-            return data.user;
+            if (contentType && contentType.indexOf("application/json") !== -1) {
+                const data = await response.json();
+                localStorage.setItem('token', data.token);
+                setToken(data.token);
+                setUser(data.user);
+                return data.user;
+            } else {
+                throw new Error("Invalid response from server. Expected JSON.");
+            }
         } catch (error) {
             console.error('Login error:', error);
             throw error;
@@ -121,16 +132,27 @@ export const AuthProvider = ({ children }) => {
                 body: JSON.stringify({ name, email, password })
             });
 
+            const contentType = response.headers.get("content-type");
             if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(errorData.error || errorData.message || 'Signup failed');
+                if (contentType && contentType.indexOf("application/json") !== -1) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.error || errorData.message || 'Signup failed');
+                } else {
+                    const text = await response.text();
+                    console.error('Server error (non-JSON):', text);
+                    throw new Error(`Server error (${response.status}). Please check if the backend is running.`);
+                }
             }
 
-            const data = await response.json();
-            localStorage.setItem('token', data.token);
-            setToken(data.token);
-            setUser(data.user);
-            return data.user;
+            if (contentType && contentType.indexOf("application/json") !== -1) {
+                const data = await response.json();
+                localStorage.setItem('token', data.token);
+                setToken(data.token);
+                setUser(data.user);
+                return data.user;
+            } else {
+                throw new Error("Invalid response from server. Expected JSON.");
+            }
         } catch (error) {
             console.error('Registration error:', error);
             throw error;
