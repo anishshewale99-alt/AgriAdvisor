@@ -243,29 +243,37 @@ const ProfileScreen = ({ darkMode, isDesktop, onEdit }) => {
                 </div>
 
                 {/* Action Buttons */}
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '14px', marginTop: '10px' }}>
                     <button
                         onClick={onEdit}
                         style={{
                             width: '100%',
-                            padding: '16px',
-                            background: '#16a34a',
+                            padding: '18px',
+                            background: 'var(--primary)',
                             color: 'white',
-                            borderRadius: '20px',
+                            borderRadius: '100px',
                             display: 'flex',
                             alignItems: 'center',
                             justifyContent: 'center',
-                            gap: '8px',
-                            fontSize: '1rem',
-                            fontWeight: '600',
+                            gap: '10px',
+                            fontSize: '1.05rem',
+                            fontWeight: '700',
                             border: 'none',
                             cursor: 'pointer',
-                            transition: 'all 0.2s ease',
-                            boxShadow: '0 4px 12px rgba(22, 163, 74, 0.2)'
+                            transition: 'all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
+                            boxShadow: '0 8px 20px rgba(22, 163, 74, 0.25)'
+                        }}
+                        onMouseOver={(e) => {
+                            e.currentTarget.style.transform = 'translateY(-2px)';
+                            e.currentTarget.style.boxShadow = '0 10px 25px rgba(22, 163, 74, 0.35)';
+                        }}
+                        onMouseOut={(e) => {
+                            e.currentTarget.style.transform = 'translateY(0)';
+                            e.currentTarget.style.boxShadow = '0 8px 20px rgba(22, 163, 74, 0.25)';
                         }}
                     >
                         <Edit2 size={20} />
-                        {isEnglish ? 'Edit Farm Information' : 'शेतीची माहिती बदला'}
+                        {isEnglish ? 'Edit Profile' : 'माहिती बदला'}
                     </button>
 
                     <button
