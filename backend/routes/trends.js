@@ -21,18 +21,13 @@ const CropTrend = require('../models/CropTrend');
 router.get('/', async (req, res) => {
     try {
         const trends = await CropTrend.find({})
-            .select('commodity percentageChange trend updatedAt -_id')
+            .select('commodity currentPrice percentageChange trend updatedAt -_id')
             .lean();
-
-        // Sort by absolute percentage change descending, take top 5
-        const top5 = trends
-            .sort((a, b) => Math.abs(b.percentageChange) - Math.abs(a.percentageChange))
-            .slice(0, 5);
 
         return res.status(200).json({
             success: true,
-            count: top5.length,
-            data: top5,
+            count: trends.length,
+            data: trends,
         });
     } catch (err) {
         console.error('[TrendsRoute] Error fetching trends:', err.message);

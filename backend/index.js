@@ -48,10 +48,13 @@ const authRoutes = require('./routes/auth');
 const postRoutes = require('./routes/posts');
 const cropRoutes = require('./routes/crops');
 const ttsRoutes = require('./routes/tts');
+const trendsRoutes = require('./routes/trends');
+
 app.use('/api/auth', authRoutes);
 app.use('/api/posts', postRoutes);
 app.use('/api/crops', cropRoutes);
 app.use('/api/tts', ttsRoutes);
+app.use('/api/trends', trendsRoutes);
 
 // Fetch all community posts
 app.get('/api/community/posts', async (req, res) => {

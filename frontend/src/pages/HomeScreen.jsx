@@ -190,7 +190,7 @@ const HomeScreen = ({ setScreen, setTab, isDarkMode, isEnglish }) => {
                     </div>
 
                     <div className="my-4">
-                        <MarketTicker isEnglish={isEn} />
+                        <MarketTicker isEnglish={isEn} isDarkMode={isDarkMode} />
                     </div>
 
                     <div className="weather-card" style={{ color: isDarkMode ? '#f3f4f6' : '#1f2937', margin: '0 0 20px', padding: '20px', boxShadow: 'none', border: isDarkMode ? '1px solid #374151' : '1px solid #f0f0f0', background: isDarkMode ? '#1f2937' : 'transparent', borderRadius: '16px' }}>

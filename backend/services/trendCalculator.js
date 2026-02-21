@@ -24,7 +24,8 @@ async function calculateTrends() {
             .lean();
 
         if (history.length < 2) {
-            ops.push(createOp(commodity, 0, 'Stable'));
+            const currentPrice = history.length > 0 ? history[0].modal_price : 0;
+            ops.push(createOp(commodity, currentPrice, 0, 'Stable'));
             continue;
         }
 
@@ -34,7 +35,7 @@ async function calculateTrends() {
         const previous = history.find(h => h.date.getTime() !== latest.date.getTime());
 
         if (!previous || previous.modal_price === 0) {
-            ops.push(createOp(commodity, 0, 'Stable'));
+            ops.push(createOp(commodity, latest.modal_price, 0, 'Stable'));
             continue;
         }
 
@@ -48,7 +49,7 @@ async function calculateTrends() {
         if (percentageChange > 0.1) trend = 'Rising';
         else if (percentageChange < -0.1) trend = 'Falling';
 
-        ops.push(createOp(commodity, percentageChange, trend));
+        ops.push(createOp(commodity, currentPrice, percentageChange, trend));
     }
 
     if (ops.length > 0) {
@@ -59,13 +60,14 @@ async function calculateTrends() {
     return ops.length;
 }
 
-function createOp(commodity, percentageChange, trend) {
+function createOp(commodity, currentPrice, percentageChange, trend) {
     return {
         updateOne: {
             filter: { commodity },
             update: {
                 $set: {
                     commodity,
+                    currentPrice,
                     percentageChange,
                     trend,
                     updatedAt: new Date(),
