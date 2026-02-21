@@ -35,7 +35,9 @@ const userSchema = new mongoose.Schema({
             default: 'acres'
         },
         mainCrops: [String],
-        soilType: String
+        soilType: String,
+        irrigation: Boolean,
+        plantingSeason: String
     },
     role: {
         type: String,

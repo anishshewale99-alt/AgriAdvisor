@@ -1,16 +1,51 @@
 import React, { useState } from 'react';
 import { motion as Motion, AnimatePresence } from 'framer-motion';
-import { LogIn, Phone, Mail, ArrowRight, Languages, Eye, EyeOff, ChevronRight, Sprout } from 'lucide-react';
+import { LogIn, Phone, Mail, ArrowRight, Languages, Eye, EyeOff, ChevronRight, Sprout, User } from 'lucide-react';
 import LandingImg from '../assets/landing 2.webp';
 import HeroVideo from '../assets/hero-video.mp4';
+import { useAuth } from '../context/AuthContext';
+import GoogleLoginButton from '../components/GoogleLoginButton';
 import '../styles/LandingScreen.css';
 
 const LandingScreen = ({ onNext, isDesktop }) => {
-    const [view, setView] = useState('landing'); // 'landing' or 'login'
+    const [view, setView] = useState('landing'); // 'landing', 'login', or 'signup'
     const [isEnglish, setIsEnglish] = useState(false);
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [name, setName] = useState('');
     const [showPassword, setShowPassword] = useState(false);
+    const [error, setError] = useState('');
+    const [loading, setLoading] = useState(false);
+
+    const { loginEmail, register } = useAuth();
+
+    const handleLogin = async (e) => {
+        e.preventDefault();
+        setError('');
+        setLoading(true);
+        try {
+            await loginEmail(email, password);
+            // App.jsx will handle navigation via AuthContext state changes
+        } catch (err) {
+            setError(err.message || 'Login failed');
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleSignup = async (e) => {
+        e.preventDefault();
+        setError('');
+        setLoading(true);
+        try {
+            await register(name, email, password);
+            // App.jsx will handle navigation via AuthContext state changes
+        } catch (err) {
+            setError(err.message || 'Signup failed');
+        } finally {
+            setLoading(false);
+        }
+    };
 
     // Landing Page View
     if (view === 'landing') {
@@ -76,10 +111,10 @@ const LandingScreen = ({ onNext, isDesktop }) => {
         );
     }
 
-    // Login Page View
+    // Login/Signup UI
     return (
         <Motion.div
-            key="login"
+            key="auth-container"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
@@ -104,9 +139,9 @@ const LandingScreen = ({ onNext, isDesktop }) => {
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ duration: 0.8, delay: 0.2 }}
                         >
-                            <h1 className="hero-title">
-                                {isEnglish ? 'Join Thousands of Smart Farmers' : 'हजारो स्मार्ट शेतकऱ्यांमध्ये सामील व्हा'}
-                            </h1>
+                            <h2 className="hero-title">
+                                {isEnglish ? 'Welcome to AgriAdvisor' : 'AgriAdvisor मध्ये आपले स्वागत आहे'}
+                            </h2>
                             <p className="hero-subtitle">
                                 {isEnglish
                                     ? 'Get personalized insights and expert guidance for your farm'
@@ -123,7 +158,7 @@ const LandingScreen = ({ onNext, isDesktop }) => {
                 </Motion.div>
             )}
 
-            {/* Right Side - Login Form */}
+            {/* Right Side - Auth Form */}
             <div className="login-form-container">
                 <Motion.div
                     initial={{ opacity: 0, x: isDesktop ? 100 : 0, y: isDesktop ? 0 : 20 }}
@@ -138,32 +173,38 @@ const LandingScreen = ({ onNext, isDesktop }) => {
                             onClick={() => setIsEnglish(!isEnglish)}
                         >
                             <Languages size={18} />
-                            <span>{isEnglish ? 'English' : 'मराठी'}</span>
+                            <span>{isEnglish ? 'मराठी' : 'English'}</span>
                         </button>
                     </div>
 
-                    {/* Title (No Logo) */}
                     <div className="login-header">
-                        <h1 className="login-title">
-                            {isEnglish ? 'Sign In' : 'साइन इन करा'}
-                        </h1>
+                        <div className="logo-container">
+                            <Sprout size={40} color="var(--primary)" />
+                        </div>
+                        <h2 className="login-title">
+                            {view === 'login'
+                                ? (isEnglish ? 'Sign In' : 'साइन इन करा')
+                                : (isEnglish ? 'Create Account' : 'खाते तयार करा')}
+                        </h2>
                         <p className="login-subtitle">
-                            {isEnglish
-                                ? 'Enter your credentials to access your account'
-                                : 'तुमच्या खात्यात प्रवेश करण्यासाठी तुमची माहिती प्रविष्ट करा'}
+                            {view === 'login'
+                                ? (isEnglish ? 'Enter your credentials to access your account' : 'तुमच्या खात्यात प्रवेश करण्यासाठी तुमची माहिती प्रविष्ट करा')
+                                : (isEnglish ? 'Join our community of smart farmers' : 'स्मार्ट शेतकऱ्यांच्या आमच्या समुदायात सामील व्हा')}
                         </p>
                     </div>
 
+                    {error && (
+                        <div style={{ backgroundColor: '#fee2e2', color: '#ef4444', padding: '12px', borderRadius: '8px', marginBottom: '20px', fontSize: '0.9rem', textAlign: 'center', border: '1px solid #fecaca' }}>
+                            {error}
+                        </div>
+                    )}
+
                     {/* Social Login Buttons */}
                     <div className="social-login-section">
-                        <button className="social-login-btn google-btn" onClick={onNext}>
-                            <img
-                                src="https://www.gstatic.com/images/branding/product/1x/gsa_512dp.png"
-                                alt="Google"
-                                className="social-icon"
-                            />
-                            <span>{isEnglish ? 'Continue with Google' : 'Google सह सुरू करा'}</span>
-                        </button>
+                        <GoogleLoginButton
+                            onSuccess={() => {/* App.jsx will handle navigation */ }}
+                            onError={(err) => setError(err.message || 'Google Login failed')}
+                        />
                     </div>
 
                     {/* Divider */}
@@ -171,8 +212,27 @@ const LandingScreen = ({ onNext, isDesktop }) => {
                         <span className="divider-text">{isEnglish ? 'OR' : 'किंवा'}</span>
                     </div>
 
-                    {/* Email/Password Form */}
-                    <form className="login-form" onSubmit={(e) => { e.preventDefault(); onNext(); }}>
+                    {/* Auth Form */}
+                    <form className="login-form" onSubmit={view === 'login' ? handleLogin : handleSignup}>
+                        {view === 'signup' && (
+                            <div className="form-group">
+                                <label className="form-label">
+                                    {isEnglish ? 'Full Name' : 'पूर्ण नाव'}
+                                </label>
+                                <div className="input-wrapper">
+                                    <User size={20} className="input-icon" />
+                                    <input
+                                        type="text"
+                                        className="form-input"
+                                        placeholder={isEnglish ? 'Enter your name' : 'तुमचे नाव प्रविष्ट करा'}
+                                        value={name}
+                                        onChange={(e) => setName(e.target.value)}
+                                        required
+                                    />
+                                </div>
+                            </div>
+                        )}
+
                         <div className="form-group">
                             <label className="form-label">
                                 {isEnglish ? 'Email Address' : 'ईमेल पत्ता'}
@@ -185,6 +245,7 @@ const LandingScreen = ({ onNext, isDesktop }) => {
                                     placeholder={isEnglish ? 'Enter your email' : 'तुमचा ईमेल प्रविष्ट करा'}
                                     value={email}
                                     onChange={(e) => setEmail(e.target.value)}
+                                    required
                                 />
                             </div>
                         </div>
@@ -201,6 +262,8 @@ const LandingScreen = ({ onNext, isDesktop }) => {
                                     value={password}
                                     onChange={(e) => setPassword(e.target.value)}
                                     style={{ paddingRight: '45px' }}
+                                    required
+                                    minLength={6}
                                 />
                                 <button
                                     type="button"
@@ -212,34 +275,40 @@ const LandingScreen = ({ onNext, isDesktop }) => {
                             </div>
                         </div>
 
-                        <div className="form-options">
-                            <label className="remember-me">
-                                <input type="checkbox" />
-                                <span>{isEnglish ? 'Remember me' : 'मला लक्षात ठेवा'}</span>
-                            </label>
-                            <a href="#" className="forgot-password">
-                                {isEnglish ? 'Forgot Password?' : 'पासवर्ड विसरलात?'}
-                            </a>
-                        </div>
+                        {view === 'login' && (
+                            <div className="form-options">
+                                <label className="remember-me">
+                                    <input type="checkbox" />
+                                    <span>{isEnglish ? 'Remember me' : 'मला लक्षात ठेवा'}</span>
+                                </label>
+                                <a href="#" className="forgot-password">
+                                    {isEnglish ? 'Forgot Password?' : 'पासवर्ड विसरलात?'}
+                                </a>
+                            </div>
+                        )}
 
-                        <button type="submit" className="submit-btn">
-                            {isEnglish ? 'Sign In' : 'साइन इन करा'}
+                        <button type="submit" className="submit-btn" disabled={loading}>
+                            {loading ? (isEnglish ? 'Processing...' : 'प्रक्रिया सुरू आहे...') : (view === 'login' ? (isEnglish ? 'Sign In' : 'साइन इन करा') : (isEnglish ? 'Sign Up' : 'नोंदणी करा'))}
                             <ArrowRight size={20} />
                         </button>
                     </form>
 
-                    {/* Sign Up Link */}
+                    {/* Toggle between Login/Signup */}
                     <div className="signup-link">
-                        <span>{isEnglish ? "Don't have an account?" : 'खाते नाही?'}</span>
-                        <a href="#" onClick={onNext}>
-                            {isEnglish ? 'Sign Up' : 'नोंदणी करा'}
+                        <span>
+                            {view === 'login'
+                                ? (isEnglish ? "Don't have an account?" : 'खाते नाही?')
+                                : (isEnglish ? "Already have an account?" : 'आधीच खाते आहे?')}
+                        </span>
+                        <a href="#" onClick={(e) => { e.preventDefault(); setView(view === 'login' ? 'signup' : 'login'); setError(''); }}>
+                            {view === 'login' ? (isEnglish ? 'Sign Up' : 'नोंदणी करा') : (isEnglish ? 'Sign In' : 'साइन इन करा')}
                         </a>
                     </div>
 
                     {/* Back to Landing */}
                     <div style={{ textAlign: 'center', marginTop: '16px' }}>
                         <button
-                            onClick={() => setView('landing')}
+                            onClick={() => { setView('landing'); setError(''); }}
                             style={{
                                 background: 'none',
                                 border: 'none',

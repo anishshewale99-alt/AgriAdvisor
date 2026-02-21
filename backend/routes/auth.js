@@ -185,16 +185,20 @@ router.get('/me', authenticateToken, async (req, res) => {
 // Update user farm information (onboarding)
 router.put('/farm-info', authenticateToken, async (req, res) => {
     try {
-        const { farmName, location, farmSize, farmSizeUnit, mainCrops, soilType } = req.body;
+        const { farmName, location, farmSize, farmSizeUnit, mainCrops, soilType, irrigation, plantingSeason } = req.body;
 
-        req.user.farmInfo = {
-            farmName,
-            location,
-            farmSize,
-            farmSizeUnit,
-            mainCrops,
-            soilType
+        const farmData = {
+            farmName: farmName || req.user.farmInfo?.farmName,
+            location: location || req.user.farmInfo?.location,
+            farmSize: farmSize !== undefined ? farmSize : req.user.farmInfo?.farmSize,
+            farmSizeUnit: farmSizeUnit || req.user.farmInfo?.farmSizeUnit,
+            mainCrops: mainCrops || req.user.farmInfo?.mainCrops,
+            soilType: soilType || req.user.farmInfo?.soilType,
+            irrigation: irrigation !== undefined ? irrigation : req.user.farmInfo?.irrigation,
+            plantingSeason: plantingSeason || req.user.farmInfo?.plantingSeason
         };
+
+        req.user.farmInfo = farmData;
         req.user.isOnboarded = true;
         await req.user.save();
 

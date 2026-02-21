@@ -208,6 +208,9 @@ function App() {
   React.useEffect(() => {
     if (!authLoading) {
       if (isAuthenticated) {
+        if (user?.farmInfo) {
+          setFarmDetails(user.farmInfo);
+        }
         if (user?.isOnboarded) {
           setOnboarding('finished');
         } else {

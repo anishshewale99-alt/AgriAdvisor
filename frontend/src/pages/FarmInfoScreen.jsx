@@ -1,14 +1,43 @@
 import React, { useState, useEffect } from 'react';
-import { Volume2, Droplets, CloudOff, ChevronRight, ChevronLeft, CloudRain, Snowflake, Sun, CalendarRange } from 'lucide-react';
+import { Volume2, Droplets, CloudOff, ChevronRight, ChevronLeft, CloudRain, Snowflake, Sun, CalendarRange, Loader2 } from 'lucide-react';
 import FarmPattern from '../assets/bg2.png';
+import { useAuth } from '../context/AuthContext';
 import '../styles/FarmInfoScreen.css';
 
 const FarmInfoScreen = ({ onNext, onBack, farmInfo, setFarmInfo, isDesktop }) => {
+    const { updateFarmInfo: saveToBackend } = useAuth();
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState('');
+
     const { acres, soil, irrigation, season: plantingSeason } = farmInfo;
 
     // Helper to update farmInfo state
     const updateFarmInfo = (updates) => {
         setFarmInfo(prev => ({ ...prev, ...updates }));
+    };
+
+    const handleNext = async () => {
+        if (!acres || !soil || plantingSeason === undefined) {
+            setError(isEnglish ? 'Please fill all fields' : 'कृपया सर्व माहिती भरा');
+            return;
+        }
+
+        setError('');
+        setLoading(true);
+        try {
+            const updatedUser = await saveToBackend({
+                location: farmInfo.location,
+                farmSize: parseFloat(acres),
+                soilType: soil,
+                irrigation: !!irrigation,
+                plantingSeason: plantingSeason
+            });
+            onNext(updatedUser.farmInfo);
+        } catch (err) {
+            setError(err.message || 'Failed to save farm information');
+        } finally {
+            setLoading(false);
+        }
     };
 
     const setAcres = (val) => updateFarmInfo({ acres: val });
@@ -199,6 +228,31 @@ const FarmInfoScreen = ({ onNext, onBack, farmInfo, setFarmInfo, isDesktop }) =>
 
                     <div style={{ marginBottom: '32px' }}>
                         <h2 className="marathi" style={{ fontSize: '1.25rem', marginBottom: '4px', color: '#1f2937' }}>
+                            {isEnglish ? 'Farm Location' : 'शेताचे ठिकाण'}
+                        </h2>
+                        <p className="english-sub" style={{ color: '#6b7280' }}>{isEnglish ? 'Enter your village/district' : 'तुमचे गाव/जिल्हा प्रविष्ट करा'}</p>
+                        <div style={{ marginTop: '16px' }}>
+                            <input
+                                type="text"
+                                value={farmInfo.location || ''}
+                                onChange={(e) => updateFarmInfo({ location: e.target.value })}
+                                placeholder={isEnglish ? "Enter location" : "ठिकाण प्रविष्ट करा"}
+                                style={{
+                                    width: '100%',
+                                    padding: '16px 20px',
+                                    borderRadius: '16px',
+                                    border: '2px solid #e5e7eb',
+                                    fontSize: '1.1rem',
+                                    fontWeight: 700,
+                                    outline: 'none',
+                                    background: '#f9fafb'
+                                }}
+                            />
+                        </div>
+                    </div>
+
+                    <div style={{ marginBottom: '32px' }}>
+                        <h2 className="marathi" style={{ fontSize: '1.25rem', marginBottom: '4px', color: '#1f2937' }}>
                             {isEnglish ? 'Farm Size (Acres)' : 'शेत आकार (एकर)'}
                         </h2>
                         <p className="english-sub" style={{ color: '#6b7280' }}>{isEnglish ? 'Select area in acres' : 'एकरमध्ये क्षेत्र निवडा'}</p>
@@ -342,11 +396,19 @@ const FarmInfoScreen = ({ onNext, onBack, farmInfo, setFarmInfo, isDesktop }) =>
                     </div>
                 </div>
 
-                <div className="floating-next-btn" onClick={onNext}>
+                {error && (
+                    <div style={{ backgroundColor: '#fee2e2', color: '#ef4444', padding: '12px', borderRadius: '8px', marginBottom: '20px', fontSize: '0.9rem', textAlign: 'center', border: '1px solid #fecaca' }}>
+                        {error}
+                    </div>
+                )}
+
+                <div className={`floating-next-btn ${loading ? 'disabled' : ''}`} onClick={!loading ? handleNext : null}>
                     <span className="marathi" style={{ fontSize: '1.1rem', fontWeight: 700 }}>
-                        {isEnglish ? 'Get Crop Recommendations' : 'पीक शिफारसी मिळवा'}
+                        {loading
+                            ? (isEnglish ? 'Saving...' : 'जतन होत आहे...')
+                            : (isEnglish ? 'Get Crop Recommendations' : 'पीक शिफारसी मिळवा')}
                     </span>
-                    <ChevronRight size={24} />
+                    {loading ? <Loader2 size={24} className="animate-spin" /> : <ChevronRight size={24} />}
                 </div>
             </div>
         </div>
