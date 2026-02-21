@@ -1,0 +1,17 @@
+.google-login-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    margin: 1rem 0;
+}
+
+.google-login-container>div {
+    width: 100%;
+    max-width: 400px;
+}
+
+/* Override Google button styles for better integration */
+.google-login-container iframe {
+    border-radius: 12px !important;
+}

@@ -1,5 +1,6 @@
 import React from 'react';
 import { TrendingUp, Droplets, ThermometerSun } from 'lucide-react';
+import '../styles/CropAnalysis.css';
 
 const CropAnalysis = () => {
     return (

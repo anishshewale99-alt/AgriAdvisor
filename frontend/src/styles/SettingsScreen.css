@@ -1,0 +1,60 @@
+/* Settings Screen Styles */
+.settings-container {
+    width: 100%;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.settings-card {
+    background: white;
+    border-radius: 24px;
+    padding: 24px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06);
+    border: 1px solid #f0f0f0;
+    width: 100%;
+}
+
+.dark .settings-card {
+    background: #111827;
+    border-color: #374151;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    color: #f3f4f6;
+}
+
+.settings-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px;
+    background: #f9fafb;
+    border-radius: 18px;
+    cursor: pointer;
+    border: 1px solid #f0f0f0;
+    transition: all 0.2s ease;
+}
+
+.dark .settings-item {
+    background: #1f2937;
+    border-color: #374151;
+}
+
+.logout-btn {
+    width: 100%;
+    padding: 16px;
+    border-radius: 18px;
+    background: #fff1f2;
+    border: 1px solid #ffe4e6;
+    color: #ef4444;
+    font-weight: 800;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.dark .logout-btn {
+    background: rgba(239, 68, 68, 0.1);
+    border-color: rgba(239, 68, 68, 0.2);
+}
