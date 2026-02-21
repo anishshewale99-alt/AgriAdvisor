@@ -11,7 +11,8 @@ import {
 import { motion as Motion } from 'framer-motion';
 import '../styles/SettingsScreen.css';
 
-const SettingsScreen = ({ darkMode, isDarkMode, setIsDarkMode, toggleTheme, lang, setLang, onLogout, isDesktop }) => {
+const SettingsScreen = ({ darkMode, isDarkMode, setIsDarkMode, toggleTheme, isEnglish, setIsEnglish, onLogout, isDesktop }) => {
+    const lang = isEnglish ? 'en' : 'mr';
     const settings = [
         {
             id: 'notifications',

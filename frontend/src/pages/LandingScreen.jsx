@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion as Motion, AnimatePresence } from 'framer-motion';
-import { LogIn, Phone, Mail, ArrowRight, Languages, Eye, EyeOff, ChevronRight, Sprout } from 'lucide-react';
+import { LogIn, Phone, Mail, ArrowRight, Languages, Eye, EyeOff, ChevronRight, Sprout, User } from 'lucide-react';
 import LandingImg from '../assets/landing 2.webp';
 import GoogleLoginButton from '../components/GoogleLoginButton';
 import { useAuth } from '../context/AuthContext';
@@ -9,11 +9,50 @@ import HeroVideo from '../assets/hero-video.mp4';
 import '../styles/LandingScreen.css';
 
 const LandingScreen = ({ onNext, isDesktop }) => {
-    const [view, setView] = useState('landing'); // 'landing' or 'login'
-    const { isEnglish, toggleLanguage } = useLanguage(); // Use global language context
+    const [view, setView] = useState('landing'); // 'landing', 'login', or 'signup'
+    const { isEnglish, toggleLanguage, t } = useLanguage();
+    const { loginEmail, register } = useAuth();
+
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [name, setName] = useState('');
     const [showPassword, setShowPassword] = useState(false);
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [error, setError] = useState('');
+
+    const handleLogin = async (e) => {
+        e.preventDefault();
+        if (!email || !password) return;
+        setError('');
+        setIsSubmitting(true);
+        try {
+            await loginEmail(email, password);
+            onNext();
+        } catch (err) {
+            setError(err.message || 'Login failed. Please try again.');
+        } finally {
+            setIsSubmitting(false);
+        }
+    };
+
+    const handleSignup = async (e) => {
+        e.preventDefault();
+        if (!email || !password || !name) return;
+        if (password.length < 6) {
+            setError(isEnglish ? 'Password must be at least 6 characters' : 'पासवर्ड किमान ६ अक्षरांचा असावा');
+            return;
+        }
+        setError('');
+        setIsSubmitting(true);
+        try {
+            await register(name, email, password);
+            onNext();
+        } catch (err) {
+            setError(err.message || 'Signup failed. Please try again.');
+        } finally {
+            setIsSubmitting(false);
+        }
+    };
 
     // Landing Page View
     if (view === 'landing') {
@@ -53,6 +92,16 @@ const LandingScreen = ({ onNext, isDesktop }) => {
                                 <span className="brand-name-landing">AgriAdvisor</span>
                             </div>
                         </div>
+
+                        {!isDesktop ? (
+                            <button className="mobile-menu-btn-landing" onClick={() => setView('login')}>
+                                <LogIn size={24} />
+                            </button>
+                        ) : (
+                            <div className="nav-links-landing">
+                                {/* Clean Nav - Sign in/up removed */}
+                            </div>
+                        )}
                     </div>
                 </nav>
 
@@ -65,121 +114,134 @@ const LandingScreen = ({ onNext, isDesktop }) => {
                     <h1 className="hero-title-main">AGRI-ADVISOR</h1>
                     <p className="hero-subtitle-sub">{isEnglish ? 'SMART AGRICULTURE • DATA-DRIVEN DECISIONS' : 'स्मार्ट कृषी • डेटा-चालित निर्णय'}</p>
 
-                    <button
-                        onClick={() => setView('login')}
-                        className="hero-discover-btn"
-                    >
-                        {isEnglish ? 'DISCOVER' : 'शोध घ्या'}
-                    </button>
+                    <div className="hero-cta-group" style={{ display: 'flex', gap: '16px', marginTop: '24px', justifyContent: 'center' }}>
+                        <button
+                            onClick={() => setView('login')}
+                            className="hero-discover-btn"
+                        >
+                            {isEnglish ? 'DISCOVER' : 'शोधा'}
+                        </button>
+                    </div>
                 </Motion.div>
             </Motion.div>
         );
     }
 
-    // Login Page View
-    return (
+    // Login/Signup UI Parts
+    const HeroPart = () => (
         <Motion.div
-            key="login"
+            className="login-hero"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.3 }}
-            className="login-container"
+            style={{
+                backgroundImage: `linear-gradient(rgba(46, 125, 50, 0.7), rgba(27, 94, 32, 0.8)), url(${LandingImg})`,
+                backgroundSize: 'cover',
+                backgroundPosition: 'center',
+            }}
         >
-            {/* Left Side - Hero Image (Desktop Only) */}
-            {isDesktop && (
+            <div className="hero-content">
                 <Motion.div
-                    className="login-hero"
-                    initial={{ x: 0 }}
-                    animate={{ x: 0 }}
-                    style={{
-                        backgroundImage: `linear-gradient(rgba(46, 125, 50, 0.7), rgba(27, 94, 32, 0.8)), url(${LandingImg})`,
-                        backgroundSize: 'cover',
-                        backgroundPosition: 'center',
-                    }}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.8, delay: 0.2 }}
                 >
-                    <div className="hero-content">
-                        <Motion.div
-                            initial={{ opacity: 0, y: 20 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ duration: 0.8, delay: 0.2 }}
-                        >
-                            <h1 className="hero-title">
-                                {isEnglish ? 'Join Thousands of Smart Farmers' : 'हजारो स्मार्ट शेतकऱ्यांमध्ये सामील व्हा'}
-                            </h1>
-                            <p className="hero-subtitle">
-                                {isEnglish
-                                    ? 'Get personalized insights and expert guidance for your farm'
-                                    : 'तुमच्या शेतासाठी वैयक्तिक माहिती आणि तज्ञ मार्गदर्शन मिळवा'}
-                            </p>
-                            <div className="hero-features">
-                                <div className="feature-item">✓ {isEnglish ? 'Personalized Crop Plans' : 'वैयक्तिक पीक योजना'}</div>
-                                <div className="feature-item">✓ {isEnglish ? 'Save Your Farm Data' : 'तुमचा शेत डेटा सुरक्षित करा'}</div>
-                                <div className="feature-item">✓ {isEnglish ? 'Track Your Progress' : 'तुमची प्रगती ट्रॅक करा'}</div>
-                                <div className="feature-item">✓ {isEnglish ? 'Connect with Experts' : 'तज्ञांशी संपर्क साधा'}</div>
-                            </div>
-                        </Motion.div>
+                    <h1 className="hero-title">
+                        {isEnglish ? 'Join Thousands of Smart Farmers' : 'हजारो स्मार्ट शेतकऱ्यांमध्ये सामील व्हा'}
+                    </h1>
+                    <p className="hero-subtitle">
+                        {isEnglish
+                            ? 'Get personalized insights and expert guidance for your farm'
+                            : 'तुमच्या शेतासाठी वैयक्तिक माहिती आणि तज्ञ मार्गदर्शन मिळवा'}
+                    </p>
+                    <div className="hero-features">
+                        <div className="feature-item">✓ {isEnglish ? 'Personalized Crop Plans' : 'वैयक्तिक पीक योजना'}</div>
+                        <div className="feature-item">✓ {isEnglish ? 'Save Your Farm Data' : 'तुमचा शेत डेटा सुरक्षित करा'}</div>
+                        <div className="feature-item">✓ {isEnglish ? 'Track Your Progress' : 'तुमची प्रगती ट्रॅक करा'}</div>
+                        <div className="feature-item">✓ {isEnglish ? 'Connect with Experts' : 'तज्ञांशी संपर्क साधा'}</div>
                     </div>
                 </Motion.div>
-            )}
+            </div>
+        </Motion.div>
+    );
 
-            {/* Right Side - Login Form */}
+    return (
+        <div className="login-container">
+            {isDesktop && <HeroPart />}
+
             <div className="login-form-container">
                 <Motion.div
-                    initial={{ opacity: 0, x: isDesktop ? 100 : 0, y: isDesktop ? 0 : 20 }}
-                    animate={{ opacity: 1, x: 0, y: 0 }}
-                    transition={{ duration: 0.6, ease: "easeOut" }}
+                    key={view}
+                    initial={{ opacity: 0, x: 20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ duration: 0.4 }}
                     className="login-form-wrapper"
                 >
-                    {/* Language Toggle */}
                     <div className="language-toggle-container">
-                        <button
-                            className="language-toggle-btn"
-                            onClick={toggleLanguage}
-                        >
+                        <button className="language-toggle-btn" onClick={toggleLanguage}>
                             <Languages size={18} />
                             <span>{isEnglish ? 'English' : 'मराठी'}</span>
                         </button>
                     </div>
 
-                    {/* Title (No Logo) */}
                     <div className="login-header">
                         <h1 className="login-title">
-                            {isEnglish ? 'Sign In' : 'साइन इन करा'}
+                            {view === 'login' ? (isEnglish ? 'Sign In' : 'साइन इन करा') : (isEnglish ? 'Create Account' : 'खाते तयार करा')}
                         </h1>
                         <p className="login-subtitle">
-                            {isEnglish
-                                ? 'Enter your credentials to access your account'
-                                : 'तुमच्या खात्यात प्रवेश करण्यासाठी तुमची माहिती प्रविष्ट करा'}
+                            {view === 'login'
+                                ? (isEnglish ? 'Access your farming dashboard' : 'तुमच्या डॅशबोर्डवर प्रवेश करा')
+                                : (isEnglish ? 'Start your journey with us' : 'तुमचा प्रवास सुरू करा')}
                         </p>
                     </div>
 
-                    {/* Social Login Buttons */}
-                    <div className="social-login-section">
-                        <GoogleLoginButton
-                            onSuccess={(user) => {
-                                // If user is onboarded, go to next screen
-                                // If not, they'll need to complete farm info
-                                onNext();
-                            }}
-                            onError={(error) => {
-                                console.error('Login failed:', error);
-                                alert(isEnglish ? 'Login failed. Please try again.' : 'लॉगिन अयशस्वी. कृपया पुन्हा प्रयत्न करा.');
-                            }}
-                        />
-                    </div>
+                    {import.meta.env.VITE_GOOGLE_CLIENT_ID && (
+                        <>
+                            <div className="social-login-section">
+                                <GoogleLoginButton onSuccess={onNext} onError={() => setError('Google login failed')} />
+                            </div>
 
-                    {/* Divider */}
-                    <div className="divider">
-                        <span className="divider-text">{isEnglish ? 'OR' : 'किंवा'}</span>
-                    </div>
+                            <div className="divider">
+                                <span className="divider-text">{isEnglish ? 'OR' : 'किंवा'}</span>
+                            </div>
+                        </>
+                    )}
 
-                    {/* Email/Password Form */}
-                    <form className="login-form" onSubmit={(e) => { e.preventDefault(); onNext(); }}>
+                    {error && (
+                        <div style={{
+                            background: '#fef2f2',
+                            border: '1px solid #fecaca',
+                            color: '#dc2626',
+                            padding: '12px 16px',
+                            borderRadius: '12px',
+                            fontSize: '0.85rem',
+                            fontWeight: 600,
+                            marginBottom: '8px',
+                            textAlign: 'center'
+                        }}>
+                            {error}
+                        </div>
+                    )}
+
+                    <form className="login-form" onSubmit={view === 'login' ? handleLogin : handleSignup}>
+                        {view === 'signup' && (
+                            <div className="form-group">
+                                <label className="form-label">{isEnglish ? 'Full Name' : 'पूर्ण नाव'}</label>
+                                <div className="input-wrapper">
+                                    <User size={20} className="input-icon" />
+                                    <input
+                                        type="text"
+                                        className="form-input"
+                                        placeholder={isEnglish ? 'Enter your name' : 'तुमचे नाव प्रविष्ट करा'}
+                                        value={name}
+                                        onChange={(e) => setName(e.target.value)}
+                                        required
+                                    />
+                                </div>
+                            </div>
+                        )}
+
                         <div className="form-group">
-                            <label className="form-label">
-                                {isEnglish ? 'Email Address' : 'ईमेल पत्ता'}
-                            </label>
+                            <label className="form-label">{isEnglish ? 'Email Address' : 'ईमेल पत्ता'}</label>
                             <div className="input-wrapper">
                                 <Mail size={20} className="input-icon" />
                                 <input
@@ -188,14 +250,13 @@ const LandingScreen = ({ onNext, isDesktop }) => {
                                     placeholder={isEnglish ? 'Enter your email' : 'तुमचा ईमेल प्रविष्ट करा'}
                                     value={email}
                                     onChange={(e) => setEmail(e.target.value)}
+                                    required
                                 />
                             </div>
                         </div>
 
                         <div className="form-group">
-                            <label className="form-label">
-                                {isEnglish ? 'Password' : 'पासवर्ड'}
-                            </label>
+                            <label className="form-label">{isEnglish ? 'Password' : 'पासवर्ड'}</label>
                             <div className="input-wrapper">
                                 <input
                                     type={showPassword ? 'text' : 'password'}
@@ -204,60 +265,37 @@ const LandingScreen = ({ onNext, isDesktop }) => {
                                     value={password}
                                     onChange={(e) => setPassword(e.target.value)}
                                     style={{ paddingRight: '45px' }}
+                                    required
                                 />
-                                <button
-                                    type="button"
-                                    className="password-toggle"
-                                    onClick={() => setShowPassword(!showPassword)}
-                                >
+                                <button type="button" className="password-toggle" onClick={() => setShowPassword(!showPassword)}>
                                     {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
                                 </button>
                             </div>
                         </div>
 
-                        <div className="form-options">
-                            <label className="remember-me">
-                                <input type="checkbox" />
-                                <span>{isEnglish ? 'Remember me' : 'मला लक्षात ठेवा'}</span>
-                            </label>
-                            <a href="#" className="forgot-password">
-                                {isEnglish ? 'Forgot Password?' : 'पासवर्ड विसरलात?'}
-                            </a>
-                        </div>
-
-                        <button type="submit" className="submit-btn">
-                            {isEnglish ? 'Sign In' : 'साइन इन करा'}
-                            <ArrowRight size={20} />
+                        <button type="submit" className="submit-btn" disabled={isSubmitting}>
+                            {isSubmitting
+                                ? (isEnglish ? 'Processing...' : 'प्रक्रिया सुरू आहे...')
+                                : (view === 'login' ? (isEnglish ? 'Sign In' : 'साइन इन करा') : (isEnglish ? 'Register' : 'नोंदणी करा'))}
+                            {!isSubmitting && <ArrowRight size={20} />}
                         </button>
                     </form>
 
-                    {/* Sign Up Link */}
                     <div className="signup-link">
-                        <span>{isEnglish ? "Don't have an account?" : 'खाते नाही?'}</span>
-                        <a href="#" onClick={onNext}>
-                            {isEnglish ? 'Sign Up' : 'नोंदणी करा'}
+                        <span>{view === 'login' ? (isEnglish ? "Don't have an account?" : 'खाते नाही?') : (isEnglish ? "Already have an account?" : 'आधीच खाते आहे?')}</span>
+                        <a href="#" onClick={(e) => { e.preventDefault(); setError(''); setView(view === 'login' ? 'signup' : 'login'); }}>
+                            {view === 'login' ? (isEnglish ? 'Sign Up' : 'नोंदणी करा') : (isEnglish ? 'Sign In' : 'साइन इन करा')}
                         </a>
                     </div>
 
-                    {/* Back to Landing */}
                     <div style={{ textAlign: 'center', marginTop: '16px' }}>
-                        <button
-                            onClick={() => setView('landing')}
-                            style={{
-                                background: 'none',
-                                border: 'none',
-                                color: 'var(--text-muted)',
-                                cursor: 'pointer',
-                                fontSize: '0.9rem',
-                                textDecoration: 'underline'
-                            }}
-                        >
+                        <button onClick={() => setView('landing')} className="back-to-home-btn" style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', fontSize: '0.9rem', textDecoration: 'underline' }}>
                             {isEnglish ? '← Back to Home' : '← होम वर परत जा'}
                         </button>
                     </div>
                 </Motion.div>
             </div>
-        </Motion.div>
+        </div>
     );
 };
 

@@ -5,10 +5,12 @@ import {
   Users,
   User,
   Mic,
-  Settings
+  Settings,
+  Loader2
 } from 'lucide-react';
 import { motion as Motion, AnimatePresence } from 'framer-motion';
 import { useLanguage } from './context/LanguageContext';
+import { useAuth } from './context/AuthContext';
 
 import LandingScreen from './pages/LandingScreen';
 import FarmInfoScreen from './pages/FarmInfoScreen';
@@ -189,29 +191,33 @@ const LoadingScreen = ({ isEnglish, isDarkMode, onFinished }) => {
 };
 
 function App() {
-  const { isEnglish: contextIsEnglish, setIsEnglish: setContextIsEnglish } = useLanguage();
+  const { isEnglish, setIsEnglish } = useLanguage();
+  const { user, isAuthenticated, loading: authLoading } = useAuth();
+
   const [onboarding, setOnboarding] = useState('landing');
   const [activeTab, setActiveTab] = useState('home');
   const [screen, setScreen] = useState('home');
   const [selectedCrop, setSelectedCrop] = useState(null);
   const [isVoiceOpen, setIsVoiceOpen] = useState(false);
-  const [isEnglish, setIsEnglish] = useState(contextIsEnglish);
-
-  // Sync with context if it changes from other sources
-  React.useEffect(() => {
-    setIsEnglish(contextIsEnglish);
-  }, [contextIsEnglish]);
-
-  // Update context when local state changes
-  const handleSetIsEnglish = (val) => {
-    setIsEnglish(val);
-    setContextIsEnglish(val);
-  };
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [farmDetails, setFarmDetails] = useState({});
   const [isDesktop, setIsDesktop] = useState(window.innerWidth >= 1024);
   const [previousCropScreen, setPreviousCropScreen] = useState('recommendations');
+
+  React.useEffect(() => {
+    if (!authLoading) {
+      if (isAuthenticated) {
+        if (user?.isOnboarded) {
+          setOnboarding('finished');
+        } else {
+          setOnboarding('farm_info');
+        }
+      } else {
+        setOnboarding('landing');
+      }
+    }
+  }, [isAuthenticated, user, authLoading]);
 
   React.useEffect(() => {
     const handleResize = () => setIsDesktop(window.innerWidth >= 1024);
@@ -228,169 +234,173 @@ function App() {
         background: isDarkMode ? '#0f172a' : '#f8fafc',
       }}
     >
-      <AnimatePresence mode="wait">
-        {onboarding === 'landing' && (
-          <LandingScreen key="landing" onNext={() => setOnboarding('farm_info')} isDesktop={isDesktop} />
-        )}
-        {onboarding === 'farm_info' && (
-          <FarmInfoScreen
-            key="farm_info"
-            farmInfo={farmDetails}
-            setFarmInfo={setFarmDetails}
-            isDesktop={isDesktop}
-            onNext={(data) => {
-              if (data) setFarmDetails(data);
-              setOnboarding('finished');
-              setScreen('loading');
-            }}
-            onBack={() => setOnboarding('landing')}
-          />
-        )}
+      {authLoading ? (
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '100vh' }}>
+          <Loader2 className="animate-spin" size={48} color="var(--primary)" />
+        </div>
+      ) : (
+        <AnimatePresence mode="wait">
+          {onboarding === 'landing' && (
+            <LandingScreen key="landing" onNext={() => setOnboarding('farm_info')} isDesktop={isDesktop} />
+          )}
+          {onboarding === 'farm_info' && (
+            <FarmInfoScreen
+              key="farm_info"
+              farmInfo={farmDetails}
+              setFarmInfo={setFarmDetails}
+              isDesktop={isDesktop}
+              onNext={(data) => {
+                if (data) setFarmDetails(data);
+                setOnboarding('finished');
+                setScreen('loading');
+              }}
+              onBack={() => setOnboarding('landing')}
+            />
+          )}
 
-        {onboarding === 'finished' && (
-          <div
-            key="app-finished"
-            className={`${isDesktop ? 'desktop-layout' : ''}`}
-            style={{
-              display: 'flex',
-              flexDirection: isDesktop ? 'row' : 'column',
-              alignItems: isDesktop ? 'stretch' : 'center',
-              width: '100%',
-              minHeight: '100vh',
-            }}
-          >
-            {isDesktop && (
-              <DesktopSidebar
-                activeTab={activeTab}
-                setTab={setActiveTab}
-                setScreen={setScreen}
-                isDarkMode={isDarkMode}
-                toggleTheme={toggleTheme}
-                isEnglish={isEnglish}
-                onLogout={() => setOnboarding('landing')}
-              />
-            )}
-
+          {onboarding === 'finished' && (
             <div
-              className={isDesktop ? "main-content-desktop" : "mobile-content-wrapper"}
+              key="app-finished"
+              className={`${isDesktop ? 'desktop-layout' : ''}`}
               style={{
-                flex: isDesktop ? 1 : 'unset',
-                width: isDesktop ? 'auto' : '100%',
                 display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                paddingTop: isDesktop ? '100px' : '84px'
+                flexDirection: isDesktop ? 'row' : 'column',
+                alignItems: isDesktop ? 'stretch' : 'center',
+                width: '100%',
+                minHeight: '100vh',
               }}
             >
-              <MainHeader
-                screen={screen}
-                setScreen={setScreen}
-                setTab={setActiveTab}
-                isEnglish={isEnglish}
-                setIsEnglish={handleSetIsEnglish}
-                setIsMenuOpen={setIsMenuOpen}
-                isDesktop={isDesktop}
-                isDarkMode={isDarkMode}
-                previousCropScreen={previousCropScreen}
-              />
-
-              {!isDesktop && (
-                <SideMenu
-                  isOpen={isMenuOpen}
-                  onClose={() => setIsMenuOpen(false)}
-                  darkMode={isDarkMode}
-                  setScreen={setScreen}
+              {isDesktop && (
+                <DesktopSidebar
+                  activeTab={activeTab}
                   setTab={setActiveTab}
+                  setScreen={setScreen}
+                  isDarkMode={isDarkMode}
+                  toggleTheme={toggleTheme}
                   isEnglish={isEnglish}
+                  onLogout={() => setOnboarding('landing')}
                 />
               )}
 
-              <div className="content-card">
-                {screen === 'home' && (
-                  <HomeScreen
-                    setIsVoiceOpen={setIsVoiceOpen}
+              <div
+                className={isDesktop ? "main-content-desktop" : "mobile-content-wrapper"}
+                style={{
+                  flex: isDesktop ? 1 : 'unset',
+                  width: isDesktop ? 'auto' : '100%',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  paddingTop: isDesktop ? '100px' : '84px'
+                }}
+              >
+                <MainHeader
+                  screen={screen}
+                  setScreen={setScreen}
+                  setTab={setActiveTab}
+                  isEnglish={isEnglish}
+                  setIsEnglish={setIsEnglish}
+                  setIsMenuOpen={setIsMenuOpen}
+                  isDesktop={isDesktop}
+                  isDarkMode={isDarkMode}
+                  previousCropScreen={previousCropScreen}
+                />
+
+                {!isDesktop && (
+                  <SideMenu
+                    isOpen={isMenuOpen}
+                    onClose={() => setIsMenuOpen(false)}
+                    darkMode={isDarkMode}
                     setScreen={setScreen}
                     setTab={setActiveTab}
-                    isDarkMode={isDarkMode}
                     isEnglish={isEnglish}
                   />
                 )}
-                {screen === 'recommendations' && (
-                  <CropRecommendationScreen
-                    isEnglish={isEnglish}
-                    isDarkMode={isDarkMode}
-                    isDesktop={isDesktop}
-                    farmInfo={farmDetails}
-                    showAll={false}
-                    setScreen={setScreen}
-                    onSelectCrop={(crop) => {
-                      setSelectedCrop(crop);
-                      setPreviousCropScreen('recommendations');
-                      setScreen('crop-detail');
-                    }}
-                  />
-                )}
-                {screen === 'loading' && (
-                  <LoadingScreen
-                    isEnglish={isEnglish}
-                    isDarkMode={isDarkMode}
-                    onFinished={() => {
-                      setScreen('recommendations');
-                      setActiveTab('crops');
-                    }}
-                  />
-                )}
-                {screen === 'all-crops' && (
-                  <CropRecommendationScreen
-                    isEnglish={isEnglish}
-                    isDarkMode={isDarkMode}
-                    isDesktop={isDesktop}
-                    farmInfo={farmDetails}
-                    showAll={true}
-                    setScreen={setScreen}
-                    onSelectCrop={(crop) => {
-                      setSelectedCrop(crop);
-                      setPreviousCropScreen('all-crops');
-                      setScreen('crop-detail');
-                    }}
-                  />
-                )}
-                {screen === 'crop-detail' && (
-                  <CropDetailScreen
-                    crop={selectedCrop}
-                    onBack={() => setScreen(previousCropScreen)}
-                    isDarkMode={isDarkMode}
-                    isEnglish={isEnglish}
-                  />
-                )}
-                {screen === 'community' && <CommunityScreen isDarkMode={isDarkMode} />}
-                {screen === 'profile' && (
-                  <ProfileScreen
-                    darkMode={isDarkMode}
-                    isDesktop={isDesktop}
-                    toggleTheme={toggleTheme}
-                    farmDetails={farmDetails}
-                  />
-                )}
-                {screen === 'settings' && (
-                  <SettingsScreen
-                    darkMode={isDarkMode}
-                    isDarkMode={isDarkMode}
-                    setIsDarkMode={setIsDarkMode}
-                    toggleTheme={toggleTheme}
-                    isEnglish={isEnglish}
-                    setIsEnglish={handleSetIsEnglish}
-                    isDesktop={isDesktop}
-                    onLogout={() => setOnboarding('landing')}
-                  />
-                )}
-              </div>
 
-              {!isDesktop && <BottomNav activeTab={activeTab} setTab={setActiveTab} setScreen={setScreen} isEnglish={isEnglish} />}
+                <div className="content-card">
+                  {screen === 'home' && (
+                    <HomeScreen
+                      setIsVoiceOpen={setIsVoiceOpen}
+                      setScreen={setScreen}
+                      setTab={setActiveTab}
+                      isDarkMode={isDarkMode}
+                      isEnglish={isEnglish}
+                    />
+                  )}
+                  {screen === 'recommendations' && (
+                    <CropRecommendationScreen
+                      isEnglish={isEnglish}
+                      isDarkMode={isDarkMode}
+                      isDesktop={isDesktop}
+                      farmInfo={farmDetails}
+                      showAll={false}
+                      setScreen={setScreen}
+                      onSelectCrop={(crop) => {
+                        setSelectedCrop(crop);
+                        setPreviousCropScreen('recommendations');
+                        setScreen('crop-detail');
+                      }}
+                    />
+                  )}
+                  {screen === 'loading' && (
+                    <LoadingScreen
+                      isEnglish={isEnglish}
+                      isDarkMode={isDarkMode}
+                      onFinished={() => {
+                        setScreen('recommendations');
+                        setActiveTab('crops');
+                      }}
+                    />
+                  )}
+                  {screen === 'all-crops' && (
+                    <CropRecommendationScreen
+                      isEnglish={isEnglish}
+                      isDarkMode={isDarkMode}
+                      isDesktop={isDesktop}
+                      farmInfo={farmDetails}
+                      showAll={true}
+                      setScreen={setScreen}
+                      onSelectCrop={(crop) => {
+                        setSelectedCrop(crop);
+                        setPreviousCropScreen('all-crops');
+                        setScreen('crop-detail');
+                      }}
+                    />
+                  )}
+                  {screen === 'crop-detail' && (
+                    <CropDetailScreen
+                      crop={selectedCrop}
+                      onBack={() => setScreen(previousCropScreen)}
+                      isDarkMode={isDarkMode}
+                      isEnglish={isEnglish}
+                    />
+                  )}
+                  {screen === 'community' && <CommunityScreen isDarkMode={isDarkMode} />}
+                  {screen === 'profile' && (
+                    <ProfileScreen
+                      darkMode={isDarkMode}
+                      isDesktop={isDesktop}
+                      onEdit={() => setOnboarding('farm_info')}
+                    />
+                  )}
+                  {screen === 'settings' && (
+                    <SettingsScreen
+                      darkMode={isDarkMode}
+                      setIsDarkMode={setIsDarkMode}
+                      toggleTheme={toggleTheme}
+                      isEnglish={isEnglish}
+                      setIsEnglish={setIsEnglish}
+                      isDesktop={isDesktop}
+                      onLogout={() => setOnboarding('landing')}
+                    />
+                  )}
+                </div>
+
+                {!isDesktop && <BottomNav activeTab={activeTab} setTab={setActiveTab} setScreen={setScreen} isEnglish={isEnglish} />}
+              </div>
             </div>
-          </div>
-        )}
-      </AnimatePresence>
+          )}
+        </AnimatePresence>
+      )}
 
       <VoiceModal isOpen={isVoiceOpen} onClose={() => setIsVoiceOpen(false)} />
     </div>

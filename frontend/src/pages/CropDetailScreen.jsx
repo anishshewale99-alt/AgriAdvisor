@@ -23,10 +23,10 @@ const IconMap = {
     Cloud: Cloud,
 };
 
-const CropDetailScreen = ({ crop, onBack, isDarkMode, lang }) => {
+const CropDetailScreen = ({ crop, onBack, isDarkMode, isEnglish }) => {
     const [isExpanded, setIsExpanded] = React.useState(false);
     if (!crop) return null;
-    const isEn = lang === 'en';
+    const isEn = isEnglish;
 
     const getTTSText = () => {
         let text = isEn

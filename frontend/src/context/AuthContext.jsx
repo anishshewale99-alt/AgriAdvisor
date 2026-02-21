@@ -15,7 +15,7 @@ export const AuthProvider = ({ children }) => {
     const [token, setToken] = useState(localStorage.getItem('token'));
     const [loading, setLoading] = useState(true);
 
-    const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+    const API_URL = import.meta.env.VITE_API_URL || '';
 
     // Fetch user profile on mount if token exists
     useEffect(() => {
@@ -70,7 +70,8 @@ export const AuthProvider = ({ children }) => {
             });
 
             if (!response.ok) {
-                throw new Error('Login failed');
+                const errorData = await response.json();
+                throw new Error(errorData.message || 'Login failed');
             }
 
             const data = await response.json();
@@ -80,6 +81,58 @@ export const AuthProvider = ({ children }) => {
             return data.user;
         } catch (error) {
             console.error('Login error:', error);
+            throw error;
+        }
+    };
+
+    const loginEmail = async (email, password) => {
+        try {
+            const response = await fetch(`${API_URL}/api/auth/login`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ email, password })
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.error || errorData.message || 'Login failed');
+            }
+
+            const data = await response.json();
+            localStorage.setItem('token', data.token);
+            setToken(data.token);
+            setUser(data.user);
+            return data.user;
+        } catch (error) {
+            console.error('Login error:', error);
+            throw error;
+        }
+    };
+
+    const register = async (name, email, password) => {
+        try {
+            const response = await fetch(`${API_URL}/api/auth/signup`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ name, email, password })
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.error || errorData.message || 'Signup failed');
+            }
+
+            const data = await response.json();
+            localStorage.setItem('token', data.token);
+            setToken(data.token);
+            setUser(data.user);
+            return data.user;
+        } catch (error) {
+            console.error('Registration error:', error);
             throw error;
         }
     };
@@ -132,6 +185,8 @@ export const AuthProvider = ({ children }) => {
         token,
         loading,
         login,
+        loginEmail,
+        register,
         logout,
         updateFarmInfo,
         isAuthenticated: !!user,
