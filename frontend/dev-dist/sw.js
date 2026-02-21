@@ -22,27 +22,27 @@ if (!self.define) {
   const singleRequire = (uri, parentUri) => {
     uri = new URL(uri + ".js", parentUri).href;
     return registry[uri] || (
-      
-        new Promise(resolve => {
-          if ("document" in self) {
-            const script = document.createElement("script");
-            script.src = uri;
-            script.onload = resolve;
-            document.head.appendChild(script);
-          } else {
-            nextDefineUri = uri;
-            importScripts(uri);
-            resolve();
-          }
-        })
-      
-      .then(() => {
-        let promise = registry[uri];
-        if (!promise) {
-          throw new Error(`Module ${uri} didn’t register its module`);
+
+      new Promise(resolve => {
+        if ("document" in self) {
+          const script = document.createElement("script");
+          script.src = uri;
+          script.onload = resolve;
+          document.head.appendChild(script);
+        } else {
+          nextDefineUri = uri;
+          importScripts(uri);
+          resolve();
         }
-        return promise;
       })
+
+        .then(() => {
+          let promise = registry[uri];
+          if (!promise) {
+            throw new Error(`Module ${uri} didn’t register its module`);
+          }
+          return promise;
+        })
     );
   };
 
@@ -67,7 +67,8 @@ if (!self.define) {
     });
   };
 }
-define(['./workbox-237f2c1f'], (function (workbox) { 'use strict';
+define(['./workbox-237f2c1f'], (function (workbox) {
+  'use strict';
 
   self.skipWaiting();
   workbox.clientsClaim();
@@ -79,7 +80,11 @@ define(['./workbox-237f2c1f'], (function (workbox) { 'use strict';
    */
   workbox.precacheAndRoute([{
     "url": "index.html",
+<<<<<<< HEAD
     "revision": "0.8ctf5ge6hi8"
+=======
+    "revision": "0.n7csh158ik4"
+>>>>>>> 5f1f9a1a8b633f5d470dcd771d13dc8f323c2d4f
   }], {});
   workbox.cleanupOutdatedCaches();
   workbox.registerRoute(new workbox.NavigationRoute(workbox.createHandlerBoundToURL("index.html"), {

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Volume2, TrendingUp, Filter, ChevronDown } from 'lucide-react';
+import { Volume2, TrendingUp, Filter, ChevronDown, Loader2 } from 'lucide-react';
 import { motion as Motion } from 'framer-motion';
 import { cropData } from '../cropData';
 import '../styles/CropRecommendationScreen.css';
@@ -11,6 +11,8 @@ const CropRecommendationScreen = ({ onSelectCrop, lang, isDarkMode, farmInfo = {
         water: 'All'
     });
     const [isSpeaking, setIsSpeaking] = useState(false);
+    const [isLoadingTTS, setIsLoadingTTS] = useState(false);
+    const audioRef = React.useRef(null);
     const isEn = lang === 'en';
 
     // Filter crops based on manual filters
@@ -44,13 +46,17 @@ const CropRecommendationScreen = ({ onSelectCrop, lang, isDarkMode, farmInfo = {
         ]
     };
 
-    const handleSpeak = () => {
-        if (window.speechSynthesis.speaking) {
-            window.speechSynthesis.cancel();
+    const handleSpeak = async () => {
+        if (isSpeaking) {
+            if (audioRef.current) {
+                audioRef.current.pause();
+                audioRef.current = null;
+            }
             setIsSpeaking(false);
             return;
         }
 
+        setIsLoadingTTS(true);
         let text = isEn ? 'Top Crops for You. ' : 'तुमच्यासाठी टॉप पिके. ';
 
         filteredCrops.forEach((crop, index) => {
@@ -61,14 +67,43 @@ const CropRecommendationScreen = ({ onSelectCrop, lang, isDarkMode, farmInfo = {
             }
         });
 
-        const utterance = new SpeechSynthesisUtterance(text);
-        utterance.lang = isEn ? 'en-US' : 'mr-IN';
+        try {
+            const backendUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+            const response = await fetch(`${backendUrl}/api/tts`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ text, lang: isEn ? 'en' : 'mr' })
+            });
 
-        utterance.onend = () => setIsSpeaking(false);
-        utterance.onerror = () => setIsSpeaking(false);
+            if (!response.ok) throw new Error('TTS request failed');
 
-        setIsSpeaking(true);
-        window.speechSynthesis.speak(utterance);
+            const blob = await response.blob();
+            const url = URL.createObjectURL(blob);
+            const audio = new Audio(url);
+            audioRef.current = audio;
+
+            audio.onplay = () => {
+                setIsLoadingTTS(false);
+                setIsSpeaking(true);
+            };
+
+            audio.onended = () => {
+                setIsSpeaking(false);
+                audioRef.current = null;
+                URL.revokeObjectURL(url);
+            };
+
+            audio.onerror = () => {
+                setIsLoadingTTS(false);
+                setIsSpeaking(false);
+            };
+
+            await audio.play();
+        } catch (error) {
+            console.error('TTS Error:', error);
+            setIsLoadingTTS(false);
+            setIsSpeaking(false);
+        }
     };
 
     return (
@@ -127,13 +162,18 @@ const CropRecommendationScreen = ({ onSelectCrop, lang, isDarkMode, farmInfo = {
                                 padding: '10px',
                                 borderRadius: '50%',
                                 display: 'flex',
-                                cursor: 'pointer',
+                                cursor: isLoadingTTS ? 'default' : 'pointer',
                                 boxShadow: isSpeaking ? '0 4px 12px rgba(22, 163, 74, 0.3)' : '0 2px 8px rgba(0,0,0,0.05)',
                                 border: isDarkMode ? '1px solid rgba(255,255,255,0.1)' : '1px solid #e5e7eb',
-                                transition: 'all 0.2s ease'
+                                transition: 'all 0.2s ease',
+                                opacity: isLoadingTTS ? 0.7 : 1
                             }}
                         >
-                            <Volume2 size={20} color={isSpeaking ? 'white' : (isDarkMode ? 'white' : '#1f2937')} />
+                            {isLoadingTTS ? (
+                                <Loader2 size={20} className="animate-spin" color={isDarkMode ? 'white' : '#1f2937'} />
+                            ) : (
+                                <Volume2 size={20} color={isSpeaking ? 'white' : (isDarkMode ? 'white' : '#1f2937')} />
+                            )}
                         </div>
                     </div>
                 </div>

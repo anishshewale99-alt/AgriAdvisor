@@ -18,7 +18,8 @@ import {
   Menu,
   ArrowLeft,
   Settings,
-  ChevronDown
+  ChevronDown,
+  Loader2
 } from 'lucide-react';
 import { motion as Motion, AnimatePresence } from 'framer-motion';
 import { useLanguage } from './context/LanguageContext';
@@ -37,11 +38,10 @@ import CropRecommendationScreen from './pages/CropRecommendationScreen';
 import CropDetailScreen from './pages/CropDetailScreen';
 import DesktopSidebar from './components/DesktopSidebar';
 import MainHeader from './components/MainHeader';
-// Image imports removed for clean solid background layout
 
 const BottomNav = ({ activeTab, setTab, setScreen }) => {
-  const { isEnglish } = useLanguage(); // Use global language context
-  const lang = isEnglish ? 'en' : 'mr'; // For backward compatibility
+  const { isEnglish } = useLanguage();
+  const lang = isEnglish ? 'en' : 'mr';
 
   return (
     <div className="bottom-nav" style={{ width: '100%', display: 'flex', justifyContent: 'center' }}>
@@ -70,11 +70,6 @@ const BottomNav = ({ activeTab, setTab, setScreen }) => {
     </div>
   );
 };
-
-
-// Replaced by CropRecommendationScreen.jsx component
-
-// Replaced by CropDetailScreen.jsx component
 
 // Loading Screen Component
 const LoadingScreen = ({ lang, isDarkMode, onFinished }) => {
@@ -234,20 +229,61 @@ function App() {
 
   const toggleTheme = () => setIsDarkMode(prev => !prev);
 
-  // Background Logic removed as per request to have solid backgrounds only
+  const [isLoadingTTS, setIsLoadingTTS] = useState(false);
+  const audioRef = React.useRef(null);
 
-  const handleTTS = () => {
-    if (window.speechSynthesis.speaking) {
-      window.speechSynthesis.cancel();
+  const handleTTS = async () => {
+    if (isSpeaking) {
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current = null;
+      }
       setIsSpeaking(false);
       return;
     }
-    const utterance = new SpeechSynthesisUtterance(lang === 'mr' ? 'ॲग्री ॲडव्हायझरमध्ये आपले स्वागत आहे. सध्या रबी हंगाम आहे.' : 'Welcome to AgriAdvisor. It is currently Rabi Season.');
-    utterance.lang = lang === 'mr' ? 'mr-IN' : 'en-US';
-    utterance.onend = () => setIsSpeaking(false);
-    utterance.onerror = () => setIsSpeaking(false);
-    setIsSpeaking(true);
-    window.speechSynthesis.speak(utterance);
+
+    setIsLoadingTTS(true);
+    const text = lang === 'mr'
+      ? 'ॲग्री ॲडव्हायझरमध्ये आपले स्वागत आहे. सध्या रबी हंगाम आहे.'
+      : 'Welcome to AgriAdvisor. It is currently Rabi Season.';
+
+    try {
+      const backendUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+      const response = await fetch(`${backendUrl}/api/tts`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text, lang: lang === 'mr' ? 'mr' : 'en' })
+      });
+
+      if (!response.ok) throw new Error('TTS request failed');
+
+      const blob = await response.blob();
+      const url = URL.createObjectURL(blob);
+      const audio = new Audio(url);
+      audioRef.current = audio;
+
+      audio.onplay = () => {
+        setIsLoadingTTS(false);
+        setIsSpeaking(true);
+      };
+
+      audio.onended = () => {
+        setIsSpeaking(false);
+        audioRef.current = null;
+        URL.revokeObjectURL(url);
+      };
+
+      audio.onerror = () => {
+        setIsLoadingTTS(false);
+        setIsSpeaking(false);
+      };
+
+      await audio.play();
+    } catch (error) {
+      console.error('TTS Error:', error);
+      setIsLoadingTTS(false);
+      setIsSpeaking(false);
+    }
   };
 
   return (
@@ -281,7 +317,7 @@ function App() {
             key="app-finished"
             className={`${isDesktop ? 'desktop-layout' : ''}`}
             style={{
-              display: isDesktop ? 'flex' : 'flex',
+              display: 'flex',
               flexDirection: isDesktop ? 'row' : 'column',
               alignItems: isDesktop ? 'stretch' : 'center',
               width: '100%',
@@ -309,7 +345,7 @@ function App() {
                 display: 'flex',
                 flexDirection: 'column',
                 alignItems: 'center',
-                paddingTop: isDesktop ? '100px' : '84px' // Account for fixed header
+                paddingTop: isDesktop ? '100px' : '84px'
               }}
             >
               <MainHeader
@@ -321,6 +357,7 @@ function App() {
                 setIsMenuOpen={setIsMenuOpen}
                 handleTTS={handleTTS}
                 isSpeaking={isSpeaking}
+                isLoadingTTS={isLoadingTTS}
                 isDesktop={isDesktop}
                 isDarkMode={isDarkMode}
                 previousCropScreen={previousCropScreen}

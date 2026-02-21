@@ -92,7 +92,7 @@ const SideMenu = ({ isOpen, onClose, darkMode, setScreen, setTab }) => {
                                     <div
                                         key={i}
                                         onClick={() => {
-                                            if (item.id === 'profile') {
+                                            if (item.id === 'profile' && setScreen && setTab) {
                                                 setScreen('profile');
                                                 setTab('profile');
                                                 onClose();
@@ -140,7 +140,7 @@ const SideMenu = ({ isOpen, onClose, darkMode, setScreen, setTab }) => {
                             textAlign: 'center'
                         }}>
                             <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
-                                Versoin 1.0.4 • © 2026 AgriAdvisor
+                                Version 1.0.4 • © 2026 AgriAdvisor
                             </p>
                         </div>
                     </Motion.div>

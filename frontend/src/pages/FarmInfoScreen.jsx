@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Volume2, Droplets, CloudOff, ChevronRight, ChevronLeft, CloudRain, Snowflake, Sun, CalendarRange } from 'lucide-react';
+import { Volume2, Droplets, CloudOff, ChevronRight, ChevronLeft, CloudRain, Snowflake, Sun, CalendarRange, Loader2 } from 'lucide-react';
 import FarmPattern from '../assets/bg2.png';
 import { useLanguage } from '../context/LanguageContext';
 import '../styles/FarmInfoScreen.css';
@@ -18,7 +18,9 @@ const FarmInfoScreen = ({ onNext, onBack, farmInfo, setFarmInfo, isDesktop }) =>
     const setPlantingSeason = (val) => updateFarmInfo({ season: val });
 
     const [isSpeaking, setIsSpeaking] = useState(false);
+    const [isLoadingTTS, setIsLoadingTTS] = useState(false);
     const [isScrolled, setIsScrolled] = useState(false);
+    const audioRef = React.useRef(null);
     const { isEnglish, toggleLanguage } = useLanguage(); // Use global language context
 
     useEffect(() => {
@@ -29,25 +31,58 @@ const FarmInfoScreen = ({ onNext, onBack, farmInfo, setFarmInfo, isDesktop }) =>
         return () => window.removeEventListener('scroll', handleScroll);
     }, []);
 
-    const handleSpeak = () => {
-        if (window.speechSynthesis.speaking) {
-            window.speechSynthesis.cancel();
+    const handleSpeak = async () => {
+        if (isSpeaking) {
+            if (audioRef.current) {
+                audioRef.current.pause();
+                audioRef.current = null;
+            }
             setIsSpeaking(false);
             return;
         }
 
+        setIsLoadingTTS(true);
         const textToRead = isEnglish
             ? "Tell us about your farm. Select your farm size and soil type."
             : "तुमच्या शेताची माहिती. कृपया आपल्या शेताचा आकार आणि मातीचा प्रकार निवडा.";
 
-        const utterance = new SpeechSynthesisUtterance(textToRead);
-        utterance.lang = isEnglish ? 'en-US' : 'mr-IN';
+        try {
+            const backendUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+            const response = await fetch(`${backendUrl}/api/tts`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ text: textToRead, lang: isEnglish ? 'en' : 'mr' })
+            });
 
-        utterance.onend = () => setIsSpeaking(false);
-        utterance.onerror = () => setIsSpeaking(false);
+            if (!response.ok) throw new Error('TTS request failed');
 
-        setIsSpeaking(true);
-        window.speechSynthesis.speak(utterance);
+            const blob = await response.blob();
+            const url = URL.createObjectURL(blob);
+            const audio = new Audio(url);
+            audioRef.current = audio;
+
+            audio.onplay = () => {
+                setIsLoadingTTS(false);
+                setIsSpeaking(true);
+            };
+
+            audio.onended = () => {
+                setIsSpeaking(false);
+                audioRef.current = null;
+                URL.revokeObjectURL(url);
+            };
+
+            audio.onerror = () => {
+                setIsLoadingTTS(false);
+                setIsSpeaking(false);
+            };
+
+            await audio.play();
+        } catch (error) {
+            console.error('TTS Error:', error);
+            setIsLoadingTTS(false);
+            setIsSpeaking(false);
+        }
     };
 
     useEffect(() => {
@@ -166,15 +201,20 @@ const FarmInfoScreen = ({ onNext, onBack, farmInfo, setFarmInfo, isDesktop }) =>
                                 padding: '6px',
                                 borderRadius: '50%',
                                 color: isSpeaking ? 'white' : 'var(--primary)',
-                                cursor: 'pointer',
+                                cursor: isLoadingTTS ? 'default' : 'pointer',
                                 transition: 'all 0.3s ease',
                                 boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
                                 display: 'flex',
                                 alignItems: 'center',
-                                justifyContent: 'center'
+                                justifyContent: 'center',
+                                opacity: isLoadingTTS ? 0.7 : 1
                             }}
                         >
-                            <Volume2 size={20} />
+                            {isLoadingTTS ? (
+                                <Loader2 size={20} className="animate-spin" />
+                            ) : (
+                                <Volume2 size={20} />
+                            )}
                         </div>
                     </div>
                 </div>
