@@ -5,21 +5,7 @@ import {
   Users,
   User,
   Mic,
-  Volume2,
-  Sun,
-  Droplets,
-  AlertTriangle,
-  Lightbulb,
-  ChevronLeft,
-  ChevronRight,
-  TrendingUp,
-  Wind,
-  MapPin,
-  Menu,
-  ArrowLeft,
-  Settings,
-  ChevronDown,
-  Loader2
+  Settings
 } from 'lucide-react';
 import { motion as Motion, AnimatePresence } from 'framer-motion';
 import { useLanguage } from './context/LanguageContext';
@@ -27,13 +13,11 @@ import { useLanguage } from './context/LanguageContext';
 import LandingScreen from './pages/LandingScreen';
 import FarmInfoScreen from './pages/FarmInfoScreen';
 import HomeScreen from './pages/HomeScreen';
-import MarketTicker from './components/MarketTicker';
 import VoiceModal from './components/VoiceModal';
 import CommunityScreen from './pages/CommunityScreen';
 import ProfileScreen from './pages/ProfileScreen';
 import SettingsScreen from './pages/SettingsScreen';
 import SideMenu from './components/SideMenu';
-import CropAnalysis from './components/CropAnalysis';
 import CropRecommendationScreen from './pages/CropRecommendationScreen';
 import CropDetailScreen from './pages/CropDetailScreen';
 import DesktopSidebar from './components/DesktopSidebar';
@@ -216,7 +200,6 @@ function App() {
   const [lang, setLang] = useState('mr');
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [isSpeaking, setIsSpeaking] = useState(false);
   const [farmDetails, setFarmDetails] = useState({});
   const [isDesktop, setIsDesktop] = useState(window.innerWidth >= 1024);
   const [previousCropScreen, setPreviousCropScreen] = useState('recommendations');
@@ -228,63 +211,6 @@ function App() {
   }, []);
 
   const toggleTheme = () => setIsDarkMode(prev => !prev);
-
-  const [isLoadingTTS, setIsLoadingTTS] = useState(false);
-  const audioRef = React.useRef(null);
-
-  const handleTTS = async () => {
-    if (isSpeaking) {
-      if (audioRef.current) {
-        audioRef.current.pause();
-        audioRef.current = null;
-      }
-      setIsSpeaking(false);
-      return;
-    }
-
-    setIsLoadingTTS(true);
-    const text = lang === 'mr'
-      ? 'ॲग्री ॲडव्हायझरमध्ये आपले स्वागत आहे. सध्या रबी हंगाम आहे.'
-      : 'Welcome to AgriAdvisor. It is currently Rabi Season.';
-
-    try {
-      const backendUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000';
-      const response = await fetch(`${backendUrl}/api/tts`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ text, lang: lang === 'mr' ? 'mr' : 'en' })
-      });
-
-      if (!response.ok) throw new Error('TTS request failed');
-
-      const blob = await response.blob();
-      const url = URL.createObjectURL(blob);
-      const audio = new Audio(url);
-      audioRef.current = audio;
-
-      audio.onplay = () => {
-        setIsLoadingTTS(false);
-        setIsSpeaking(true);
-      };
-
-      audio.onended = () => {
-        setIsSpeaking(false);
-        audioRef.current = null;
-        URL.revokeObjectURL(url);
-      };
-
-      audio.onerror = () => {
-        setIsLoadingTTS(false);
-        setIsSpeaking(false);
-      };
-
-      await audio.play();
-    } catch (error) {
-      console.error('TTS Error:', error);
-      setIsLoadingTTS(false);
-      setIsSpeaking(false);
-    }
-  };
 
   return (
     <div
@@ -355,9 +281,6 @@ function App() {
                 lang={lang}
                 setLang={setLang}
                 setIsMenuOpen={setIsMenuOpen}
-                handleTTS={handleTTS}
-                isSpeaking={isSpeaking}
-                isLoadingTTS={isLoadingTTS}
                 isDesktop={isDesktop}
                 isDarkMode={isDarkMode}
                 previousCropScreen={previousCropScreen}

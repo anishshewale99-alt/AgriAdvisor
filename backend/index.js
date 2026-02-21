@@ -38,9 +38,11 @@ const CommunityPost = require('./models/CommunityPost');
 const authRoutes = require('./routes/auth');
 const postRoutes = require('./routes/posts');
 const cropRoutes = require('./routes/crops');
+const ttsRoutes = require('./routes/tts');
 app.use('/api/auth', authRoutes);
 app.use('/api/posts', postRoutes);
 app.use('/api/crops', cropRoutes);
+app.use('/api/tts', ttsRoutes);
 
 // Fetch all community posts
 app.get('/api/community/posts', async (req, res) => {
@@ -144,7 +146,7 @@ mongoose.connect(MONGO_URI)
     .then(() => console.log('✅ MongoDB connected successfully'))
     .catch(err => {
         console.error('❌ MongoDB connection error:', err.message);
-        process.exit(1);
+        console.warn('⚠️ Server will continue running without database connection.');
     });
 
 server.listen(PORT, () => {

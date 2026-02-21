@@ -13,6 +13,7 @@ import {
     ChevronDown
 } from 'lucide-react';
 import { motion as Motion, AnimatePresence } from 'framer-motion';
+import TTSButton from '../components/TTSButton';
 import '../styles/CropDetailScreen.css';
 
 const IconMap = {
@@ -26,6 +27,22 @@ const CropDetailScreen = ({ crop, onBack, isDarkMode, lang }) => {
     const [isExpanded, setIsExpanded] = React.useState(false);
     if (!crop) return null;
     const isEn = lang === 'en';
+
+    const getTTSText = () => {
+        let text = isEn
+            ? `Crop Detail: ${crop.englishName}. `
+            : `पीक माहिती: ${crop.marathiName}. `;
+
+        text += isEn
+            ? `Market demand is ${crop.matchScore} percent. Risk level is ${crop.risks.weather.level}. `
+            : `बाजार मागणी ${crop.matchScore} टक्के आहे. जोखीम पातळी ${crop.risks.weather.level === 'Low' ? 'कमी' : crop.risks.weather.level === 'Medium' ? 'मध्यम' : 'जास्त'} आहे. `;
+
+        text += isEn
+            ? `Ideal for ${crop.soil.join(', ')} soil with ${crop.waterReq} water requirement.`
+            : `${crop.soil.join(', ')} मातीसाठी आणि ${crop.waterReq === 'Low' ? 'कमी' : crop.waterReq === 'Medium' ? 'मध्यम' : 'जास्त'} पाणी गरजेसाठी योग्य आहे.`;
+
+        return text;
+    };
 
     return (
         <Motion.div
@@ -68,6 +85,10 @@ const CropDetailScreen = ({ crop, onBack, isDarkMode, lang }) => {
                     }}
                 >
                     <ChevronLeft size={24} color="white" />
+                </div>
+
+                <div style={{ position: 'absolute', top: '16px', right: '16px' }}>
+                    <TTSButton textToRead={getTTSText()} isDarkMode={false} />
                 </div>
 
                 <div className="marathi" style={{

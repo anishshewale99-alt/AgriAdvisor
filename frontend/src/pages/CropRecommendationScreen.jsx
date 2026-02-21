@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { Volume2, TrendingUp, Filter, ChevronDown, Loader2 } from 'lucide-react';
+import { TrendingUp, ChevronDown } from 'lucide-react';
 import { motion as Motion } from 'framer-motion';
 import { cropData } from '../cropData';
+import TTSButton from '../components/TTSButton';
 import '../styles/CropRecommendationScreen.css';
 
 const CropRecommendationScreen = ({ onSelectCrop, lang, isDarkMode, farmInfo = {}, isDesktop, showAll = false, setScreen }) => {
@@ -10,9 +11,6 @@ const CropRecommendationScreen = ({ onSelectCrop, lang, isDarkMode, farmInfo = {
         season: 'All',
         water: 'All'
     });
-    const [isSpeaking, setIsSpeaking] = useState(false);
-    const [isLoadingTTS, setIsLoadingTTS] = useState(false);
-    const audioRef = React.useRef(null);
     const isEn = lang === 'en';
 
     // Filter crops based on manual filters
@@ -46,64 +44,16 @@ const CropRecommendationScreen = ({ onSelectCrop, lang, isDarkMode, farmInfo = {
         ]
     };
 
-    const handleSpeak = async () => {
-        if (isSpeaking) {
-            if (audioRef.current) {
-                audioRef.current.pause();
-                audioRef.current = null;
-            }
-            setIsSpeaking(false);
-            return;
-        }
-
-        setIsLoadingTTS(true);
+    const getTTSText = () => {
         let text = isEn ? 'Top Crops for You. ' : 'तुमच्यासाठी टॉप पिके. ';
-
-        filteredCrops.forEach((crop, index) => {
+        displayCrops.forEach((crop, index) => {
             if (isEn) {
                 text += `Number ${index + 1}, ${crop.englishName}, Match ${crop.matchScore} percent. `;
             } else {
                 text += `क्रमांक ${index + 1}, ${crop.marathiName}, जुळणी ${crop.matchScore} टक्के. `;
             }
         });
-
-        try {
-            const backendUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000';
-            const response = await fetch(`${backendUrl}/api/tts`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ text, lang: isEn ? 'en' : 'mr' })
-            });
-
-            if (!response.ok) throw new Error('TTS request failed');
-
-            const blob = await response.blob();
-            const url = URL.createObjectURL(blob);
-            const audio = new Audio(url);
-            audioRef.current = audio;
-
-            audio.onplay = () => {
-                setIsLoadingTTS(false);
-                setIsSpeaking(true);
-            };
-
-            audio.onended = () => {
-                setIsSpeaking(false);
-                audioRef.current = null;
-                URL.revokeObjectURL(url);
-            };
-
-            audio.onerror = () => {
-                setIsLoadingTTS(false);
-                setIsSpeaking(false);
-            };
-
-            await audio.play();
-        } catch (error) {
-            console.error('TTS Error:', error);
-            setIsLoadingTTS(false);
-            setIsSpeaking(false);
-        }
+        return text;
     };
 
     return (
@@ -153,29 +103,7 @@ const CropRecommendationScreen = ({ onSelectCrop, lang, isDarkMode, farmInfo = {
                         </span>
                     </div>
 
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                        {/* Speaker Icon */}
-                        <div
-                            onClick={handleSpeak}
-                            style={{
-                                background: isSpeaking ? '#16a34a' : (isDarkMode ? 'rgba(255,255,255,0.1)' : 'white'),
-                                padding: '10px',
-                                borderRadius: '50%',
-                                display: 'flex',
-                                cursor: isLoadingTTS ? 'default' : 'pointer',
-                                boxShadow: isSpeaking ? '0 4px 12px rgba(22, 163, 74, 0.3)' : '0 2px 8px rgba(0,0,0,0.05)',
-                                border: isDarkMode ? '1px solid rgba(255,255,255,0.1)' : '1px solid #e5e7eb',
-                                transition: 'all 0.2s ease',
-                                opacity: isLoadingTTS ? 0.7 : 1
-                            }}
-                        >
-                            {isLoadingTTS ? (
-                                <Loader2 size={20} className="animate-spin" color={isDarkMode ? 'white' : '#1f2937'} />
-                            ) : (
-                                <Volume2 size={20} color={isSpeaking ? 'white' : (isDarkMode ? 'white' : '#1f2937')} />
-                            )}
-                        </div>
-                    </div>
+                    <TTSButton textToRead={getTTSText()} isDarkMode={isDarkMode} />
                 </div>
 
                 {/* Filter Dropdowns */}

@@ -3,11 +3,12 @@ import { motion as Motion } from 'framer-motion';
 import { MapPin, Sun, Droplets, Wind, AlertTriangle, TrendingUp, Lightbulb } from 'lucide-react';
 import MarketTicker from '../components/MarketTicker';
 import { useLanguage } from '../context/LanguageContext';
+import TTSButton from '../components/TTSButton';
 import '../styles/HomeScreen.css';
 
 const HomeScreen = ({ setScreen, setTab, isDarkMode }) => {
-    const { isEnglish } = useLanguage(); // Use global language context
-    const isEn = isEnglish; // Keep isEn for backward compatibility
+    const { isEnglish } = useLanguage();
+    const isEn = isEnglish;
     const [weather, setWeather] = React.useState(null);
 
     const weatherTranslations = {
@@ -99,7 +100,6 @@ const HomeScreen = ({ setScreen, setTab, isDarkMode }) => {
                     setWeather(weatherInfo);
                 }
             } catch (err) {
-                // Fallback to Open-Meteo
                 try {
                     const fallbackRes = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true`);
                     const fallbackData = await fallbackRes.json();
@@ -118,6 +118,20 @@ const HomeScreen = ({ setScreen, setTab, isDarkMode }) => {
         fetchWeather();
     }, [isEn]);
 
+    const getTTSText = () => {
+        let text = isEn ? "Home Overview. " : "होम ओव्हरव्ह्यू. ";
+        text += isEn ? "Current Season: Rabi. " : "सध्याचा हंगाम: रबी. ";
+        if (weather) {
+            text += isEn
+                ? `Weather in ${weather.location} is ${weather.description} with ${weather.temperature} degrees.`
+                : `${weather.location} मधील हवामान ${weather.descriptionMR} असून तापमान ${weather.temperature} अंश आहे.`;
+        }
+        text += isEn
+            ? "Alert: Heat risk warning next week. Tip: Increase the use of organic fertilizers."
+            : "अलर्ट: पुढच्या आठवड्यात उष्णतेचा धोका. टीप: सेंद्रिय खतांचा वापर वाढवा.";
+        return text;
+    };
+
     return (
         <>
             <Motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="app-shell home-shell" style={{ background: 'transparent' }}>
@@ -130,14 +144,19 @@ const HomeScreen = ({ setScreen, setTab, isDarkMode }) => {
                     margin: '0 auto 40px',
                     color: isDarkMode ? '#f3f4f6' : '#111827',
                     border: isDarkMode ? '1px solid #374151' : 'none',
-                    paddingBottom: '96px' // pb-24 equivalent
+                    paddingBottom: '96px',
+                    position: 'relative'
                 }} className="pb-24">
-                    <div className="my-4">
-                        <MarketTicker />
+
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+                        <div className="season-chip bg-white text-gray-800 dark:bg-gray-800 dark:text-gray-200 border border-gray-100 dark:border-gray-700 shadow-sm" style={{ margin: 0 }}>
+                            {isEn ? 'Rabi Season - Feb 2026' : 'रबी हंगाम – फेब्रुवारी 2026'}
+                        </div>
+                        <TTSButton textToRead={getTTSText()} isDarkMode={isDarkMode} />
                     </div>
 
-                    <div className="season-chip bg-white text-gray-800 dark:bg-gray-800 dark:text-gray-200 border border-gray-100 dark:border-gray-700 shadow-sm" style={{ margin: '16px 0' }}>
-                        {isEn ? 'Rabi Season - Feb 2026' : 'रबी हंगाम – फेब्रुवारी 2026'}
+                    <div className="my-4">
+                        <MarketTicker />
                     </div>
 
                     <div className="weather-card" style={{ color: isDarkMode ? '#f3f4f6' : '#1f2937', margin: '0 0 20px', padding: '20px', boxShadow: 'none', border: isDarkMode ? '1px solid #374151' : '1px solid #f0f0f0', background: isDarkMode ? '#1f2937' : 'transparent', borderRadius: '16px' }}>

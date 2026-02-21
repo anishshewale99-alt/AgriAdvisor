@@ -1,7 +1,8 @@
-import { Menu, ArrowLeft, Volume2, Sprout, Loader2 } from 'lucide-react';
+import { Menu, ArrowLeft, Sprout } from 'lucide-react';
 import LanguageToggle from './LanguageToggle';
+import TTSButton from './TTSButton';
 
-const MainHeader = ({ screen, setScreen, setTab, lang, setLang, setIsMenuOpen, handleTTS, isSpeaking, isLoadingTTS, isDesktop, isDarkMode, previousCropScreen }) => (
+const MainHeader = ({ screen, setScreen, setTab, lang, setLang, setIsMenuOpen, isDesktop, isDarkMode, previousCropScreen }) => (
     <div className="top-bar flex items-center justify-between gap-2" style={{
         width: '100%',
         margin: '0 auto',
@@ -59,31 +60,12 @@ const MainHeader = ({ screen, setScreen, setTab, lang, setLang, setIsMenuOpen, h
         <div className="flex items-center gap-4">
             <LanguageToggle lang={lang} setLang={setLang} isDarkMode={isDarkMode} />
 
-            <div onClick={handleTTS} style={{
-                cursor: isLoadingTTS ? 'default' : 'pointer',
-                background: isDarkMode ? '#1f2937' : 'white',
-                padding: '10px',
-                borderRadius: '50%',
-                border: isDarkMode ? '1px solid #374151' : '1px solid #eee',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                width: isDesktop ? '42px' : '38px',
-                height: isDesktop ? '42px' : '38px',
-                flexShrink: 0,
-                boxShadow: '0 4px 12px rgba(0,0,0,0.05)',
-                transition: 'all 0.2s',
-                opacity: isLoadingTTS ? 0.7 : 1
-            }}>
-                {isLoadingTTS ? (
-                    <Loader2 size={isDesktop ? 22 : 20} className="animate-spin" color={isDarkMode ? '#fff' : 'var(--primary)'} />
-                ) : (
-                    <Volume2 size={isDesktop ? 22 : 20} color={isSpeaking ? 'var(--primary)' : (isDarkMode ? '#9ca3af' : '#64748b')} />
-                )}
-            </div>
+            <TTSButton
+                textToRead={lang === 'en' ? "Welcome to AgriAdvisor. Your agricultural precision farming assistant." : "ॲग्री ॲडव्हायझरमध्ये आपले स्वागत आहे. आपले कृषी मार्गदर्शक."}
+                isDarkMode={isDarkMode}
+            />
         </div>
     </div>
 );
 
 export default MainHeader;
-
