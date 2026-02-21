@@ -42,7 +42,11 @@ const HomeScreen = ({ setScreen, setTab, isDarkMode, isEnglish }) => {
 
             const getPosition = () => {
                 return new Promise((resolve, reject) => {
-                    navigator.geolocation.getCurrentPosition(resolve, reject, { timeout: 8000 });
+                    navigator.geolocation.getCurrentPosition(resolve, reject, {
+                        timeout: 10000,
+                        enableHighAccuracy: true,
+                        maximumAge: 0
+                    });
                 });
             };
 
@@ -56,7 +60,7 @@ const HomeScreen = ({ setScreen, setTab, isDarkMode, isEnglish }) => {
                 lon = pos.coords.longitude;
                 locationName = isEn ? "Your Location" : "तुमचे ठिकाण";
             } catch (err) {
-                console.warn("Location access denied.");
+                console.warn("Location access denied. Using Pune as default.");
             }
 
             try {
@@ -65,31 +69,35 @@ const HomeScreen = ({ setScreen, setTab, isDarkMode, isEnglish }) => {
                 const cachedLoc = JSON.parse(localStorage.getItem(CACHE_LOC_KEY) || '{}');
                 const now = Date.now();
 
-                const isSameLocation = cachedLoc.lat && Math.abs(cachedLoc.lat - lat) < 0.01 &&
-                    cachedLoc.lon && Math.abs(cachedLoc.lon - lon) < 0.01;
+                const isSameLocation = cachedLoc.lat && Math.abs(cachedLoc.lat - lat) < 0.005 &&
+                    cachedLoc.lon && Math.abs(cachedLoc.lon - lon) < 0.005;
 
-                if (cachedData && cachedTime && isSameLocation && (now - parseInt(cachedTime) < 900000)) {
+                // Cache for 2 minutes for a more real-time feel
+                if (cachedData && cachedTime && isSameLocation && (now - parseInt(cachedTime) < 120000)) {
                     setWeather(JSON.parse(cachedData));
                     return;
                 }
             } catch (e) { }
 
             try {
-                if (!API_KEY || API_KEY === 'your_key_here') throw new Error("Missing API Key");
+                // Prioritize the user provided key for genuine real-time data
+                const ACTIVE_KEY = "d7d71b6cbcb8eec1002e93051825b17b";
 
-                const response = await fetch(`https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${API_KEY}&units=metric`);
+                const response = await fetch(`https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${ACTIVE_KEY}&units=metric`);
                 if (!response.ok) throw new Error("API Error");
 
                 const data = await response.json();
                 if (data.main) {
                     const englishDesc = data.weather[0].description;
+
                     const weatherInfo = {
                         temperature: Math.round(data.main.temp),
                         humidity: data.main.humidity,
-                        windspeed: data.wind.speed,
+                        windspeed: Math.round(data.wind.speed * 3.6),
                         description: englishDesc,
                         descriptionMR: translateWeather(englishDesc),
-                        location: data.name || locationName
+                        location: data.name || locationName,
+                        timestamp: Date.now()
                     };
 
                     localStorage.setItem(CACHE_KEY, JSON.stringify(weatherInfo));
@@ -99,23 +107,50 @@ const HomeScreen = ({ setScreen, setTab, isDarkMode, isEnglish }) => {
                     setWeather(weatherInfo);
                 }
             } catch (err) {
+                console.error("Weather Fetch Failed:", err);
+                // Simple fallback to Open-Meteo only if OpenWeather fails
                 try {
-                    const fallbackRes = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true`);
+                    const fallbackRes = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,wind_speed_10m&timezone=auto`);
                     const fallbackData = await fallbackRes.json();
-                    setWeather({
-                        temperature: Math.round(fallbackData.current_weather.temperature),
-                        humidity: '--',
-                        windspeed: fallbackData.current_weather.windspeed,
-                        description: 'Cloudy',
-                        descriptionMR: isEn ? 'Cloudy' : 'ढगाळ वातावरण',
-                        location: locationName
-                    });
+                    if (fallbackData.current) {
+                        setWeather({
+                            temperature: Math.round(fallbackData.current.temperature_2m),
+                            humidity: Math.round(fallbackData.current.relative_humidity_2m),
+                            windspeed: Math.round(fallbackData.current.wind_speed_10m),
+                            description: 'Live (Fallback)',
+                            descriptionMR: isEn ? 'Live (Fallback)' : 'थेट डेटा',
+                            location: locationName,
+                            timestamp: Date.now()
+                        });
+                    }
                 } catch (fallbackErr) { }
             }
         };
 
         fetchWeather();
+        const interval = setInterval(fetchWeather, 120000);
+        return () => clearInterval(interval);
     }, [isEn]);
+
+    const getRiskFactor = () => {
+        if (!weather) return { level: isEn ? 'Low' : 'कमी', value: 20, color: '#10b981' };
+        let score = 20; // base score
+        if (weather.temperature > 38) score += 45;
+        else if (weather.temperature > 32) score += 25;
+
+        if (weather.humidity > 85) score += 20;
+        else if (weather.humidity > 70) score += 10;
+
+        if (weather.windspeed > 25) score += 10;
+
+        score = Math.min(score, 100);
+
+        if (score < 40) return { level: isEn ? 'Low' : 'कमी', value: score, color: '#10b981' };
+        if (score < 75) return { level: isEn ? 'Medium' : 'मध्यम', value: score, color: '#f59e0b' };
+        return { level: isEn ? 'High' : 'जास्त', value: score, color: '#ef4444' };
+    };
+
+    const risk = getRiskFactor();
 
     const getTTSText = () => {
         let text = isEn ? "Home Overview. " : "होम ओव्हरव्ह्यू. ";
@@ -177,11 +212,17 @@ const HomeScreen = ({ setScreen, setTab, isDarkMode, isEnglish }) => {
                                 <div className="weather-stats">
                                     <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                                         <Droplets size={16} />
-                                        <span style={{ fontWeight: 600 }}>{isEn ? 'Humidity' : 'आर्द्रता'} {weather.humidity}%</span>
+                                        <span style={{ fontWeight: 600 }}>
+                                            {isEn ? 'Humidity' : 'आर्द्रता'}: {weather.humidity}%
+                                        </span>
                                     </div>
                                     <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                                         <Wind size={16} />
                                         <span style={{ fontWeight: 600 }}>{isEn ? 'Wind' : 'वारा'} {weather.windspeed} km/h</span>
+                                    </div>
+                                    <div style={{ fontSize: '0.65rem', opacity: 0.5, marginTop: '8px', width: '100%', display: 'flex', justifyContent: 'space-between' }}>
+                                        <span>{isEn ? 'Real-time update' : 'रिअल-टाइम अपडेट'}</span>
+                                        <span>{new Date(weather.timestamp).toLocaleTimeString()}</span>
                                     </div>
                                 </div>
                             </>
@@ -227,11 +268,11 @@ const HomeScreen = ({ setScreen, setTab, isDarkMode, isEnglish }) => {
                                 {isEn ? 'जोखीम पातळी' : 'Risk Level'}
                             </div>
                             <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.75rem', fontWeight: 700, marginBottom: '4px' }}>
-                                <span className="text-gray-500 dark:text-gray-400">{isEn ? 'Medium' : 'मध्यम'}</span>
-                                <span className="text-gray-500 dark:text-gray-400">60%</span>
+                                <span className="text-gray-500 dark:text-gray-400">{risk.level}</span>
+                                <span className="text-gray-500 dark:text-gray-400">{risk.value}%</span>
                             </div>
                             <div className="progress-bar-container bg-gray-100 dark:bg-gray-700 rounded-full h-2 overflow-hidden">
-                                <div className="progress-bar h-full" style={{ width: '60%', background: 'var(--accent-yellow)' }}></div>
+                                <div className="progress-bar h-full" style={{ width: `${risk.value}%`, background: risk.color }}></div>
                             </div>
                         </div>
                     </div>
