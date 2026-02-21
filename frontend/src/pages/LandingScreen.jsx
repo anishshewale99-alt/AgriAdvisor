@@ -24,9 +24,12 @@ const LandingScreen = ({ onNext, isDesktop }) => {
         setError('');
         setLoading(true);
         try {
-            await loginEmail(email, password);
+            console.log('Attempting login with:', email);
+            const user = await loginEmail(email, password);
+            console.log('Login successful! User:', user);
             // App.jsx will handle navigation via AuthContext state changes
         } catch (err) {
+            console.error('Login error detail:', err);
             setError(err.message || 'Login failed');
         } finally {
             setLoading(false);
@@ -199,20 +202,10 @@ const LandingScreen = ({ onNext, isDesktop }) => {
                         </div>
                     )}
 
-                    {/* Social Login Buttons */}
-                    <div className="social-login-section">
-                        <GoogleLoginButton
-                            onSuccess={() => {/* App.jsx will handle navigation */ }}
-                            onError={(err) => setError(err.message || 'Google Login failed')}
-                        />
-                    </div>
+                    {/* Diagnostic Logs (Frontend) */}
+                    {loading && <p style={{ fontSize: '0.7rem', color: '#6b7280', textAlign: 'center' }}>Connecting to server...</p>}
 
-                    {/* Divider */}
-                    <div className="divider">
-                        <span className="divider-text">{isEnglish ? 'OR' : 'किंवा'}</span>
-                    </div>
-
-                    {/* Auth Form */}
+                    {/* Manual Auth Form */}
                     <form className="login-form" onSubmit={view === 'login' ? handleLogin : handleSignup}>
                         {view === 'signup' && (
                             <div className="form-group">

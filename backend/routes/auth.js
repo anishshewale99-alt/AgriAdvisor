@@ -74,23 +74,28 @@ router.post('/google', async (req, res) => {
 
 // Standard Email/Password Signup
 router.post('/signup', async (req, res) => {
+    console.log('📝 Signup attempt:', req.body.email);
     try {
         const { name, email, password } = req.body;
 
         if (!name || !email || !password) {
+            console.warn('⚠️ Signup failed: Missing fields');
             return res.status(400).json({ message: 'All fields are required' });
         }
 
         if (!validateEmail(email)) {
+            console.warn('⚠️ Signup failed: Invalid email', email);
             return res.status(400).json({ message: 'Invalid email format' });
         }
 
         if (password.length < 6) {
+            console.warn('⚠️ Signup failed: Password too short');
             return res.status(400).json({ message: 'Password must be at least 6 characters' });
         }
 
         const existingUser = await User.findOne({ email });
         if (existingUser) {
+            console.warn('⚠️ Signup failed: Email already exists', email);
             return res.status(400).json({ message: 'Email already registered' });
         }
 
@@ -102,6 +107,7 @@ router.post('/signup', async (req, res) => {
         });
 
         await user.save();
+        console.log('✅ User created successfully:', email);
 
         const token = jwt.sign(
             { userId: user._id, email: user.email, role: user.role },
@@ -120,13 +126,14 @@ router.post('/signup', async (req, res) => {
             }
         });
     } catch (error) {
-        console.error('Signup error:', error);
+        console.error('❌ Signup error:', error);
         res.status(500).json({ message: 'Signup failed', error: error.message });
     }
 });
 
 // Standard Email/Password Login
 router.post('/login', async (req, res) => {
+    console.log('🔑 Login attempt:', req.body.email);
     try {
         const { email, password } = req.body;
 
@@ -135,10 +142,18 @@ router.post('/login', async (req, res) => {
         }
 
         const user = await User.findOne({ email });
-        if (!user || !(await user.comparePassword(password))) {
+        if (!user) {
+            console.warn('⚠️ Login failed: User not found', email);
             return res.status(401).json({ message: 'Invalid email or password' });
         }
 
+        const isMatch = await user.comparePassword(password);
+        if (!isMatch) {
+            console.warn('⚠️ Login failed: Incorrect password for', email);
+            return res.status(401).json({ message: 'Invalid email or password' });
+        }
+
+        console.log('✅ Login successful:', email);
         const token = jwt.sign(
             { userId: user._id, email: user.email, role: user.role },
             process.env.JWT_SECRET,
@@ -158,7 +173,7 @@ router.post('/login', async (req, res) => {
             }
         });
     } catch (error) {
-        console.error('Login error:', error);
+        console.error('❌ Login error:', error);
         res.status(500).json({ message: 'Login failed', error: error.message });
     }
 });
