@@ -6,11 +6,12 @@ import io from 'socket.io-client';
 import { useLanguage } from '../context/LanguageContext';
 
 // ─── MyMemory free translation API (no key, CORS-safe) ───────────────────────
-async function translateText(text, fromLang, toLang) {
-    if (!text?.trim() || fromLang === toLang) return '';
+async function translateText(text, toLang) {
+    if (!text?.trim()) return '';
     try {
+        // Use 'auto' to let MyMemory detect the source language
         const res = await fetch(
-            `https://api.mymemory.translated.net/get?q=${encodeURIComponent(text.slice(0, 450))}&langpair=${fromLang}|${toLang}`
+            `https://api.mymemory.translated.net/get?q=${encodeURIComponent(text.slice(0, 450))}&langpair=auto|${toLang}`
         );
         if (!res.ok) return '';
         const json = await res.json();
@@ -46,10 +47,11 @@ const CommunityScreen = ({ isDarkMode }) => {
                 ...prev,
                 [postId]: { ...(prev[postId] || {}), enLoading: true }
             }));
-            translateText(content, 'mr', 'en').then(result => {
+            translateText(content, 'en').then(result => {
+                const isDifferent = result && result.trim().toLowerCase() !== content.trim().toLowerCase();
                 setTranslations(prev => ({
                     ...prev,
-                    [postId]: { ...(prev[postId] || {}), en: result, enLoading: false }
+                    [postId]: { ...(prev[postId] || {}), en: isDifferent ? result : null, enLoading: false }
                 }));
             });
         }
@@ -62,10 +64,11 @@ const CommunityScreen = ({ isDarkMode }) => {
                 ...prev,
                 [postId]: { ...(prev[postId] || {}), mrLoading: true }
             }));
-            translateText(content, 'en', 'mr').then(result => {
+            translateText(content, 'mr').then(result => {
+                const isDifferent = result && result.trim().toLowerCase() !== content.trim().toLowerCase();
                 setTranslations(prev => ({
                     ...prev,
-                    [postId]: { ...(prev[postId] || {}), mr: result, mrLoading: false }
+                    [postId]: { ...(prev[postId] || {}), mr: isDifferent ? result : null, mrLoading: false }
                 }));
             });
         }
@@ -94,7 +97,7 @@ const CommunityScreen = ({ isDarkMode }) => {
                 setMessages(prev => {
                     const ids = new Set(prev.map(m => m._id));
                     const combined = [...formatted.filter(m => !ids.has(m._id)), ...prev];
-                    return combined.sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
+                    return combined.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
                 });
             } catch (err) {
                 console.error('Error fetching messages:', err);
@@ -113,7 +116,7 @@ const CommunityScreen = ({ isDarkMode }) => {
                 );
                 if (exists) {
                     return prev.map(m =>
-                        data.clientId && m.clientId === data.clientId
+                        (data.clientId && m.clientId === data.clientId) || m._id === data._id
                             ? {
                                 ...m, ...data,
                                 user: data.authorName || data.user,
@@ -122,7 +125,7 @@ const CommunityScreen = ({ isDarkMode }) => {
                                 isTemp: false
                             }
                             : m
-                    );
+                    ).sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
                 }
                 return [...prev, {
                     ...data,
@@ -131,7 +134,7 @@ const CommunityScreen = ({ isDarkMode }) => {
                     location: data.location || 'गावाकडून',
                     timestamp: data.createdAt || data.timestamp,
                     isSelf: (data.authorId || data.userId) === 'anonymous-user',
-                }].sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
+                }].sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
             });
         });
 
@@ -153,14 +156,14 @@ const CommunityScreen = ({ isDarkMode }) => {
         };
 
         setIsPosting(true);
-        setMessages(prev => [...prev, {
+        setMessages(prev => [{
             ...postData,
             _id: clientId,
             user: postData.authorName,
             timestamp: new Date().toISOString(),
             isSelf: true,
             isTemp: true,
-        }]);
+        }, ...prev]);
 
         try {
             const res = await fetch('/api/community/post', {
@@ -187,8 +190,9 @@ const CommunityScreen = ({ isDarkMode }) => {
     const getTranslation = (postId) => {
         const t = translations[postId];
         if (!t) return null;
-        if (isEnglish) return { text: t.en, loading: !!t.enLoading };
-        return { text: t.mr, loading: !!t.mrLoading };
+        const current = isEnglish ? { text: t.en, loading: !!t.enLoading } : { text: t.mr, loading: !!t.mrLoading };
+        if (!current.text && !current.loading) return null;
+        return current;
     };
 
     // ── Render ──────────────────────────────────────────────────────────────
