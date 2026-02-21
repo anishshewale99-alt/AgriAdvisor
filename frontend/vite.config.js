@@ -4,6 +4,25 @@ import { VitePWA } from 'vite-plugin-pwa'
 
 // https://vite.dev/config/
 export default defineConfig({
+  server: {
+    host: true,        // Bind to 0.0.0.0 — enables LAN access from any device
+    strictPort: false,
+    proxy: {
+      // Proxy all /api calls → backend (no CORS, works from any IP)
+      '/api': {
+        target: 'http://localhost:5000',
+        changeOrigin: true,
+        secure: false,
+      },
+      // Proxy Socket.IO connections → backend
+      '/socket.io': {
+        target: 'http://localhost:5000',
+        changeOrigin: true,
+        secure: false,
+        ws: true,      // WebSocket support
+      },
+    },
+  },
   plugins: [
     react(),
     VitePWA({

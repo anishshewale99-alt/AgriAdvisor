@@ -47,7 +47,7 @@ app.use('/api/tts', ttsRoutes);
 // Fetch all community posts
 app.get('/api/community/posts', async (req, res) => {
     try {
-        const posts = await CommunityPost.find().sort({ createdAt: 1 });
+        const posts = await CommunityPost.find().sort({ createdAt: -1 });
         res.json(posts);
     } catch (err) {
         res.status(500).json({ error: 'Failed to fetch posts' });
@@ -56,10 +56,12 @@ app.get('/api/community/posts', async (req, res) => {
 
 // Create a community post via REST API
 app.post('/api/community/post', async (req, res) => {
+    console.log('📩 Received community post request:', req.body);
     try {
         const { content, authorId, authorName, location, en, clientId } = req.body;
 
         if (!content || !authorId) {
+            console.warn('⚠️ Missing required fields:', { content, authorId });
             return res.status(400).json({ error: 'Missing required fields: content and authorId' });
         }
 
@@ -73,6 +75,7 @@ app.post('/api/community/post', async (req, res) => {
         });
 
         await newPost.save();
+        console.log('✅ Post saved to DB:', newPost._id);
 
         const broadcastData = {
             ...newPost.toObject(),
@@ -85,7 +88,7 @@ app.post('/api/community/post', async (req, res) => {
 
         return res.status(201).json(newPost);
     } catch (err) {
-        console.error('Error creating post:', err);
+        console.error('❌ Error creating post:', err);
         return res.status(500).json({ error: 'Database save failed: ' + err.message });
     }
 });
