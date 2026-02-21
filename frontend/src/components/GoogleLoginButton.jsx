@@ -6,6 +6,12 @@ import './GoogleLoginButton.css';
 
 const GoogleLoginButton = ({ onSuccess, onError }) => {
     const { login } = useAuth();
+    const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
+
+    // Don't render if no Google Client ID is configured
+    if (!clientId) {
+        return null;
+    }
 
     const handleSuccess = async (credentialResponse) => {
         try {

@@ -1,13 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { Droplets, CloudOff, ChevronRight, ChevronLeft, CloudRain, Snowflake, Sun, CalendarRange } from 'lucide-react';
+import { Volume2, Droplets, CloudOff, ChevronRight, ChevronLeft, CloudRain, Snowflake, Sun, CalendarRange } from 'lucide-react';
 import FarmPattern from '../assets/bg2.png';
-import { useLanguage } from '../context/LanguageContext';
-import TTSButton from '../components/TTSButton';
 import '../styles/FarmInfoScreen.css';
 
 const FarmInfoScreen = ({ onNext, onBack, farmInfo, setFarmInfo, isDesktop }) => {
     const { acres, soil, irrigation, season: plantingSeason } = farmInfo;
 
+    // Helper to update farmInfo state
     const updateFarmInfo = (updates) => {
         setFarmInfo(prev => ({ ...prev, ...updates }));
     };
@@ -17,15 +16,33 @@ const FarmInfoScreen = ({ onNext, onBack, farmInfo, setFarmInfo, isDesktop }) =>
     const setIrrigation = (val) => updateFarmInfo({ irrigation: val });
     const setPlantingSeason = (val) => updateFarmInfo({ season: val });
 
-    const [isScrolled, setIsScrolled] = useState(false);
-    const { isEnglish, toggleLanguage } = useLanguage();
+    const [isSpeaking, setIsSpeaking] = useState(false);
+    const [isEnglish, setIsEnglish] = useState(false);
+
+
+    const handleSpeak = () => {
+        if (window.speechSynthesis.speaking) {
+            window.speechSynthesis.cancel();
+            setIsSpeaking(false);
+            return;
+        }
+
+        const textToRead = isEnglish
+            ? "Tell us about your farm. Select your farm size and soil type."
+            : "तुमच्या शेताची माहिती. कृपया आपल्या शेताचा आकार आणि मातीचा प्रकार निवडा.";
+
+        const utterance = new SpeechSynthesisUtterance(textToRead);
+        utterance.lang = isEnglish ? 'en-US' : 'mr-IN';
+
+        utterance.onend = () => setIsSpeaking(false);
+        utterance.onerror = () => setIsSpeaking(false);
+
+        setIsSpeaking(true);
+        window.speechSynthesis.speak(utterance);
+    };
 
     useEffect(() => {
-        const handleScroll = () => {
-            setIsScrolled(window.scrollY > 50);
-        };
-        window.addEventListener('scroll', handleScroll);
-        return () => window.removeEventListener('scroll', handleScroll);
+        return () => window.speechSynthesis.cancel();
     }, []);
 
     const soilTypes = [
@@ -52,8 +69,8 @@ const FarmInfoScreen = ({ onNext, onBack, farmInfo, setFarmInfo, isDesktop }) =>
         }}>
             <div className="top-bar content-card" style={{
                 width: '100%',
-                background: isScrolled ? 'white' : 'transparent',
-                boxShadow: isScrolled ? '0 4px 20px rgba(0,0,0,0.08)' : 'none',
+                background: 'white',
+                boxShadow: '0 4px 20px rgba(0,0,0,0.08)',
                 position: 'fixed',
                 top: 0,
                 transition: 'all 0.3s ease',
@@ -72,7 +89,7 @@ const FarmInfoScreen = ({ onNext, onBack, farmInfo, setFarmInfo, isDesktop }) =>
                                     display: 'flex',
                                     alignItems: 'center',
                                     justifyContent: 'center',
-                                    color: isScrolled ? 'var(--primary)' : 'white',
+                                    color: 'var(--primary)',
                                     transition: 'all 0.3s ease',
                                     marginLeft: '-8px'
                                 }}
@@ -82,26 +99,26 @@ const FarmInfoScreen = ({ onNext, onBack, farmInfo, setFarmInfo, isDesktop }) =>
                         )}
                         <span className="title" style={{
                             letterSpacing: '-0.5px',
-                            color: isScrolled ? 'var(--primary)' : 'white',
+                            color: 'var(--primary)',
                             transition: 'all 0.3s ease'
-                        }}>CropAdvisor</span>
+                        }}>AgriAdvisor</span>
                     </div>
 
                     <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                         {!isDesktop && (
                             <div
-                                onClick={toggleLanguage}
+                                onClick={() => setIsEnglish(!isEnglish)}
                                 style={{
                                     display: 'flex',
                                     alignItems: 'center',
-                                    background: isScrolled ? '#f3f4f6' : 'rgba(255,255,255,0.2)',
+                                    background: '#f3f4f6',
                                     padding: '3px',
                                     borderRadius: '30px',
                                     cursor: 'pointer',
                                     position: 'relative',
                                     width: '90px',
                                     height: '40px',
-                                    border: isScrolled ? '1px solid #eee' : '1px solid rgba(255,255,255,0.3)',
+                                    border: '1px solid #eee',
                                     transition: 'all 0.3s ease'
                                 }}
                             >
@@ -121,7 +138,7 @@ const FarmInfoScreen = ({ onNext, onBack, farmInfo, setFarmInfo, isDesktop }) =>
                                     fontSize: '0.85rem',
                                     fontWeight: 800,
                                     zIndex: 2,
-                                    color: !isEnglish ? 'white' : (isScrolled ? 'var(--text-muted)' : 'rgba(255,255,255,0.8)')
+                                    color: !isEnglish ? 'white' : 'var(--text-muted)'
                                 }}>MR</span>
                                 <span style={{
                                     flex: 1,
@@ -129,15 +146,27 @@ const FarmInfoScreen = ({ onNext, onBack, farmInfo, setFarmInfo, isDesktop }) =>
                                     fontSize: '0.85rem',
                                     fontWeight: 800,
                                     zIndex: 2,
-                                    color: isEnglish ? 'white' : (isScrolled ? 'var(--text-muted)' : 'rgba(255,255,255,0.8)')
+                                    color: isEnglish ? 'white' : 'var(--text-muted)'
                                 }}>EN</span>
                             </div>
                         )}
-
-                        <TTSButton
-                            textToRead={isEnglish ? "Tell us about your farm. Select your farm size and soil type." : "तुमच्या शेताची माहिती. कृपया आपल्या शेताचा आकार आणि मातीचा प्रकार निवडा."}
-                            isDarkMode={false} // Header in FarmInfo is usually light background when scrolled
-                        />
+                        <div
+                            onClick={handleSpeak}
+                            style={{
+                                background: isSpeaking ? 'var(--accent-orange)' : 'white',
+                                padding: '6px',
+                                borderRadius: '50%',
+                                color: isSpeaking ? 'white' : 'var(--primary)',
+                                cursor: 'pointer',
+                                transition: 'all 0.3s ease',
+                                boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center'
+                            }}
+                        >
+                            <Volume2 size={20} />
+                        </div>
                     </div>
                 </div>
             </div>
@@ -173,21 +202,37 @@ const FarmInfoScreen = ({ onNext, onBack, farmInfo, setFarmInfo, isDesktop }) =>
                             {isEnglish ? 'Farm Size (Acres)' : 'शेत आकार (एकर)'}
                         </h2>
                         <p className="english-sub" style={{ color: '#6b7280' }}>{isEnglish ? 'Select area in acres' : 'एकरमध्ये क्षेत्र निवडा'}</p>
-                        <div className="pill-selector">
-                            {['0.5', '1', '2', '3', '5+'].map(val => (
-                                <div
-                                    key={val}
-                                    className="pill-item"
-                                    onClick={() => setAcres(val)}
-                                    style={{
-                                        background: acres === val ? '#15803d' : '#f3f4f6',
-                                        color: acres === val ? 'white' : '#1f2937',
-                                        border: acres === val ? '2px solid #15803d' : '2px solid transparent'
-                                    }}
-                                >
-                                    {val} {isEnglish ? 'Acres' : 'एकर'}
-                                </div>
-                            ))}
+                        <div style={{ marginTop: '16px', position: 'relative' }}>
+                            <input
+                                type="number"
+                                step="any"
+                                value={acres || ''}
+                                onChange={(e) => setAcres(e.target.value)}
+                                placeholder={isEnglish ? "Enter size" : "आकार प्रविष्ट करा"}
+                                style={{
+                                    width: '100%',
+                                    padding: '16px 20px',
+                                    borderRadius: '16px',
+                                    border: '2px solid #e5e7eb',
+                                    fontSize: '1.1rem',
+                                    fontWeight: 700,
+                                    outline: 'none',
+                                    transition: 'border-color 0.2s',
+                                    background: '#f9fafb'
+                                }}
+                                onFocus={(e) => e.target.style.borderColor = '#15803d'}
+                                onBlur={(e) => e.target.style.borderColor = '#e5e7eb'}
+                            />
+                            <span style={{
+                                position: 'absolute',
+                                right: '20px',
+                                top: '50%',
+                                transform: 'translateY(-50%)',
+                                fontWeight: 700,
+                                color: '#6b7280'
+                            }}>
+                                {isEnglish ? 'Acres' : 'एकर'}
+                            </span>
                         </div>
                     </div>
 

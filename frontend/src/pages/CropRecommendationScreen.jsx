@@ -4,6 +4,7 @@ import { motion as Motion } from 'framer-motion';
 import { cropData } from '../cropData';
 import TTSButton from '../components/TTSButton';
 import '../styles/CropRecommendationScreen.css';
+import FarmPattern from '../assets/bg2.png';
 
 const CropRecommendationScreen = ({ onSelectCrop, isEnglish, isDarkMode, farmInfo = {}, isDesktop, showAll = false, setScreen }) => {
     const [filters, setFilters] = useState({
@@ -60,7 +61,11 @@ const CropRecommendationScreen = ({ onSelectCrop, isEnglish, isDarkMode, farmInf
         <div style={{
             width: '100%',
             margin: '0 auto',
-            padding: '0 20px 40px'
+            padding: '0 20px 40px',
+            background: isDarkMode ? 'transparent' : `linear-gradient(rgba(240, 249, 241, 0.95), rgba(240, 249, 241, 0.95)), url(${FarmPattern})`,
+            backgroundSize: 'cover',
+            backgroundAttachment: 'fixed',
+            minHeight: '100vh'
         }}>
             {/* Main Content Card Container */}
             <div style={{

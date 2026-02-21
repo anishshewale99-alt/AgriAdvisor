@@ -16,6 +16,8 @@ import { motion as Motion, AnimatePresence } from 'framer-motion';
 import TTSButton from '../components/TTSButton';
 import '../styles/CropDetailScreen.css';
 
+import FarmPattern from '../assets/bg2.png';
+
 const IconMap = {
     Sun: Sun,
     Thermometer: Thermometer,
@@ -52,7 +54,11 @@ const CropDetailScreen = ({ crop, onBack, isDarkMode, isEnglish }) => {
             style={{
                 width: '100%',
                 margin: '0 auto',
-                paddingBottom: '40px'
+                paddingBottom: '40px',
+                background: isDarkMode ? 'transparent' : `linear-gradient(rgba(240, 249, 241, 0.95), rgba(240, 249, 241, 0.95)), url(${FarmPattern})`,
+                backgroundSize: 'cover',
+                backgroundAttachment: 'fixed',
+                minHeight: '100vh'
             }}
         >
             {/* Header Banner */}

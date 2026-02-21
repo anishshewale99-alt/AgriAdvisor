@@ -81,7 +81,7 @@ const SideMenu = ({ isOpen, onClose, darkMode, setScreen, setTab, isEnglish }) =
                             >
                                 <X size={20} />
                             </button>
-                            <h2 className="marathi" style={{ fontSize: '1.5rem', marginBottom: '4px' }}>CropAdvisor</h2>
+                            <h2 className="marathi" style={{ fontSize: '1.5rem', marginBottom: '4px' }}>AgriAdvisor</h2>
                             <p style={{ fontSize: '0.85rem', opacity: 0.8 }}>सहाय्य केंद्र • Help Center</p>
                         </div>
 
