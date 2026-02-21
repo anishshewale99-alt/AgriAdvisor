@@ -4,6 +4,7 @@ import { motion as Motion, AnimatePresence } from 'framer-motion';
 import '../styles/CommunityScreen.css';
 import io from 'socket.io-client';
 import { useLanguage } from '../context/LanguageContext';
+import { useAuth } from '../context/AuthContext';
 
 // ─── Translation API (Google Translate GTX - Reliable client-side) ──────────
 async function translateText(text, toLang) {
@@ -42,6 +43,7 @@ async function translateText(text, toLang) {
 
 const CommunityScreen = ({ isDarkMode }) => {
     const { isEnglish } = useLanguage();
+    const { user: currentUser } = useAuth();
 
     const [showCreate, setShowCreate] = React.useState(false);
     const [messages, setMessages] = React.useState([]);
@@ -107,7 +109,7 @@ const CommunityScreen = ({ isDarkMode }) => {
                 const data = await res.json();
                 const formatted = data.map(msg => ({
                     ...msg,
-                    isSelf: (msg.authorId || msg.userId) === 'anonymous-user',
+                    isSelf: (msg.authorId || msg.userId) === currentUser?.id,
                     user: msg.authorName || msg.user || 'शेतकरी मित्र',
                     timestamp: msg.createdAt || msg.timestamp,
                     content: msg.content || msg.message,
@@ -126,6 +128,8 @@ const CommunityScreen = ({ isDarkMode }) => {
 
         const sock = io('/'); // proxied through Vite → backend
         sock.emit('joinRoom', 'farmers-community');
+
+        const currentUserId = currentUser?.id;
 
         sock.on('receiveMessage', (data) => {
             setMessages(prev => {
@@ -151,13 +155,13 @@ const CommunityScreen = ({ isDarkMode }) => {
                     user: data.authorName || data.user || 'शेतकरी मित्र',
                     location: data.location || 'गावाकडून',
                     timestamp: data.createdAt || data.timestamp,
-                    isSelf: (data.authorId || data.userId) === 'anonymous-user',
+                    isSelf: (data.authorId || data.userId) === currentUserId,
                 }].sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
             });
         });
 
         return () => sock.disconnect();
-    }, []);
+    }, [currentUser?.id]);
 
     // ── Post handler ────────────────────────────────────────────────────────
     const handlePost = async () => {
@@ -166,9 +170,9 @@ const CommunityScreen = ({ isDarkMode }) => {
         const clientId = Date.now().toString() + Math.random().toString(36).substr(2, 9);
         const postData = {
             content: newPost.trim(),
-            authorId: 'anonymous-user',
-            authorName: 'पाटील साहेब',
-            location: 'पुणे',
+            authorId: currentUser?.id || 'anonymous-user',
+            authorName: currentUser?.name || 'पाटील साहेब',
+            location: currentUser?.farmInfo?.location || 'पुणे',
             en: '',
             clientId,
         };
