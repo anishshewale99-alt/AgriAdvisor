@@ -1,23 +1,41 @@
 import React from 'react';
-import { Plus, MessageCircle, Heart, Share2 } from 'lucide-react';
+import { Plus } from 'lucide-react';
 import { motion as Motion, AnimatePresence } from 'framer-motion';
 import '../styles/CommunityScreen.css';
 import io from 'socket.io-client';
 import { useLanguage } from '../context/LanguageContext';
 
-// ─── MyMemory free translation API (no key, CORS-safe) ───────────────────────
+// ─── Translation API (Google Translate GTX - Reliable client-side) ──────────
 async function translateText(text, toLang) {
     if (!text?.trim()) return '';
     try {
-        // Use 'auto' to let MyMemory detect the source language
-        const res = await fetch(
-            `https://api.mymemory.translated.net/get?q=${encodeURIComponent(text.slice(0, 450))}&langpair=auto|${toLang}`
-        );
-        if (!res.ok) return '';
-        const json = await res.json();
-        return json.responseStatus === 200 ? json.responseData.translatedText : '';
-    } catch {
-        return ''; // Silently fail — original always visible
+        const url = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=${toLang}&dt=t&q=${encodeURIComponent(text)}`;
+        const res = await fetch(url);
+        if (res.ok) {
+            const json = await res.json();
+            if (json && json[0]) {
+                const translated = json[0].map(s => s[0]).join('');
+                if (translated && translated.trim().toLowerCase() !== text.trim().toLowerCase()) {
+                    return translated;
+                }
+            }
+        }
+        throw new Error('Google Translate failed');
+    } catch (err) {
+        try {
+            // Fallback to MyMemory
+            const res = await fetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=auto|${toLang}`);
+            if (res.ok) {
+                const json = await res.json();
+                const translated = json.responseData?.translatedText || '';
+                if (translated && translated.trim().toLowerCase() !== text.trim().toLowerCase()) {
+                    return translated;
+                }
+            }
+            return null;
+        } catch {
+            return null;
+        }
     }
 }
 // ─────────────────────────────────────────────────────────────────────────────
@@ -351,88 +369,72 @@ const CommunityScreen = ({ isDarkMode }) => {
                             </div>
 
                             {/* Original content — always visible */}
-                            <p
-                                className="marathi"
-                                style={{
-                                    color: isDarkMode ? '#f3f4f6' : '#1f2937',
-                                    lineHeight: 1.65,
-                                    fontSize: '0.95rem',
-                                    marginBottom: translation ? '10px' : '0',
-                                }}
-                            >
-                                {post.content}
-                            </p>
+                            <div style={{ marginBottom: translation ? '16px' : '0' }}>
+                                <p
+                                    className="marathi"
+                                    style={{
+                                        color: isDarkMode ? '#f3f4f6' : '#1f2937',
+                                        lineHeight: 1.65,
+                                        fontSize: '0.95rem',
+                                        margin: 0,
+                                    }}
+                                >
+                                    {post.content}
+                                </p>
+                            </div>
 
                             {/* Translation block — shows when translation is available (either direction) */}
                             {translation && (
                                 <div style={{
-                                    padding: '8px 12px',
-                                    borderLeft: '3px solid var(--primary)',
-                                    borderRadius: '0 8px 8px 0',
+                                    padding: '12px 14px',
+                                    borderLeft: `3px solid var(--primary)`,
+                                    borderRadius: '8px',
                                     background: isDarkMode
-                                        ? 'rgba(255,255,255,0.04)'
-                                        : 'rgba(46,125,50,0.05)',
+                                        ? 'rgba(255,255,255,0.03)'
+                                        : 'rgba(0,0,0,0.02)',
+                                    marginTop: '8px'
                                 }}>
-                                    <span style={{
-                                        display: 'block',
-                                        fontSize: '0.6rem',
-                                        fontWeight: 700,
-                                        color: 'var(--primary)',
-                                        textTransform: 'uppercase',
-                                        letterSpacing: '0.07em',
-                                        marginBottom: '4px',
+                                    <div style={{
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        gap: '6px',
+                                        marginBottom: '6px',
+                                        opacity: 0.7
                                     }}>
-                                        🌐 {isEnglish ? 'English' : 'मराठी'}
-                                    </span>
+                                        <span style={{
+                                            fontSize: '0.6rem',
+                                            fontWeight: 900,
+                                            color: 'var(--primary)',
+                                            textTransform: 'uppercase',
+                                            letterSpacing: '0.1em',
+                                        }}>
+                                            🌐 {isEnglish ? 'Translated' : 'भाषांतरित'}
+                                        </span>
+                                    </div>
 
                                     {translation.loading ? (
-                                        <span style={{
-                                            fontSize: '0.82rem',
+                                        <div style={{
+                                            fontSize: '0.85rem',
                                             fontStyle: 'italic',
-                                            color: isDarkMode ? '#6b7280' : '#9ca3af',
+                                            color: isDarkMode ? '#9ca3af' : '#6b7280',
                                         }}>
-                                            {isEnglish ? 'Translating…' : 'भाषांतर होत आहे…'}
-                                        </span>
+                                            {isEnglish ? 'Translating...' : 'भाषांतर होत आहे...'}
+                                        </div>
                                     ) : translation.text ? (
-                                        <span style={{
-                                            fontSize: '0.88rem',
+                                        <p style={{
+                                            fontSize: '0.9rem',
                                             color: isDarkMode ? '#d1d5db' : '#4b5563',
                                             lineHeight: 1.55,
+                                            margin: 0,
+                                            fontWeight: 450
                                         }}>
                                             {translation.text}
-                                        </span>
-                                    ) : (
-                                        // Translation returned empty (same language or short text)
-                                        <span style={{
-                                            fontSize: '0.82rem',
-                                            fontStyle: 'italic',
-                                            color: isDarkMode ? '#6b7280' : '#9ca3af',
-                                        }}>
-                                            {isEnglish ? 'Translation unavailable' : 'भाषांतर उपलब्ध नाही'}
-                                        </span>
-                                    )}
+                                        </p>
+                                    ) : null}
                                 </div>
                             )}
 
-                            {/* Like / Comment / Share / Translate */}
-                            <div style={{
-                                display: 'flex',
-                                gap: '20px',
-                                marginTop: '16px',
-                                borderTop: isDarkMode ? '1px solid #374151' : '1px solid #f0f0f0',
-                                paddingTop: '12px',
-                                pointerEvents: 'auto'
-                            }}>
-                                <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: isDarkMode ? '#9ca3af' : 'var(--text-muted)', fontSize: '0.875rem', cursor: 'pointer' }}>
-                                    <Heart size={18} /> {post.likes || 0}
-                                </div>
-                                <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: isDarkMode ? '#9ca3af' : 'var(--text-muted)', fontSize: '0.875rem', cursor: 'pointer' }}>
-                                    <MessageCircle size={18} /> {post.comments || 0}
-                                </div>
-                                <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: isDarkMode ? '#9ca3af' : 'var(--text-muted)', fontSize: '0.875rem', cursor: 'pointer', marginLeft: 'auto' }}>
-                                    <Share2 size={18} />
-                                </div>
-                            </div>
+
                         </Motion.div>
                     );
                 })}
