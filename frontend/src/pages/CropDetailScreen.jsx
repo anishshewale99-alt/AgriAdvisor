@@ -10,7 +10,8 @@ import {
     Wind,
     AlertTriangle,
     ChevronLeft,
-    ChevronDown
+    ChevronDown,
+    Flag
 } from 'lucide-react';
 import { motion as Motion, AnimatePresence } from 'framer-motion';
 import TTSButton from '../components/TTSButton';
@@ -184,11 +185,57 @@ const CropDetailScreen = ({ crop, onBack, isDarkMode, isEnglish }) => {
                                 <div className="english-sub" style={{ fontSize: '0.7rem', color: isDarkMode ? '#9ca3af' : 'var(--text-muted)', fontWeight: 700, textTransform: 'uppercase' }}>
                                     {isEn ? 'Risk Level' : 'जोखीम पातळी'}
                                 </div>
-                                <div style={{ fontSize: '1.1rem', fontWeight: 800 }}>
+                                <div style={{ fontSize: '1.1rem', fontWeight: 800, display: 'flex', alignItems: 'center', gap: '8px' }}>
                                     {isEn ? crop.risks.weather.level : (crop.risks.weather.level === 'Low' ? 'कमी' : crop.risks.weather.level === 'Medium' ? 'मध्यम' : 'जास्त')}
+                                    <Flag
+                                        size={16}
+                                        fill={crop.risks.weather.level === 'Low' ? '#22c55e' : crop.risks.weather.level === 'Medium' ? '#f59e0b' : '#ef4444'}
+                                        color={crop.risks.weather.level === 'Low' ? '#22c55e' : crop.risks.weather.level === 'Medium' ? '#f59e0b' : '#ef4444'}
+                                    />
                                 </div>
                             </div>
                         </div>
+                    </div>
+
+                    {/* Specific Risk Factor Flags */}
+                    <div style={{
+                        display: 'flex',
+                        flexWrap: 'wrap',
+                        gap: '8px',
+                        paddingTop: '16px',
+                        borderTop: isDarkMode ? '1px solid #374151' : '1px solid #f3f4f6'
+                    }}>
+                        {Object.entries(crop.risks).map(([key, info]) => {
+                            const isLow = info.level.toLowerCase().includes('low');
+                            const isMed = info.level.toLowerCase().includes('medium');
+                            const bgColor = isLow ? '#f0fdf4' : isMed ? '#fffbeb' : '#fef2f2';
+                            const textColor = isLow ? '#166534' : isMed ? '#92400e' : '#991b1b';
+                            const borderColor = isLow ? '#bbf7d0' : isMed ? '#fde68a' : '#fecaca';
+
+                            return (
+                                <div key={key} style={{
+                                    background: isDarkMode ? (isLow ? '#064e3b' : isMed ? '#78350f' : '#7f1d1d') : bgColor,
+                                    color: isDarkMode ? '#fff' : textColor,
+                                    padding: '6px 12px',
+                                    borderRadius: '12px',
+                                    fontSize: '0.75rem',
+                                    fontWeight: 700,
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    gap: '6px',
+                                    border: `1px solid ${isDarkMode ? 'transparent' : borderColor}`,
+                                    boxShadow: '0 2px 4px rgba(0,0,0,0.02)'
+                                }}>
+                                    <AlertTriangle size={12} fill="currentColor" opacity={0.8} />
+                                    <span className="marathi" style={{ textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                                        {isEn
+                                            ? `${key === 'weather' ? 'Weather' : key === 'market' ? 'Market' : 'Water'} Risk: ${info.level}`
+                                            : `${key === 'weather' ? 'हवामान' : key === 'market' ? 'बाजार' : 'पाणी'} जोखीम: ${info.level === 'Low' ? 'कमी' : info.level === 'Medium' ? 'मध्यम' : 'जास्त'}`
+                                        }
+                                    </span>
+                                </div>
+                            );
+                        })}
                     </div>
                 </div>
 
@@ -364,7 +411,7 @@ const CropDetailScreen = ({ crop, onBack, isDarkMode, isEnglish }) => {
                 </div>
 
             </div>
-        </Motion.div>
+        </Motion.div >
     );
 };
 
