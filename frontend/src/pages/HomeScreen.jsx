@@ -2,11 +2,12 @@ import React from 'react';
 import { motion as Motion } from 'framer-motion';
 import { MapPin, Sun, Droplets, Wind, AlertTriangle, TrendingUp, Lightbulb } from 'lucide-react';
 import MarketTicker from '../components/MarketTicker';
+import { cropData } from '../cropData';
 import { useLanguage } from '../context/LanguageContext';
 import TTSButton from '../components/TTSButton';
 import '../styles/HomeScreen.css';
 
-const HomeScreen = ({ setScreen, setTab, isDarkMode, isEnglish }) => {
+const HomeScreen = ({ setScreen, setTab, isDarkMode, isEnglish, setSelectedCrop }) => {
     const isEn = isEnglish;
     const [weather, setWeather] = React.useState(null);
 
@@ -150,7 +151,41 @@ const HomeScreen = ({ setScreen, setTab, isDarkMode, isEnglish }) => {
         return { level: isEn ? 'High' : 'जास्त', value: score, color: '#ef4444' };
     };
 
+    const getDiseaseRisk = () => {
+        if (!weather) return null;
+        const { temperature, humidity } = weather;
+
+        if (humidity > 80) {
+            if (temperature >= 15 && temperature <= 25) {
+                return {
+                    title: isEn ? 'High Fungal Risk' : 'बुरशीजन्य रोगाचा मोठा धोका',
+                    desc: isEn ? 'Conditions ideal for Downy Mildew. Monitor leaves for spots.' : 'केवडा (Downy Mildew) रोगासाठी पोषक वातावरण. पानांवरील ठिपके तपासा.',
+                    type: 'fungal'
+                };
+            } else if (temperature > 25) {
+                return {
+                    title: isEn ? 'Bacterial Risk Alert' : 'जीवाणूजन्य रोगाचा इशारा',
+                    desc: isEn ? 'High humidity and warmth may cause Bacterial Spot. Ensure ventilation.' : 'जास्त आर्द्रता आणि उष्णतेमुळे जीवाणूजन्य ठिपके (Bacterial Spot) पडू शकतात.',
+                    type: 'bacterial'
+                };
+            }
+        } else if (temperature > 35) {
+            return {
+                title: isEn ? 'Heat Stress Warning' : 'उष्णतेचा ताण (Heat Stress)',
+                desc: isEn ? 'Extreme heat can cause wilting. Increase irrigation frequency.' : 'अति उष्णतेमुळे पिके कोमेजून जाऊ शकतात. पाण्याची पाळी वाढवा.',
+                type: 'heat'
+            };
+        }
+        return {
+            title: isEn ? 'Stable Environment' : 'स्थिर वातावरण',
+            desc: isEn ? 'Weather is currently stable for most Rabi crops.' : 'पाने आणि फुलांची वाढ होण्यासाठी सध्याचे हवामान पोषक आहे.',
+            type: 'stable'
+        };
+    };
+
     const risk = getRiskFactor();
+    const diseaseRisk = getDiseaseRisk();
+    const topCrop = cropData[0]; // Highest match score (Jowar - 95%)
 
     const getTTSText = () => {
         let text = isEn ? "Home Overview. " : "होम ओव्हरव्ह्यू. ";
@@ -160,9 +195,9 @@ const HomeScreen = ({ setScreen, setTab, isDarkMode, isEnglish }) => {
                 ? `Weather in ${weather.location} is ${weather.description} with ${weather.temperature} degrees.`
                 : `${weather.location} मधील हवामान ${weather.descriptionMR} असून तापमान ${weather.temperature} अंश आहे.`;
         }
-        text += isEn
-            ? "Alert: Heat risk warning next week. Tip: Increase the use of organic fertilizers."
-            : "अलर्ट: पुढच्या आठवड्यात उष्णतेचा धोका. टीप: सेंद्रिय खतांचा वापर वाढवा.";
+        text += diseaseRisk
+            ? (isEn ? `Alert: ${diseaseRisk.title}. ${diseaseRisk.desc}` : `इशारा: ${diseaseRisk.title}. ${diseaseRisk.desc}`)
+            : (isEn ? "Alert: Analyzing conditions." : "इशारा: परिस्थितीचे विश्लेषण करत आहे.");
         return text;
     };
 
@@ -231,33 +266,33 @@ const HomeScreen = ({ setScreen, setTab, isDarkMode, isEnglish }) => {
                         )}
                     </div>
 
-                    <div className="alert-card bg-yellow-50 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400 border border-yellow-100 dark:border-yellow-950" style={{ margin: '0 0 20px', padding: '16px', borderRadius: '16px', display: 'flex', alignItems: 'center', gap: '12px' }}>
-                        <div className="p-2 bg-yellow-100 dark:bg-yellow-800/40 rounded-lg">
-                            <AlertTriangle size={20} className="text-yellow-700 dark:text-yellow-400" />
+                    <div className={`alert-card ${diseaseRisk?.type === 'stable' ? 'bg-green-50 text-green-800 dark:bg-green-900/30 dark:text-green-400 border-green-100 dark:border-green-950' : 'bg-yellow-50 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400 border-yellow-100 dark:border-yellow-950'}`} style={{ margin: '0 0 20px', padding: '16px', borderRadius: '16px', display: 'flex', alignItems: 'center', gap: '12px' }}>
+                        <div className={`p-2 ${diseaseRisk?.type === 'stable' ? 'bg-green-100 dark:bg-green-800/40' : 'bg-yellow-100 dark:bg-yellow-800/40'} rounded-lg`}>
+                            <AlertTriangle size={20} className={diseaseRisk?.type === 'stable' ? 'text-green-700 dark:text-green-400' : 'text-yellow-700 dark:text-yellow-400'} />
                         </div>
                         <div>
                             <div className="marathi font-bold text-gray-900 dark:text-white">
-                                {isEn ? 'Heat risk warning next week' : 'पुढच्या आठवड्यात उष्णतेचा धोका'}
+                                {diseaseRisk ? diseaseRisk.title : (isEn ? 'Weather Analysis Loading...' : 'हवामान विश्लेषण लोड होत आहे...')}
                             </div>
                             <div className="english-sub text-gray-500 dark:text-gray-400 text-sm">
-                                {isEn ? 'Take necessary precautions.' : 'आवश्यक ती काळजी घ्या.'}
+                                {diseaseRisk ? diseaseRisk.desc : (isEn ? 'Please wait while we analyze risks.' : 'कृपया विश्लेषण होईपर्यंत प्रतीक्षा करा.')}
                             </div>
                         </div>
                     </div>
 
                     <div className="insight-grid grid grid-cols-2 gap-4" style={{ margin: '0 0 20px' }}>
-                        <div className="insight-card bg-white dark:bg-gray-800 p-4 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700">
+                        <div className="insight-card bg-white dark:bg-gray-800 p-4 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700" onClick={() => { setSelectedCrop(topCrop); setScreen('crop-detail'); }} style={{ cursor: 'pointer' }}>
                             <div className="marathi text-gray-900 dark:text-white font-bold" style={{ fontSize: '1rem' }}>
-                                {isEn ? 'Harvest Grapes' : 'द्राक्ष काढणी'}
+                                {isEn ? topCrop.englishName : topCrop.marathiName}
                             </div>
                             <div style={{ fontSize: '0.75rem', color: '#9ca3af', marginBottom: '8px' }}>
-                                {isEn ? 'द्राक्ष काढणी' : 'Harvest Grapes'}
+                                {isEn ? topCrop.marathiName : topCrop.englishName}
                             </div>
                             <div className="badge success" style={{ background: isDarkMode ? 'rgba(34, 197, 94, 0.2)' : '#E8F5E9', color: isDarkMode ? '#86efac' : '#2E7D32', padding: '4px 8px', borderRadius: '6px', fontSize: '0.75rem', fontWeight: 800, display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
-                                <TrendingUp size={12} /> ↑ {isEn ? 'High Demand' : 'जास्त मागणी'}
+                                <TrendingUp size={12} /> ↑ {isEn ? 'Top Recommended' : 'टॉप शिफारस'}
                             </div>
                             <div style={{ fontSize: '0.65rem', color: '#9ca3af', marginTop: '4px', marginLeft: '16px' }}>
-                                {isEn ? 'जास्त मागणी' : 'High Demand'}
+                                {isEn ? `Match: ${topCrop.matchScore}%` : `जुळणी: ${topCrop.matchScore}%`}
                             </div>
                         </div>
                         <div className="insight-card bg-white dark:bg-gray-800 p-4 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700">

@@ -322,6 +322,7 @@ function App() {
                 <div className="content-card">
                   {screen === 'home' && (
                     <HomeScreen
+                      setSelectedCrop={setSelectedCrop}
                       setIsVoiceOpen={setIsVoiceOpen}
                       setScreen={setScreen}
                       setTab={setActiveTab}

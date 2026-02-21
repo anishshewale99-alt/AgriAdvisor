@@ -354,61 +354,6 @@ const CropDetailScreen = ({ crop, onBack, isDarkMode, isEnglish }) => {
                     </div>
                 </div>
 
-                {/* 30-Day Outlook Section */}
-                <div style={{
-                    background: isDarkMode ? '#1f2937' : 'white',
-                    borderRadius: '24px',
-                    padding: '24px',
-                    boxShadow: '0 10px 25px rgba(0,0,0,0.08)',
-                    border: isDarkMode ? '1px solid #374151' : '1px solid #f0f0f0'
-                }}>
-                    <h3 className="marathi" style={{ fontSize: '1.1rem', marginBottom: '20px', color: isDarkMode ? '#fff' : 'var(--primary-dark)' }}>
-                        {isEn ? '30-Day Outlook' : '30-दिवस दृष्टिकोन'}
-                    </h3>
-                    <div style={{
-                        display: 'flex',
-                        gap: '12px',
-                        overflowX: 'auto',
-                        paddingBottom: '10px',
-                        scrollbarWidth: 'none',
-                        msOverflowStyle: 'none'
-                    }}>
-                        {crop.outlook.map((week, idx) => {
-                            const WeekIcon = IconMap[week.icon] || Sun;
-                            return (
-                                <div key={idx} style={{
-                                    minWidth: '100px',
-                                    background: isDarkMode ? '#111827' : '#f9fafb',
-                                    padding: '16px 12px',
-                                    borderRadius: '20px',
-                                    textAlign: 'center',
-                                    border: isDarkMode ? '1px solid #374151' : '1px solid #f0f0f0'
-                                }}>
-                                    <div style={{ fontSize: '0.75rem', fontWeight: 600, opacity: 0.7, marginBottom: '8px' }}>
-                                        {isEn ? week.week : week.week.replace('W', 'आठवडा ')}
-                                    </div>
-                                    <div style={{
-                                        background: 'white',
-                                        width: '40px',
-                                        height: '40px',
-                                        borderRadius: '12px',
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        justifyContent: 'center',
-                                        margin: '0 auto 8px',
-                                        boxShadow: '0 4px 10px rgba(0,0,0,0.05)',
-                                        color: '#f59e0b'
-                                    }}>
-                                        <WeekIcon size={24} />
-                                    </div>
-                                    <div className="marathi" style={{ fontSize: '0.75rem', fontWeight: 700 }}>
-                                        {isEn ? week.status : (week.status === 'Clear' ? 'स्वच्छ' : week.status === 'Cloudy' ? 'ढगाळ' : week.status)}
-                                    </div>
-                                </div>
-                            );
-                        })}
-                    </div>
-                </div>
 
             </div>
         </Motion.div >
