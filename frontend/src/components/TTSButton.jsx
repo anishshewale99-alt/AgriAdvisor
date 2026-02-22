@@ -24,7 +24,7 @@ const TTSButton = ({ textToRead, isDarkMode, className = "" }) => {
         setIsLoading(true);
         try {
             // Calling our own backend API which now uses Sarvam AI
-            const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+            const apiUrl = import.meta.env.VITE_API_URL || '';
             const response = await fetch(`${apiUrl}/api/tts`, {
                 method: 'POST',
                 headers: {
