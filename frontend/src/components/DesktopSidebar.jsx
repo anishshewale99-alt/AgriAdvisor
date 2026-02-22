@@ -1,5 +1,5 @@
 import React from 'react';
-import { Home, Sprout, Users, User, Settings, LogOut, Moon, Sun, Mic } from 'lucide-react';
+import { Home, Sprout, Users, User, Settings, LogOut, Moon, Sun, Mic, MessageSquare } from 'lucide-react';
 import { motion } from 'framer-motion';
 import '../styles/DesktopSidebar.css';
 
@@ -10,6 +10,7 @@ const DesktopSidebar = ({ activeTab, setTab, setScreen, isDarkMode, toggleTheme,
         { id: 'community', icon: Users, labelMar: 'समुदाय', labelEng: 'Community', screen: 'community' },
         { id: 'profile', icon: User, labelMar: 'प्रोफाईल', labelEng: 'Profile', screen: 'profile' },
         { id: 'settings', icon: Settings, labelMar: 'सेटिंग्ज', labelEng: 'Settings', screen: 'settings' },
+        { id: 'feedback', icon: MessageSquare, labelMar: 'अभिप्राय', labelEng: 'Feedback', screen: 'feedback' },
     ];
 
     return (

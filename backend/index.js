@@ -50,6 +50,7 @@ const cropRoutes = require('./routes/crops');
 const trendRoutes = require('./routes/trends');
 const syncRoutes = require('./routes/sync');
 const ttsRoutes = require('./routes/tts');
+const feedbackRoutes = require('./routes/feedback');
 
 app.use('/api/auth', authRoutes);
 app.use('/api/posts', postRoutes);
@@ -57,6 +58,7 @@ app.use('/api/crops', cropRoutes);
 app.use('/api/trends', trendRoutes);
 app.use('/api/sync', syncRoutes);
 app.use('/api/tts', ttsRoutes);
+app.use('/api/feedback', feedbackRoutes);
 
 // Detailed recommendation route
 const { generateRecommendations } = require('./services/scoringEngine');

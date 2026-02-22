@@ -19,6 +19,7 @@ import VoiceModal from './components/VoiceModal';
 import CommunityScreen from './pages/CommunityScreen';
 import ProfileScreen from './pages/ProfileScreen';
 import SettingsScreen from './pages/SettingsScreen';
+import FeedbackScreen from './pages/FeedbackScreen';
 import SideMenu from './components/SideMenu';
 import CropRecommendationScreen from './pages/CropRecommendationScreen';
 import CropDetailScreen from './pages/CropDetailScreen';
@@ -403,6 +404,12 @@ function App() {
                         setOnboarding('landing');
                         window.location.reload();
                       }}
+                    />
+                  )}
+                  {screen === 'feedback' && (
+                    <FeedbackScreen
+                      isDarkMode={isDarkMode}
+                      isEnglish={isEnglish}
                     />
                   )}
                 </div>

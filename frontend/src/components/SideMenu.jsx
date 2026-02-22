@@ -6,7 +6,8 @@ import {
     FileText,
     X,
     ChevronRight,
-    User
+    User,
+    MessageSquare
 } from 'lucide-react';
 import { motion as Motion, AnimatePresence } from 'framer-motion';
 
@@ -17,6 +18,7 @@ const SideMenu = ({ isOpen, onClose, darkMode, setScreen, setTab, isEnglish }) =
         { icon: Phone, title: isEnglish ? 'Contact Us' : 'संपर्क साधा', color: '#4CAF50' },
         { icon: FileText, title: isEnglish ? 'Privacy Policy' : 'गोपनीयता धोरण', color: '#607D8B' },
         { icon: User, title: isEnglish ? 'Profile' : 'प्रोफाईल', color: '#FF5722', id: 'profile' },
+        { icon: MessageSquare, title: isEnglish ? 'Feedback' : 'अभिप्राय', color: '#E91E63', id: 'feedback' },
     ];
 
     return (
@@ -95,6 +97,9 @@ const SideMenu = ({ isOpen, onClose, darkMode, setScreen, setTab, isEnglish }) =
                                             if (item.id === 'profile' && setScreen && setTab) {
                                                 setScreen('profile');
                                                 setTab('profile');
+                                                onClose();
+                                            } else if (item.id === 'feedback' && setScreen) {
+                                                setScreen('feedback');
                                                 onClose();
                                             }
                                         }}

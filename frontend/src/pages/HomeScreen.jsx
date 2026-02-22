@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion as Motion } from 'framer-motion';
-import { MapPin, Sun, Droplets, Wind, AlertTriangle, TrendingUp, Lightbulb } from 'lucide-react';
+import { MapPin, Sun, Droplets, Wind, AlertTriangle, TrendingUp, Lightbulb, MessageSquareQuote } from 'lucide-react';
 import MarketTicker from '../components/MarketTicker';
 import { cropData } from '../cropData';
 import { useLanguage } from '../context/LanguageContext';
@@ -325,6 +325,32 @@ const HomeScreen = ({ setScreen, setTab, isDarkMode, isEnglish, setSelectedCrop 
                         <div>
                             <div className="marathi font-bold" style={{ marginBottom: '4px', fontSize: '0.95rem' }}>
                                 {isEn ? 'Increase the use of organic fertilizers to improve soil texture.' : 'सेंद्रिय खतांचा वापर वाढवा आणि जमिनीचा पोत सुधारा.'}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div
+                        onClick={() => setScreen('feedback')}
+                        style={{
+                            background: isDarkMode ? '#1f2937' : 'white',
+                            margin: '0 0 24px',
+                            padding: '20px',
+                            borderRadius: '24px',
+                            display: 'flex',
+                            gap: '16px',
+                            border: isDarkMode ? '1px solid #374151' : '1px solid #f0f0f0',
+                            cursor: 'pointer'
+                        }}
+                    >
+                        <div style={{ background: 'rgba(233, 30, 99, 0.1)', padding: '10px', borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                            <MessageSquareQuote size={24} color="#E91E63" />
+                        </div>
+                        <div>
+                            <div className="marathi font-bold" style={{ marginBottom: '2px', fontSize: '0.95rem' }}>
+                                {isEn ? 'Share Your Experience' : 'तुमचा अनुभव शेअर करा'}
+                            </div>
+                            <div style={{ fontSize: '0.75rem', color: isDarkMode ? '#9ca3af' : '#64748b' }}>
+                                {isEn ? 'Did you make a profit with our suggestions?' : 'आमच्या शिफारशींमुळे तुम्हाला नफा झाला का?'}
                             </div>
                         </div>
                     </div>
