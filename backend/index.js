@@ -47,14 +47,36 @@ const CommunityPost = require('./models/CommunityPost');
 const authRoutes = require('./routes/auth');
 const postRoutes = require('./routes/posts');
 const cropRoutes = require('./routes/crops');
+const trendRoutes = require('./routes/trends');
+const syncRoutes = require('./routes/sync');
 const ttsRoutes = require('./routes/tts');
-const trendsRoutes = require('./routes/trends');
 
 app.use('/api/auth', authRoutes);
 app.use('/api/posts', postRoutes);
 app.use('/api/crops', cropRoutes);
+app.use('/api/trends', trendRoutes);
+app.use('/api/sync', syncRoutes);
 app.use('/api/tts', ttsRoutes);
-app.use('/api/trends', trendsRoutes);
+
+// Detailed recommendation route
+const { generateRecommendations } = require('./services/scoringEngine');
+const { getRealTimeWeather } = require('./services/weatherService');
+
+app.post('/api/recommend-crops', async (req, res) => {
+    try {
+        const weather = await getRealTimeWeather(req.body.lat, req.body.lon);
+        const recommendations = await generateRecommendations(req.body, weather);
+        res.json({ weather, ...recommendations });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+// JSON error handler for 404s
+app.use('/api/*', (req, res) => {
+    res.status(404).json({ error: 'API route not found' });
+});
+
 
 // Fetch all community posts
 app.get('/api/community/posts', async (req, res) => {
@@ -150,10 +172,10 @@ io.on('connection', (socket) => {
 });
 
 // Database Connection
-const MONGO_URI = process.env.MONGO_URI;
+const MONGO_URI = process.env.MONGO_URI || process.env.MONGODB_URI;
 
 if (!MONGO_URI) {
-    console.error('FATAL ERROR: MONGO_URI is not defined in .env');
+    console.error('FATAL ERROR: MONGO_URI or MONGODB_URI is not defined in .env');
     process.exit(1);
 }
 

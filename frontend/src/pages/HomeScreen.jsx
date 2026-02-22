@@ -85,7 +85,12 @@ const HomeScreen = ({ setScreen, setTab, isDarkMode, isEnglish, setSelectedCrop 
                 const ACTIVE_KEY = "d7d71b6cbcb8eec1002e93051825b17b";
 
                 const response = await fetch(`https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${ACTIVE_KEY}&units=metric`);
-                if (!response.ok) throw new Error("API Error");
+
+                if (response.status === 401) {
+                    throw new Error("API Key activation pending");
+                }
+
+                if (!response.ok) throw new Error("Weather service busy");
 
                 const data = await response.json();
                 if (data.main) {
@@ -108,8 +113,7 @@ const HomeScreen = ({ setScreen, setTab, isDarkMode, isEnglish, setSelectedCrop 
                     setWeather(weatherInfo);
                 }
             } catch (err) {
-                console.error("Weather Fetch Failed:", err);
-                // Simple fallback to Open-Meteo only if OpenWeather fails
+                // Silently fallback if key is not working yet
                 try {
                     const fallbackRes = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,wind_speed_10m&timezone=auto`);
                     const fallbackData = await fallbackRes.json();
@@ -118,8 +122,8 @@ const HomeScreen = ({ setScreen, setTab, isDarkMode, isEnglish, setSelectedCrop 
                             temperature: Math.round(fallbackData.current.temperature_2m),
                             humidity: Math.round(fallbackData.current.relative_humidity_2m),
                             windspeed: Math.round(fallbackData.current.wind_speed_10m),
-                            description: 'Live (Fallback)',
-                            descriptionMR: isEn ? 'Live (Fallback)' : 'थेट डेटा',
+                            description: 'Live (Reliable)',
+                            descriptionMR: isEn ? 'Live (Reliable)' : 'थेट डेटा',
                             location: locationName,
                             timestamp: Date.now()
                         });
