@@ -6,9 +6,10 @@ const MarketTicker = ({ isEnglish, isDarkMode }) => {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
+        const backendUrl = import.meta.env.VITE_API_URL || '';
         const fetchTrends = async () => {
             try {
-                const response = await fetch('/api/trends');
+                const response = await fetch(`${backendUrl}/api/trends`);
                 if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
 
                 const result = await response.json();

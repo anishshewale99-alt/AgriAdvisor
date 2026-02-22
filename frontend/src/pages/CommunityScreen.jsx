@@ -22,9 +22,10 @@ const CommunityScreen = ({ isDarkMode }) => {
 
     // ── Socket.IO + initial fetch ───────────────────────────────────────────
     React.useEffect(() => {
+        const backendUrl = import.meta.env.VITE_API_URL || '';
         const fetchMessages = async () => {
             try {
-                const res = await fetch('/api/community/posts');
+                const res = await fetch(`${backendUrl}/api/community/posts`);
                 const data = await res.json();
                 const formatted = data.map(msg => ({
                     ...msg,
@@ -45,7 +46,7 @@ const CommunityScreen = ({ isDarkMode }) => {
 
         fetchMessages();
 
-        const sock = io('/'); // proxied through Vite → backend
+        const sock = io(backendUrl || '/'); // Use absolute URL in production, relative in dev (proxy)
         sock.emit('joinRoom', 'farmers-community');
 
         const currentUserId = currentUser?.id;
@@ -86,6 +87,7 @@ const CommunityScreen = ({ isDarkMode }) => {
     const handlePost = async () => {
         if (!newPost.trim() || isPosting) return;
 
+        const backendUrl = import.meta.env.VITE_API_URL || '';
         const clientId = Date.now().toString() + Math.random().toString(36).substr(2, 9);
         const postData = {
             content: newPost.trim(),
@@ -106,7 +108,7 @@ const CommunityScreen = ({ isDarkMode }) => {
         }, ...prev]);
 
         try {
-            const res = await fetch('/api/community/post', {
+            const res = await fetch(`${backendUrl}/api/community/post`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(postData),
