@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { cropData } from '../cropData';
 
 const MarketTicker = ({ isEnglish, isDarkMode }) => {
     const [trends, setTrends] = useState([]);
@@ -7,16 +8,47 @@ const MarketTicker = ({ isEnglish, isDarkMode }) => {
     useEffect(() => {
         const fetchTrends = async () => {
             try {
-                // Use relative URL to leverage Vite proxy
                 const response = await fetch('/api/trends');
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
+                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+
                 const result = await response.json();
                 if (result.success && result.data && result.data.length > 0) {
-                    setTrends(result.data);
+                    // Filter: Only include crops with a price > 0 that exist in our cropData file
+                    const filtered = result.data.filter(item => {
+                        const hasPrice = item.currentPrice && item.currentPrice > 0;
+                        const existsInFile = cropData.some(c =>
+                            c.englishName.toLowerCase().includes(item.commodity.toLowerCase()) ||
+                            c.marathiName.includes(item.commodity)
+                        );
+                        return hasPrice && existsInFile;
+                    });
+
+                    if (filtered.length === 0) {
+                        useFallback();
+                        return;
+                    }
+
+                    const enriched = filtered.map(item => {
+                        const cropMatch = cropData.find(c =>
+                            c.englishName.toLowerCase().includes(item.commodity.toLowerCase()) ||
+                            c.marathiName.includes(item.commodity)
+                        );
+
+                        let displayName = item.commodity;
+                        if (cropMatch) {
+                            displayName = isEnglish
+                                ? `${cropMatch.englishName} (${cropMatch.marathiName})`
+                                : `${cropMatch.marathiName} (${cropMatch.englishName})`;
+                        }
+
+                        return {
+                            ...item,
+                            commodity: displayName,
+                            unit: cropMatch ? cropMatch.price.split('/-')[1] : 'quintal'
+                        };
+                    });
+                    setTrends(enriched);
                 } else {
-                    console.warn('Trends API returned no data, using fallback.');
                     useFallback();
                 }
             } catch (err) {
@@ -28,19 +60,24 @@ const MarketTicker = ({ isEnglish, isDarkMode }) => {
         };
 
         const useFallback = () => {
-            // Realistic fallback data if API is empty or failing
-            const fallbacks = [
-                { commodity: isEnglish ? 'Wheat (गहू)' : 'गहू (Wheat)', currentPrice: 2450, percentageChange: 2.1, trend: 'Rising' },
-                { commodity: isEnglish ? 'Onion (कांदा)' : 'कांदा (Onion)', currentPrice: 1800, percentageChange: -5.4, trend: 'Falling' },
-                { commodity: isEnglish ? 'Cotton (कापूस)' : 'कापूस (Cotton)', currentPrice: 7200, percentageChange: 0.8, trend: 'Rising' },
-                { commodity: isEnglish ? 'Soybean (सोयाबीन)' : 'सोयाबीन (Soybean)', currentPrice: 4600, percentageChange: -1.2, trend: 'Falling' },
-                { commodity: isEnglish ? 'Tomato (टोमॅटो)' : 'टोमॅटो (Tomato)', currentPrice: 1200, percentageChange: 12.5, trend: 'Rising' }
-            ];
+            // Use crops from cropData as fallback, ensuring they all have valid prices
+            const fallbacks = cropData.map(c => {
+                const priceParts = c.price.split('/-');
+                const numericPrice = parseInt(priceParts[0].replace(/[₹,]/g, ''));
+                // Use a more realistic stable/rising trend for fallback
+                const change = (Math.random() * 1.5).toFixed(1);
+                return {
+                    commodity: isEnglish ? `${c.englishName} (${c.marathiName})` : `${c.marathiName} (${c.englishName})`,
+                    currentPrice: numericPrice,
+                    unit: priceParts[1] || 'quintal',
+                    percentageChange: change,
+                    trend: parseFloat(change) > 0 ? 'Rising' : 'Stable'
+                };
+            });
             setTrends(fallbacks);
         };
 
         fetchTrends();
-        // Refresh every 10 minutes
         const interval = setInterval(fetchTrends, 10 * 60 * 1000);
         return () => clearInterval(interval);
     }, [isEnglish]);
@@ -64,7 +101,6 @@ const MarketTicker = ({ isEnglish, isDarkMode }) => {
         );
     }
 
-    // Double the items to ensure smooth infinite loop (50% translation)
     const displayItems = [...trends, ...trends];
 
     return (
@@ -82,8 +118,8 @@ const MarketTicker = ({ isEnglish, isDarkMode }) => {
                         <span style={{ fontWeight: 800, color: isDarkMode ? '#fff' : '#1e293b', fontSize: '0.9rem' }}>
                             {item.commodity}
                         </span>
-                        <span style={{ marginLeft: '8px', fontWeight: 600, color: isDarkMode ? '#9ca3af' : '#64748b' }}>
-                            ₹{item.currentPrice?.toLocaleString() || 'N/A'}
+                        <span style={{ marginLeft: '8px', fontWeight: 600, color: isDarkMode ? '#9ca3af' : '#64748b', fontSize: '0.85rem' }}>
+                            ₹{item.currentPrice?.toLocaleString()}/-{item.unit || 'quintal'}
                         </span>
                         <span style={{
                             marginLeft: '10px',
