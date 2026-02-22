@@ -17,10 +17,6 @@ const communityPostSchema = new mongoose.Schema({
         type: String,
         default: 'गावाकडून'
     },
-    en: {
-        type: String,
-        default: 'Translated message...'
-    },
     clientId: {
         type: String
     },

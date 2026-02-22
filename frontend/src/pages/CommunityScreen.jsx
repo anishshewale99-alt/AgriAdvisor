@@ -1,44 +1,14 @@
 import React from 'react';
 import { Plus } from 'lucide-react';
-import { motion as Motion, AnimatePresence } from 'framer-motion';
+import { motion as Motion } from 'framer-motion';
 import '../styles/CommunityScreen.css';
 import io from 'socket.io-client';
 import { useLanguage } from '../context/LanguageContext';
 import { useAuth } from '../context/AuthContext';
 
-// ─── Translation API (Google Translate GTX - Reliable client-side) ──────────
-async function translateText(text, toLang) {
-    if (!text?.trim()) return '';
-    try {
-        const url = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=${toLang}&dt=t&q=${encodeURIComponent(text)}`;
-        const res = await fetch(url);
-        if (res.ok) {
-            const json = await res.json();
-            if (json && json[0]) {
-                const translated = json[0].map(s => s[0]).join('');
-                if (translated && translated.trim().toLowerCase() !== text.trim().toLowerCase()) {
-                    return translated;
-                }
-            }
-        }
-        throw new Error('Google Translate failed');
-    } catch (err) {
-        try {
-            // Fallback to MyMemory
-            const res = await fetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=auto|${toLang}`);
-            if (res.ok) {
-                const json = await res.json();
-                const translated = json.responseData?.translatedText || '';
-                if (translated && translated.trim().toLowerCase() !== text.trim().toLowerCase()) {
-                    return translated;
-                }
-            }
-            return null;
-        } catch {
-            return null;
-        }
-    }
-}
+// ─── Backend-powered translation (no CORS — works in every browser) ─────────
+// New posts come with `en` and `mr` already from the backend.
+// For old posts without translations, we ask the backend to translate them.
 // ─────────────────────────────────────────────────────────────────────────────
 
 const CommunityScreen = ({ isDarkMode }) => {
@@ -49,57 +19,6 @@ const CommunityScreen = ({ isDarkMode }) => {
     const [messages, setMessages] = React.useState([]);
     const [newPost, setNewPost] = React.useState('');
     const [isPosting, setIsPosting] = React.useState(false);
-
-    // Cache both directions so a language switch is instant
-    // shape: { [postId]: { en: string|null, mr: string|null } }
-    const [translations, setTranslations] = React.useState({});
-    const processedRef = React.useRef(new Set()); // cacheKey → in-flight or done
-
-    // ── Queue translation both ways for a post ──────────────────────────────
-    const queueTranslation = React.useCallback((postId, content) => {
-        if (!postId || !content?.trim()) return;
-
-        // Translate to English
-        const enKey = `${postId}_en`;
-        if (!processedRef.current.has(enKey)) {
-            processedRef.current.add(enKey);
-            setTranslations(prev => ({
-                ...prev,
-                [postId]: { ...(prev[postId] || {}), enLoading: true }
-            }));
-            translateText(content, 'en').then(result => {
-                const isDifferent = result && result.trim().toLowerCase() !== content.trim().toLowerCase();
-                setTranslations(prev => ({
-                    ...prev,
-                    [postId]: { ...(prev[postId] || {}), en: isDifferent ? result : null, enLoading: false }
-                }));
-            });
-        }
-
-        // Translate to Marathi (for posts that may be in English)
-        const mrKey = `${postId}_mr`;
-        if (!processedRef.current.has(mrKey)) {
-            processedRef.current.add(mrKey);
-            setTranslations(prev => ({
-                ...prev,
-                [postId]: { ...(prev[postId] || {}), mrLoading: true }
-            }));
-            translateText(content, 'mr').then(result => {
-                const isDifferent = result && result.trim().toLowerCase() !== content.trim().toLowerCase();
-                setTranslations(prev => ({
-                    ...prev,
-                    [postId]: { ...(prev[postId] || {}), mr: isDifferent ? result : null, mrLoading: false }
-                }));
-            });
-        }
-    }, []);
-
-    // Translate all posts (new or existing) eagerly — both languages cached up-front
-    React.useEffect(() => {
-        messages.forEach(post => {
-            if (post._id) queueTranslation(post._id, post.content);
-        });
-    }, [messages, queueTranslation]);
 
     // ── Socket.IO + initial fetch ───────────────────────────────────────────
     React.useEffect(() => {
@@ -173,7 +92,6 @@ const CommunityScreen = ({ isDarkMode }) => {
             authorId: currentUser?.id || 'anonymous-user',
             authorName: currentUser?.name || 'पाटील साहेब',
             location: currentUser?.farmInfo?.location || 'पुणे',
-            en: '',
             clientId,
         };
 
@@ -208,15 +126,6 @@ const CommunityScreen = ({ isDarkMode }) => {
         }
     };
 
-    // ── Helpers ─────────────────────────────────────────────────────────────
-    const getTranslation = (postId) => {
-        const t = translations[postId];
-        if (!t) return null;
-        const current = isEnglish ? { text: t.en, loading: !!t.enLoading } : { text: t.mr, loading: !!t.mrLoading };
-        if (!current.text && !current.loading) return null;
-        return current;
-    };
-
     // ── Render ──────────────────────────────────────────────────────────────
     return (
         <Motion.div
@@ -232,7 +141,9 @@ const CommunityScreen = ({ isDarkMode }) => {
                 alignItems: 'center',
                 marginBottom: '24px',
             }}>
-                <h2 className="marathi">समुदाय / Community</h2>
+                <h2 className="marathi" style={{ fontSize: '1.25rem', fontWeight: 800 }}>
+                    {isEnglish ? 'Farmers Community' : 'शेतकरी समुदाय'}
+                </h2>
                 <button
                     id="community-post-toggle"
                     onClick={() => setShowCreate(v => !v)}
@@ -252,21 +163,17 @@ const CommunityScreen = ({ isDarkMode }) => {
                     }}
                 >
                     <Plus size={18} />
-                    {showCreate ? 'बंद करा' : 'पोस्ट करा'}
+                    {isEnglish ? (showCreate ? 'Close' : 'Create Post') : (showCreate ? 'बंद करा' : 'पोस्ट करा')}
                 </button>
             </div>
 
-            {/* ── Compose box ──
-                FIX: use a plain div with CSS transition instead of Framer
-                height animation — avoids overflow: hidden blocking pointer events
-            ── */}
+            {/* ── Compose box ── */}
             <div style={{
                 maxHeight: showCreate ? '300px' : '0px',
                 overflow: 'hidden',
                 transition: 'max-height 0.35s ease, opacity 0.25s ease',
-                opacity: showCreate ? 1 : 0,
+                opacity: showCreate ? '1' : 0,
                 marginBottom: showCreate ? '20px' : '0',
-                // Ensure the open state never clips content
                 ...(showCreate ? { overflow: 'visible' } : {}),
             }}>
                 <div style={{
@@ -275,14 +182,13 @@ const CommunityScreen = ({ isDarkMode }) => {
                     borderRadius: '20px',
                     boxShadow: '0 4px 20px rgba(0,0,0,0.08)',
                     border: isDarkMode ? '1px solid #374151' : '1px solid #e5e7eb',
-                    // ensure pointer events work
                     pointerEvents: showCreate ? 'auto' : 'none',
                 }}>
                     <textarea
                         id="community-post-textarea"
                         value={newPost}
                         onChange={e => setNewPost(e.target.value)}
-                        placeholder="तुमचे विचार सांगा... / Share your thoughts..."
+                        placeholder={isEnglish ? "Share your thoughts with other farmers..." : "इतर शेतकऱ्यांशी तुमचे विचार शेअर करा..."}
                         style={{
                             display: 'block',
                             width: '100%',
@@ -298,7 +204,6 @@ const CommunityScreen = ({ isDarkMode }) => {
                             resize: 'none',
                             boxSizing: 'border-box',
                             outline: 'none',
-                            // guarantee interactivity
                             pointerEvents: 'auto',
                             zIndex: 20,
                             position: 'relative',
@@ -325,7 +230,9 @@ const CommunityScreen = ({ isDarkMode }) => {
                             position: 'relative',
                         }}
                     >
-                        {isPosting ? 'पाठवत आहे...' : 'पोस्ट करा / Post'}
+                        {isPosting
+                            ? (isEnglish ? 'Posting...' : 'पोस्ट करत आहे...')
+                            : (isEnglish ? 'Post Now' : 'आताच पोस्ट करा')}
                     </button>
                 </div>
             </div>
@@ -333,8 +240,6 @@ const CommunityScreen = ({ isDarkMode }) => {
             {/* ── Feed ── */}
             <div className="messages-container">
                 {messages.map((post, i) => {
-                    const translation = getTranslation(post._id);
-
                     return (
                         <Motion.div
                             key={post._id || i}
@@ -373,7 +278,7 @@ const CommunityScreen = ({ isDarkMode }) => {
                             </div>
 
                             {/* Original content — always visible */}
-                            <div style={{ marginBottom: translation ? '16px' : '0' }}>
+                            <div>
                                 <p
                                     className="marathi"
                                     style={{
@@ -386,59 +291,6 @@ const CommunityScreen = ({ isDarkMode }) => {
                                     {post.content}
                                 </p>
                             </div>
-
-                            {/* Translation block — shows when translation is available (either direction) */}
-                            {translation && (
-                                <div style={{
-                                    padding: '12px 14px',
-                                    borderLeft: `3px solid var(--primary)`,
-                                    borderRadius: '8px',
-                                    background: isDarkMode
-                                        ? 'rgba(255,255,255,0.03)'
-                                        : 'rgba(0,0,0,0.02)',
-                                    marginTop: '8px'
-                                }}>
-                                    <div style={{
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        gap: '6px',
-                                        marginBottom: '6px',
-                                        opacity: 0.7
-                                    }}>
-                                        <span style={{
-                                            fontSize: '0.6rem',
-                                            fontWeight: 900,
-                                            color: 'var(--primary)',
-                                            textTransform: 'uppercase',
-                                            letterSpacing: '0.1em',
-                                        }}>
-                                            🌐 {isEnglish ? 'Translated' : 'भाषांतरित'}
-                                        </span>
-                                    </div>
-
-                                    {translation.loading ? (
-                                        <div style={{
-                                            fontSize: '0.85rem',
-                                            fontStyle: 'italic',
-                                            color: isDarkMode ? '#9ca3af' : '#6b7280',
-                                        }}>
-                                            {isEnglish ? 'Translating...' : 'भाषांतर होत आहे...'}
-                                        </div>
-                                    ) : translation.text ? (
-                                        <p style={{
-                                            fontSize: '0.9rem',
-                                            color: isDarkMode ? '#d1d5db' : '#4b5563',
-                                            lineHeight: 1.55,
-                                            margin: 0,
-                                            fontWeight: 450
-                                        }}>
-                                            {translation.text}
-                                        </p>
-                                    ) : null}
-                                </div>
-                            )}
-
-
                         </Motion.div>
                     );
                 })}

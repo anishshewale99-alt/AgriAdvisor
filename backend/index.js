@@ -72,15 +72,6 @@ app.post('/api/recommend-crops', async (req, res) => {
     }
 });
 
-// JSON error handler for 404s
-app.use((req, res, next) => {
-    if (req.url.startsWith('/api/')) {
-        return res.status(404).json({ error: 'API route not found' });
-    }
-    next();
-});
-
-
 // Fetch all community posts
 app.get('/api/community/posts', async (req, res) => {
     try {
@@ -95,7 +86,7 @@ app.get('/api/community/posts', async (req, res) => {
 app.post('/api/community/post', async (req, res) => {
     console.log('📩 Received community post request:', req.body);
     try {
-        const { content, authorId, authorName, location, en, clientId } = req.body;
+        const { content, authorId, authorName, location, clientId } = req.body;
 
         if (!content || !authorId) {
             console.warn('⚠️ Missing required fields:', { content, authorId });
@@ -107,7 +98,6 @@ app.post('/api/community/post', async (req, res) => {
             authorId,
             authorName: authorName || 'शेतकरी मित्र',
             location: location || 'गावाकडून',
-            en: en || 'Auto-translated text will appear here...',
             clientId
         });
 
@@ -130,6 +120,14 @@ app.post('/api/community/post', async (req, res) => {
     }
 });
 
+// JSON error handler for 404s — MUST be after all route definitions
+app.use((req, res, next) => {
+    if (req.url.startsWith('/api/')) {
+        return res.status(404).json({ error: 'API route not found' });
+    }
+    next();
+});
+
 // Socket.IO logic
 io.on('connection', (socket) => {
     console.log('User connected:', socket.id);
@@ -140,7 +138,7 @@ io.on('connection', (socket) => {
     });
 
     socket.on('sendMessage', async (data, callback) => {
-        const { room, message, userId, user, location, en, clientId } = data;
+        const { room, message, userId, user, location, clientId } = data;
 
         try {
             const newPost = new CommunityPost({
@@ -148,7 +146,6 @@ io.on('connection', (socket) => {
                 authorId: userId,
                 authorName: user || 'शेतकरी मित्र',
                 location: location || 'गावाकडून',
-                en: en || 'Auto-translated text will appear here...',
                 clientId
             });
             await newPost.save();
