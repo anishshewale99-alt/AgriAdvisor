@@ -281,7 +281,11 @@ function App() {
                   isDarkMode={isDarkMode}
                   toggleTheme={toggleTheme}
                   isEnglish={isEnglish}
-                  onLogout={() => setOnboarding('landing')}
+                  onLogout={() => {
+                    localStorage.removeItem('token');
+                    setOnboarding('landing');
+                    window.location.reload();
+                  }}
                 />
               )}
 
@@ -394,7 +398,11 @@ function App() {
                       isEnglish={isEnglish}
                       setIsEnglish={setIsEnglish}
                       isDesktop={isDesktop}
-                      onLogout={() => setOnboarding('landing')}
+                      onLogout={() => {
+                        localStorage.removeItem('token');
+                        setOnboarding('landing');
+                        window.location.reload();
+                      }}
                     />
                   )}
                 </div>

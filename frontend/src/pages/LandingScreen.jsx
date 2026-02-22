@@ -286,6 +286,24 @@ const LandingScreen = ({ onNext, isDesktop }) => {
                         </button>
                     </form>
 
+                    {/* Google Sign-In Option */}
+                    <div style={{ marginTop: '20px', textAlign: 'center' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', margin: '16px 0', gap: '12px' }}>
+                            <div style={{ flex: 1, height: '1px', background: '#e5e7eb' }}></div>
+                            <span style={{ fontSize: '0.8rem', color: '#9ca3af', fontWeight: 600, whiteSpace: 'nowrap' }}>
+                                {isEnglish ? 'OR' : 'किंवा'}
+                            </span>
+                            <div style={{ flex: 1, height: '1px', background: '#e5e7eb' }}></div>
+                        </div>
+                        <GoogleLoginButton
+                            onSuccess={() => setLoading(false)}
+                            onError={(err) => {
+                                setError(err.message || (isEnglish ? 'Google Login Failed' : 'Google लॉगिन अयशस्वी'));
+                                setLoading(false);
+                            }}
+                        />
+                    </div>
+
                     {/* Toggle between Login/Signup */}
                     <div className="signup-link">
                         <span>

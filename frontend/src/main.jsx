@@ -8,19 +8,36 @@ import App from './App.jsx'
 import PWAUpdatePrompt from './components/PWAUpdatePrompt.jsx'
 import PWAInstallBanner from './components/PWAInstallBanner.jsx'
 
-const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID;
+const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID || '216336910908-v4p6q34ljgn9fo2f49bbospd7s8044sv.apps.googleusercontent.com';
+
+const AppWrapper = () => {
+  if (GOOGLE_CLIENT_ID) {
+    return (
+      <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>
+        <LanguageProvider>
+          <AuthProvider>
+            <App />
+            <PWAUpdatePrompt />
+            <PWAInstallBanner />
+          </AuthProvider>
+        </LanguageProvider>
+      </GoogleOAuthProvider>
+    );
+  }
+
+  return (
+    <LanguageProvider>
+      <AuthProvider>
+        <App />
+        <PWAUpdatePrompt />
+        <PWAInstallBanner />
+      </AuthProvider>
+    </LanguageProvider>
+  );
+};
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
-    <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>
-      <LanguageProvider>
-        <AuthProvider>
-          <App />
-          {/* PWA Components - shown as overlays when needed */}
-          <PWAUpdatePrompt />
-          <PWAInstallBanner />
-        </AuthProvider>
-      </LanguageProvider>
-    </GoogleOAuthProvider>
+    <AppWrapper />
   </StrictMode>,
 )
