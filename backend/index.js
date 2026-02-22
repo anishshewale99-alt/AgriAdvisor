@@ -113,6 +113,16 @@ app.post('/api/community/post', async (req, res) => {
         // Emit via Socket.IO for real-time update
         io.emit('receiveMessage', broadcastData);
 
+        // Global notification event
+        io.emit('community:newActivity', {
+            type: 'post',
+            authorId: newPost.authorId,
+            authorName: newPost.authorName,
+            content: newPost.content,
+            timestamp: newPost.createdAt,
+            _id: newPost._id
+        });
+
         return res.status(201).json(newPost);
     } catch (err) {
         console.error('❌ Error creating post:', err);
@@ -158,6 +168,16 @@ io.on('connection', (socket) => {
 
             // Broadcast to all connected users
             io.to(room).emit('receiveMessage', broadcastData);
+
+            // Global notification event (broadcast to everyone connected)
+            io.emit('community:newActivity', {
+                type: 'message',
+                authorId: newPost.authorId,
+                authorName: newPost.authorName,
+                content: newPost.content,
+                timestamp: newPost.createdAt,
+                _id: newPost._id
+            });
 
             if (callback) callback({ success: true, data: broadcastData });
         } catch (err) {

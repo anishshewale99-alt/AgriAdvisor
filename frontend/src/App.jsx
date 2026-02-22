@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import {
   Home,
   Sprout,
@@ -24,6 +24,8 @@ import CropRecommendationScreen from './pages/CropRecommendationScreen';
 import CropDetailScreen from './pages/CropDetailScreen';
 import DesktopSidebar from './components/DesktopSidebar';
 import MainHeader from './components/MainHeader';
+import NotificationTray from './components/NotificationTray';
+import io from 'socket.io-client';
 
 const BottomNav = ({ activeTab, setTab, setScreen, isEnglish }) => {
   return (
@@ -204,6 +206,39 @@ function App() {
   const [farmDetails, setFarmDetails] = useState({});
   const [isDesktop, setIsDesktop] = useState(window.innerWidth >= 1024);
   const [previousCropScreen, setPreviousCropScreen] = useState('recommendations');
+  const [notifications, setNotifications] = useState([]);
+  const notificationSound = useRef(new Audio('https://assets.mixkit.co/active_storage/sfx/2354/2354-preview.mp3'));
+
+  React.useEffect(() => {
+    if (isAuthenticated && user) {
+      const backendUrl = import.meta.env.VITE_API_URL || '';
+      const sock = io(backendUrl || '/');
+
+      sock.on('community:newActivity', (data) => {
+        // Only show notification if it's not from the current user
+        if (data.authorId !== user.id && data.authorName !== user.name) {
+          // Play sound
+          notificationSound.current.play().catch(e => console.log('Audio play blocked by browser:', e));
+
+          setNotifications(prev => {
+            // Avoid duplicate notifications for the same ID
+            if (prev.find(n => n._id === data._id)) return prev;
+
+            const newNotif = { ...data, timestamp: Date.now() };
+
+            // Auto-remove after 6 seconds
+            setTimeout(() => {
+              setNotifications(current => current.filter(n => (n._id || n.timestamp) !== (newNotif._id || newNotif.timestamp)));
+            }, 6000);
+
+            return [newNotif, ...prev].slice(0, 3); // Max 3 notifications at a time
+          });
+        }
+      });
+
+      return () => sock.disconnect();
+    }
+  }, [isAuthenticated, user]);
 
   React.useEffect(() => {
     if (!authLoading) {
@@ -415,6 +450,16 @@ function App() {
       )}
 
       <VoiceModal isOpen={isVoiceOpen} onClose={() => setIsVoiceOpen(false)} />
+
+      {isAuthenticated && (
+        <NotificationTray
+          notifications={notifications}
+          removeNotification={(id) => setNotifications(prev => prev.filter(n => (n._id || n.timestamp) !== id))}
+          isEnglish={isEnglish}
+          setScreen={setScreen}
+          setTab={setActiveTab}
+        />
+      )}
     </div>
   );
 }
