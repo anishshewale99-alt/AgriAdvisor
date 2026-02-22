@@ -288,11 +288,13 @@ const HomeScreen = ({ setScreen, setTab, isDarkMode, isEnglish, setSelectedCrop 
                             <div style={{ fontSize: '0.75rem', color: '#9ca3af', marginBottom: '8px' }}>
                                 {isEn ? topCrop.marathiName : topCrop.englishName}
                             </div>
-                            <div className="badge success" style={{ background: isDarkMode ? 'rgba(34, 197, 94, 0.2)' : '#E8F5E9', color: isDarkMode ? '#86efac' : '#2E7D32', padding: '4px 8px', borderRadius: '6px', fontSize: '0.75rem', fontWeight: 800, display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
-                                <TrendingUp size={12} /> ↑ {isEn ? 'Top Recommended' : 'टॉप शिफारस'}
-                            </div>
-                            <div style={{ fontSize: '0.65rem', color: '#9ca3af', marginTop: '4px', marginLeft: '16px' }}>
-                                {isEn ? `Match: ${topCrop.matchScore}%` : `जुळणी: ${topCrop.matchScore}%`}
+                            <div style={{ fontSize: '0.65rem', color: isDarkMode ? '#9ca3af' : '#1e293b', marginTop: '6px', display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                                <div style={{ fontWeight: 800, color: 'var(--primary)' }}>
+                                    {isEn ? `Price: ${topCrop.price}` : `दर: ${topCrop.price}`}
+                                </div>
+                                <div style={{ opacity: 0.8 }}>
+                                    {isEn ? `Match: ${topCrop.matchScore}%` : `जुळणी: ${topCrop.matchScore}%`}
+                                </div>
                             </div>
                         </div>
                         <div className="insight-card bg-white dark:bg-gray-800 p-4 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700">
