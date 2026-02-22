@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { GoogleLogin } from '@react-oauth/google';
 import { jwtDecode } from 'jwt-decode';
 import { useAuth } from '../context/AuthContext';
@@ -6,21 +6,12 @@ import './GoogleLoginButton.css';
 
 const GoogleLoginButton = ({ onSuccess, onError }) => {
     const { login } = useAuth();
-    const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
-
-    // Don't render if no Google Client ID is configured
-    if (!clientId) {
-        return null;
-    }
+    const [googleError, setGoogleError] = useState(false);
 
     const handleSuccess = async (credentialResponse) => {
         try {
-            // Decode the JWT credential to get user info
             const decoded = jwtDecode(credentialResponse.credential);
-
-            // Send to backend
             const user = await login(decoded);
-
             if (onSuccess) {
                 onSuccess(user);
             }
@@ -33,22 +24,26 @@ const GoogleLoginButton = ({ onSuccess, onError }) => {
     };
 
     const handleError = () => {
-        console.error('Google Login Failed');
-        if (onError) {
-            onError(new Error('Google Login Failed'));
-        }
+        console.warn('Google Login unavailable — origin may not be configured in Google Cloud Console.');
+        setGoogleError(true);
+        // Don't call onError here to avoid showing a scary error to the user
     };
+
+    // If Google Login failed to initialize (wrong origin), hide it silently
+    if (googleError) {
+        return null;
+    }
 
     return (
         <div className="google-login-container">
             <GoogleLogin
                 onSuccess={handleSuccess}
                 onError={handleError}
-                useOneTap
                 theme="filled_blue"
                 size="large"
                 text="continue_with"
                 shape="rectangular"
+                width="300"
             />
         </div>
     );

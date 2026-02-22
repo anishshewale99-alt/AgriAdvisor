@@ -10,13 +10,13 @@ export default defineConfig({
     proxy: {
       // Proxy all /api calls → backend (no CORS, works from any IP)
       '/api': {
-        target: 'http://127.0.0.1:5000',
+        target: 'http://localhost:5000',
         changeOrigin: true,
         secure: false,
       },
       // Proxy Socket.IO connections → backend
       '/socket.io': {
-        target: 'http://127.0.0.1:5000',
+        target: 'http://localhost:5000',
         changeOrigin: true,
         secure: false,
         ws: true,      // WebSocket support

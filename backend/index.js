@@ -73,8 +73,11 @@ app.post('/api/recommend-crops', async (req, res) => {
 });
 
 // JSON error handler for 404s
-app.use('/api/*', (req, res) => {
-    res.status(404).json({ error: 'API route not found' });
+app.use((req, res, next) => {
+    if (req.url.startsWith('/api/')) {
+        return res.status(404).json({ error: 'API route not found' });
+    }
+    next();
 });
 
 
